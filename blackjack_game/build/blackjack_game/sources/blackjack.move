@@ -7,7 +7,17 @@ module blackjack_game::blackjack {
   use sui::sui::SUI;
   use sui::tx_context::{Self, TxContext};
   use sui::transfer;
+  use std::vector;
+
   
+  // game identity
+  struct GameInfo has key {
+    id: UID,
+    admin: address
+  }
+
+  // GameTable is essential object to play blackjack
+  // it wrap objects like below
   struct GameTable has key, store {
     id: UID,
     player_hand: Option<Hand>,
@@ -15,8 +25,10 @@ module blackjack_game::blackjack {
     card_deck: CardDeck,
     money_box: MoneyBox,
     is_playing: u64,
+    game_id: ID,
   }
 
+  // player and delear with Hand can hold some cards
   struct Hand has key, store {
     id: UID,
     account: address,
@@ -24,12 +36,16 @@ module blackjack_game::blackjack {
     game_id: ID,
   }
 
+  // a set of cards, total_cards_number refers to the quantity of cards in a deck.
   struct CardDeck has key, store {
     id: UID,
-    cards: vector<Card>,
+    cards: vector<Option<Card>>,
     total_cards_number: u64,
     game_id: ID,
   }
+
+  // When card is open, card number is number. 
+  // In other hand, when card is flipped over, card number is some cryptogram
   struct Card has key, store {
     id: UID,
     // card_number: String,
@@ -44,64 +60,100 @@ module blackjack_game::blackjack {
     stake: Option<vector<Coin<SUI>>>, 
     game_id: ID,
   }   
+
+  // when package is published, init function will be executed
   fun init(ctx: &mut TxContext) {
     create_game(ctx);
   }
+
+  // This function will be executed in the Backend
+  // dealer or anyone who wanna be a dealer can create new game
   public entry fun new_game(ctx: &mut TxContext) {
     create_game(ctx);
   }
+
+  // GameInfo object is essential to play game
   fun create_game(ctx: &mut TxContext) {
     let sender = tx_context::sender(ctx);
     let id = object::new(ctx);
-    let game_id = object::uid_to_inner(&id);
+    transfer::freeze_object(
+      GameInfo {
+      id,
+      admin: sender,
+    }
+    );
+  }
 
+  // can create game table for blackjack game with game info object
+  // create a card deck, a dealer hand and a money box
+  // the objects created will be transfered to game table
+  public entry fun create_game_table(game: &GameInfo, ctx: &mut TxContext) {
+    let sender = tx_context::sender(ctx);
+    let game_id = object::uid_to_inner(&game.id);
 
-    // create cards and card deck
-    // create money box
-    let dealer_hand = create_hand(sender, game_id, ctx);
-    let card_deck = create_card_deck(1, game_id, ctx); 
-    let money_box = create_money_box(game_id, ctx);
+    let dealer_hand = create_hand(game, ctx);
+    let card_deck = create_card_deck(game,1, ctx); 
+    let money_box = create_money_box(game, ctx);
     
-    // create game table
+    // create game table and transfer to dealer(sender)
     transfer::transfer(
       GameTable {
-        id: id,
+        id: object::new(ctx),
         player_hand: option::none(),
         dealer_hand: dealer_hand,
         card_deck: card_deck,
         money_box: money_box,
         is_playing : 0,
-      },
-      sender
-    );
-    // create card deck and transfer card dect to game table
+        game_id: game_id,
+      }
+      , sender);
   }
-  fun create_game_table() {
-  }
-  fun create_hand(account: address, game_id: ID, ctx: &mut TxContext) :Hand {
+
+  fun create_hand(game: &GameInfo, ctx: &mut TxContext) :Hand {
     let sender = tx_context::sender(ctx);
+    let game_id = object::id(game);
     
     Hand {
       id : object::new(ctx),
-      account: account,
+      account: sender,
       cards: option::none(),
       game_id: game_id,
     }
   }
-  fun create_card_deck(number_of_cards: u64, game_id: ID, ctx: &mut TxContext) : CardDeck {
-     // create_cards
+
+  fun create_card_deck(game: &GameInfo, number_of_cards: u64, ctx: &mut TxContext) : CardDeck {
     let id = object::new(ctx);
     let card_deck_id = object::uid_to_inner(&id);
-    let card = create_card(2, 1,card_deck_id, ctx);
-    let card_list = vector[card];
+
+    // create_cards
+    // for number_of_cards { create_card(); encrypt_card(); }
+    
+    // let card = create_card(2, 1, card_deck_id, ctx);
+
+    // let card_list = vector[card];
 
      CardDeck {
       id : id,
-      cards : card_list,
+      cards : vector[option::none()] ,
       total_cards_number : number_of_cards,
-      game_id : game_id,
+      game_id : object::id(game),
      }
   }
+
+  public entry fun fill_card_deck(game_table: GameTable, ctx: &mut TxContext) {
+    let d = game_table.card_deck.total_cards_number;
+
+    let i = 0;
+    while (i < game_table.card_deck.total_cards_number) {
+      let card = create_card(i, i, object::id(&game_table.card_deck), ctx);
+      vector::push_back<Option<Card>>(&mut game_table.card_deck.cards, option::some(card));
+      i = i + 1;
+    };
+
+    transfer::transfer(game_table, tx_context::sender(ctx));
+
+  }
+
   fun create_card(card_number: u64, sequence_number: u64, card_deck_id: ID, ctx: &mut TxContext) : Card {
     // TODO : convert card_number to String
     // let str_card_number = card_number.to_string();
@@ -115,22 +167,29 @@ module blackjack_game::blackjack {
     }
   }
 
-  fun create_money_box(game_id: ID, ctx: &mut TxContext) : MoneyBox {
+  fun create_money_box(game: &GameInfo, ctx: &mut TxContext) : MoneyBox {
     MoneyBox {
       id : object::new(ctx),
       stake : option::none(),
-      game_id : game_id,
+      game_id : object::id(game),
     }
   }
 
 
-  fun shuffle_cards(card_deck_id: ID, sequence_number: u64,  ctx: &mut TxContext) {
+
+// ------------------------------------------------------------------------------------------------------------
+
+  public entry fun shuffle_cards(card_deck: &CardDeck, ctx: &mut TxContext) {
 
   }
 
   fun change_sequence_number(sequence_number: u64, ctx: &mut TxContext) {
 
   }
+
+  // fun encrypt_card_deck(card_deck: CardDeck, ctx: &mut TxContext) {
+
+  // }
 
   fun encrypt_card_number() {
   }
