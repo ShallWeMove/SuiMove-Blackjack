@@ -8,6 +8,9 @@ module blackjack_game::blackjack {
   use sui::tx_context::{Self, TxContext};
   use sui::transfer;
   use std::vector;
+  use sui::dynamic_object_field;
+  use std::bcs;
+
 
   
   // game identity
@@ -20,10 +23,10 @@ module blackjack_game::blackjack {
   // it wrap objects like below
   struct GameTable has key, store {
     id: UID,
-    player_hand: Option<Hand>,
-    dealer_hand: Hand,
-    card_deck: CardDeck,
-    money_box: MoneyBox,
+    player_hand: Option<ID>,
+    dealer_hand: ID,
+    card_deck: ID,
+    money_box: ID,
     is_playing: u64,
     game_id: ID,
   }
@@ -32,14 +35,14 @@ module blackjack_game::blackjack {
   struct Hand has key, store {
     id: UID,
     account: address,
-    cards: Option<vector<Card>>,
+    cards: vector<Option<ID>>,
     game_id: ID,
   }
 
   // a set of cards, total_cards_number refers to the quantity of cards in a deck.
   struct CardDeck has key, store {
     id: UID,
-    cards: vector<Option<Card>>,
+    cards: vector<Option<ID>>,
     total_cards_number: u64,
     game_id: ID,
   }
@@ -48,8 +51,7 @@ module blackjack_game::blackjack {
   // In other hand, when card is flipped over, card number is some cryptogram
   struct Card has key, store {
     id: UID,
-    // card_number: String,
-    card_number: u64,
+    card_number: vector<u8>,
     sequence_number: u64,
     is_open: bool,
     card_deck_id: ID,
@@ -90,22 +92,38 @@ module blackjack_game::blackjack {
   public entry fun create_game_table(game: &GameInfo, ctx: &mut TxContext) {
     let sender = tx_context::sender(ctx);
     let game_id = object::uid_to_inner(&game.id);
+    let game_table_id = object::new(ctx);
 
     let dealer_hand = create_hand(game, ctx);
-    let card_deck = create_card_deck(game,1, ctx); 
+    let dealer_hand_id = object::uid_to_inner(&dealer_hand.id);
+    dynamic_object_field::add(&mut game_table_id, b"dealer_hand", dealer_hand);
+
+    let number_of_cards : u64 = 2;
+    let card_deck = create_card_deck(game, number_of_cards, ctx); 
+    let card_deck_id = object::uid_to_inner(&card_deck.id);
+    dynamic_object_field::add(&mut game_table_id, b"card_deck", card_deck);
+
     let money_box = create_money_box(game, ctx);
+    let money_box_id = object::uid_to_inner(&money_box.id);
+    dynamic_object_field::add(&mut game_table_id, b"money_box", money_box);
+
+    let game_table = GameTable {
+        id: game_table_id,
+        player_hand: option::none(),
+        dealer_hand: dealer_hand_id,
+        card_deck: card_deck_id,
+        money_box: money_box_id,
+        is_playing : 0,
+        game_id: game_id,
+      };
+
+    // TODO : fill card deck
+    fill_card_deck(&mut game_table, ctx);
+
     
     // create game table and transfer to dealer(sender)
     transfer::transfer(
-      GameTable {
-        id: object::new(ctx),
-        player_hand: option::none(),
-        dealer_hand: dealer_hand,
-        card_deck: card_deck,
-        money_box: money_box,
-        is_playing : 0,
-        game_id: game_id,
-      }
+      game_table
       , sender);
   }
 
@@ -116,55 +134,21 @@ module blackjack_game::blackjack {
     Hand {
       id : object::new(ctx),
       account: sender,
-      cards: option::none(),
+      cards: vector[option::none()],
       game_id: game_id,
     }
   }
 
   fun create_card_deck(game: &GameInfo, number_of_cards: u64, ctx: &mut TxContext) : CardDeck {
     let id = object::new(ctx);
-    let card_deck_id = object::uid_to_inner(&id);
-
-    // create_cards
-    // for number_of_cards { create_card(); encrypt_card(); }
-    
-    // let card = create_card(2, 1, card_deck_id, ctx);
-
-    // let card_list = vector[card];
+    let game_id = object::id(game);
 
      CardDeck {
       id : id,
       cards : vector[option::none()] ,
       total_cards_number : number_of_cards,
-      game_id : object::id(game),
+      game_id : game_id,
      }
-  }
-
-  public entry fun fill_card_deck(game_table: GameTable, ctx: &mut TxContext) {
-    let d = game_table.card_deck.total_cards_number;
-
-    let i = 0;
-    while (i < game_table.card_deck.total_cards_number) {
-      let card = create_card(i, i, object::id(&game_table.card_deck), ctx);
-      vector::push_back<Option<Card>>(&mut game_table.card_deck.cards, option::some(card));
-      i = i + 1;
-    };
-
-    transfer::transfer(game_table, tx_context::sender(ctx));
-
-  }
-
-  fun create_card(card_number: u64, sequence_number: u64, card_deck_id: ID, ctx: &mut TxContext) : Card {
-    // TODO : convert card_number to String
-    // let str_card_number = card_number.to_string();
-
-    Card {
-      id : object::new(ctx),
-      card_number : card_number,
-      sequence_number : sequence_number,
-      is_open : true,
-      card_deck_id : card_deck_id,
-    }
   }
 
   fun create_money_box(game: &GameInfo, ctx: &mut TxContext) : MoneyBox {
@@ -175,11 +159,65 @@ module blackjack_game::blackjack {
     }
   }
 
+  fun fill_card_deck(game_table: &mut GameTable, ctx: &mut TxContext) {
+
+    let card_deck = dynamic_object_field::borrow_mut<vector<u8>, CardDeck> (&mut game_table.id, b"card_deck");
+ 
+    let i : u64 = 0;
+    while (i < card_deck.total_cards_number) {
+      // TODO : insert encrypt_function(i) : vector<u8> {}
+      let bytes_i = bcs::to_bytes(&i);
+      // let bytes_i = bcs::to_bytes(&b"card_number");
+      
+      let card = create_card(bytes_i, i, object::uid_to_inner(&card_deck.id), ctx);
+      let card_id = object::uid_to_inner(&card.id);
+      dynamic_object_field::add(&mut card_deck.id, i, card);
+      vector::push_back<Option<ID>>(&mut card_deck.cards, option::some(card_id));
+      i = i + 1;
+    }
+
+  }
+
+  fun create_card(card_number: vector<u8>, sequence_number: u64, card_deck_id: ID, ctx: &mut TxContext) : Card {
+    Card {
+      id : object::new(ctx),
+      card_number : card_number,
+      sequence_number : sequence_number,
+      is_open : true,
+      card_deck_id : card_deck_id,
+    }
+  }
+
+  // fun change_card_number(card_deck: CardDeck, card_number_want_to_change: vector<u8>, ctx: &mut TxContext) {
+
+  // }
+
+  // fun encrypt_card_number(card: Card, card_number_u64: u64, ctx: &mut TxContext) : Card {
+
+  // }
+
+  
+
+  
+  public entry fun create_user_hand(game: &GameInfo, ctx: &mut TxContext) {
+    let sender = tx_context::sender(ctx);
+    let game_id = object::id(game);
+
+    transfer::transfer(
+      Hand {
+        id : object::new(ctx),
+        account: sender,
+        cards: vector[option::none()],
+        game_id: game_id,
+      },
+      sender
+    );
+  }
 
 
 // ------------------------------------------------------------------------------------------------------------
 
-  public entry fun shuffle_cards(card_deck: &CardDeck, ctx: &mut TxContext) {
+  public entry fun shuffle_cards(game_table: &mut GameTable, ctx: &mut TxContext) {
 
   }
 
