@@ -1,8 +1,24 @@
+import { useWallet } from '@suiet/wallet-kit';
+import * as tweetnacl from 'tweetnacl';
 import { ConnectButton, ErrorCode } from "@suiet/wallet-kit";
+import { useEffect, useState } from 'react';
 import "@suiet/wallet-kit/style.css";
 import "./suiet-wallet-kit-custom.css";
 
 function WalletButton() {
+
+    const wallet = useWallet();
+
+    useEffect(() => {
+        if (wallet.status == 'connected') {
+            console.log('wallet status', wallet.status)
+            console.log('wallet name', wallet.name)
+            console.log('wallet address', wallet.account.address)
+        } else {
+            console.log('wallet status', wallet.status)
+        }
+    }, [wallet.connected])
+
     return (
         <ConnectButton
             // The BaseError instance has properties like {code, message, details}

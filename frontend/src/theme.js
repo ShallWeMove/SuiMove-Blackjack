@@ -5,6 +5,10 @@ import { createTheme } from "@mui/material/styles";
 export const tokens = (mode) => ({
     ...(mode === "dark"
         ? {
+            background: {
+                100: "#121827",
+                200: "#FFFFFF"
+            },
             grey: {
                 100: "#e0e0e0",
                 200: "#c2c2c2",
@@ -60,13 +64,12 @@ export const tokens = (mode) => ({
                 800: "#2a2d64",
                 900: "#151632",
             },
-            badgeBackground: {
-                100: "#3b353eff",
-                200: "#3B3A3E",
-                300: "#2d3c47ff"
-            }
         }
         : {
+            background: {
+                100: "#FFFFFF",
+                200: "#121827"
+            },
             grey: {
                 100: "#141414",
                 200: "#292929",
@@ -122,11 +125,6 @@ export const tokens = (mode) => ({
                 800: "#c3c6fd",
                 900: "#e1e2fe",
             },
-            badgeBackground: {
-                100: "#F2F0F0",
-                200: "#F2F0F0",
-                300: "#F2F0F0"
-            }
         }),
 });
 
@@ -151,7 +149,8 @@ export const themeSettings = (mode) => {
                         light: colors.grey[100],
                     },
                     background: {
-                        default: colors.primary[500],
+                        default: colors.background[100],
+                        paper: colors.background[200]
                     },
                 }
                 : {
@@ -168,7 +167,8 @@ export const themeSettings = (mode) => {
                         light: colors.grey[100],
                     },
                     background: {
-                        default: "#fcfcfc",
+                        default: colors.background[100],
+                        paper: colors.background[200],
                     },
                 }),
         },
