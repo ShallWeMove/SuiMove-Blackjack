@@ -25,7 +25,7 @@ const Navbar = () => {
     return (
         <AppBar position="static"
             sx={{
-                backgroundColor: colors.background[100],
+                backgroundColor: colors.background[200],
                 height: "7.36569rem",
                 display: "flex",
                 justifyContent: "center",
@@ -48,9 +48,9 @@ const Navbar = () => {
                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
                     <IconButton color="inherit" onClick={handleDarkModeToggle}>
                         {theme.palette.mode === 'dark' ?
-                            <Brightness7Icon sx={{ color: colors.background[200] }} />
+                            <Brightness7Icon sx={{ color: colors.background[100] }} />
                             :
-                            <Brightness4Icon sx={{ color: colors.background[200] }} />
+                            <Brightness4Icon sx={{ color: colors.background[100] }} />
                         }
                     </IconButton>
                 </Box>

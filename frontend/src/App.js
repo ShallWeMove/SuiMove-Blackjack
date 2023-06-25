@@ -13,6 +13,7 @@ export default function App() {
   return (
     <ThemeProvider theme={theme} >
       <ColorModeContext.Provider value={colorMode}>
+        <CssBaseline />
         <Box sx={{ flexGrow: 1 }}>
           <Navbar />
           <Routes>
