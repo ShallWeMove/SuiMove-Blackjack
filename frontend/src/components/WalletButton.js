@@ -4,9 +4,10 @@ import { ConnectButton, ErrorCode } from "@suiet/wallet-kit";
 import { useEffect, useState } from 'react';
 import "@suiet/wallet-kit/style.css";
 import "./suiet-wallet-kit-custom.css";
+import { useNavigate } from "react-router-dom";
 
 function WalletButton() {
-
+    const navigate = useNavigate();
     const wallet = useWallet();
 
     useEffect(() => {
@@ -14,8 +15,10 @@ function WalletButton() {
             console.log('wallet status', wallet.status)
             console.log('wallet name', wallet.name)
             console.log('wallet address', wallet.account.address)
+            navigate("/game")
         } else {
             console.log('wallet status', wallet.status)
+            navigate("/")
         }
     }, [wallet.connected])
 

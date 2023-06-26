@@ -45,7 +45,7 @@ const Navbar = () => {
                 <Typography variant="h3" component="div" sx={{ flexGrow: 1, color: "#0054E7" }}>
                     Shall We Move
                 </Typography>
-                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                {/* <Box sx={{ display: 'flex', alignItems: 'center' }}>
                     <IconButton color="inherit" onClick={handleDarkModeToggle}>
                         {theme.palette.mode === 'dark' ?
                             <Brightness7Icon sx={{ color: colors.background[100] }} />
@@ -53,7 +53,7 @@ const Navbar = () => {
                             <Brightness4Icon sx={{ color: colors.background[100] }} />
                         }
                     </IconButton>
-                </Box>
+                </Box> */}
                 <WalletProvider>
                     <WalletButton />
                 </WalletProvider>
