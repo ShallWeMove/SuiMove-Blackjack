@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useTheme, styled, alpha } from "@mui/material";
 import { ColorModeContext, tokens } from "../theme";
 import { Typography, Box, TextField, Button } from "@mui/material";
+import BlackJack from "./BlackJack.tsx";
 
 const Game = () => {
     const theme = useTheme();
@@ -27,7 +28,7 @@ const Game = () => {
         setBettingAmount(e.target.value);
     }
 
-    const handleOnButtonClick = (e) => {
+    const handleStartButtonClick = (e) => {
         setConfirmed(true)
         console.log(confirmed)
     }
@@ -45,9 +46,9 @@ const Game = () => {
         >
             {
                 confirmed ?
-                    <div>
-                        blackjack
-                    </div>
+                    <Box>
+                        <BlackJack />
+                    </Box>
                     :
                     <Box sx={{
                         width: "23.8125rem",
@@ -104,7 +105,7 @@ const Game = () => {
                                 height: "3.53119rem",
                                 borderRadius: "30px"
                             }}
-                            onClick={handleOnButtonClick}
+                            onClick={handleStartButtonClick}
                         >
                             Game Start
                         </Button>
