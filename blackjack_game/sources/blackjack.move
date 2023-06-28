@@ -121,6 +121,9 @@ module blackjack_game::blackjack {
     // TODO : fill card deck
     fill_card_deck(&mut game_table, ctx);
 
+    // TODO : suffle card deck
+    // shuffle_card_deck(&mut game_table, ctx);
+
     
     // create game table and transfer to dealer(sender)
     transfer::transfer(
@@ -167,7 +170,8 @@ module blackjack_game::blackjack {
  
     let i : u64 = 0;
     while (i < card_deck.total_cards_number) {
-      // TODO : insert encrypt_function(i) : vector<u8> {}
+      // TODO : flip the card created and make is_opened false
+      // insert encrypt_function(i) : vector<u8> {}
       let bytes_i = bcs::to_bytes(&i);
       // let bytes_i = bcs::to_bytes(&b"card_number");
       
@@ -177,7 +181,6 @@ module blackjack_game::blackjack {
       vector::push_back<Option<ID>>(&mut card_deck.cards, option::some(card_id));
       i = i + 1;
     }
-
   }
 
   fun create_card(card_number: vector<u8>, sequence_number: u64, card_deck_id: ID, ctx: &mut TxContext) : Card {
@@ -190,13 +193,19 @@ module blackjack_game::blackjack {
     }
   }
 
+  // TODO : encrypt card number with card number and timestamp
+  // fun encrypt_card_number(card: Card, card_number_u64: u64, ctx: &mut TxContext) :Card {}
+
+  // TODO : shuffle card deck
+  // fun shuffle_card_dec(game_table: &mut GameTable, ctx: &mut TxContext) {}
+
+
+
   // fun change_card_number(card_deck: CardDeck, card_number_want_to_change: vector<u8>, ctx: &mut TxContext) {
 
   // }
 
-  // fun encrypt_card_number(card: Card, card_number_u64: u64, ctx: &mut TxContext) : Card {
-
-  // }
+  
 
   
 
@@ -227,8 +236,8 @@ module blackjack_game::blackjack {
     // pass_hand(player_hand)
     pass_hand(game_table, player_hand, ctx);
 
+    // TODO : split_money(player_money)
     // let money = pay::split(&mut coin, bet_amount, ctx);
-    // split_money(player_money)
     bet_player_money(game_table, money, ctx);
   }
 
