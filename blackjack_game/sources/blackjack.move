@@ -3,6 +3,7 @@ module blackjack_game::blackjack {
   use std::option::{Self, Option, none};
   use std::string::{Self, String};
   use sui::coin::{Self, Coin};
+  use sui::pay;
   use sui::balance::Balance;
   use sui::sui::SUI;
   use sui::tx_context::{Self, TxContext};
@@ -57,7 +58,7 @@ module blackjack_game::blackjack {
   // TODO : sui -> casino chips
   struct MoneyBox has key, store {
     id: UID,
-    stake: Option<vector<Coin<SUI>>>, 
+    stake: vector<Option<Coin<SUI>>>, 
     game_id: ID,
   }   
 
@@ -152,7 +153,7 @@ module blackjack_game::blackjack {
   fun create_money_box(game: &GameInfo, ctx: &mut TxContext) : MoneyBox {
     MoneyBox {
       id : object::new(ctx),
-      stake : option::none(),
+      stake : vector[option::none()],
       game_id : object::id(game),
     }
   }
@@ -212,12 +213,60 @@ module blackjack_game::blackjack {
     );
   }
 
+  // player action from FE
+  // transfer player hand to game table and bet some money
+  public entry fun ready_game(game: &GameInfo, game_table: &mut GameTable, player_hand: Hand, money: Coin<SUI>, ctx: &mut TxContext) {
+    // check game id
+    check_id(game, game_table.game_id);
+    check_id(game, player_hand.game_id);
 
-// ------------------------------------------------------------------------------------------------------------
+    // pass_hand(player_hand)
+    pass_hand(game_table, player_hand, ctx);
 
+    // let money = pay::split(&mut coin, bet_amount, ctx);
+    // split_money(player_money)
+    bet_player_money(game_table, money, ctx);
+
+
+  }
+
+  fun pass_hand(game_table: &mut GameTable, player_hand: Hand, ctx: &mut TxContext) {
+    let player_hand_id = object::uid_to_inner(&player_hand.id);
+    dynamic_object_field::add(&mut game_table.id, b"player_hand", player_hand);
+    game_table.player_hand = option::some(player_hand_id);
+  }
+
+  fun bet_player_money(game_table: &mut GameTable, money: Coin<SUI>, ctx: &mut TxContext) {
+    let money_box = dynamic_object_field::borrow_mut<vector<u8>,MoneyBox>(&mut game_table.id, b"money_box");
+    dynamic_object_field::add(&mut money_box.id, b"player_money", money);
+
+    // let money_id = object::uid_to_inner(&money.id);
+    // vector::push_back<Option<Coin<SUI>>>(&mut money_box.stake, option::some(money));
+
+  }
+
+  fun check_id(game_info: &GameInfo, id: ID) {
+    assert!(id(game_info) == id, 403); // TODO: error code
+  }
+
+  fun id(game_info: &GameInfo): ID {
+    object::id(game_info)
+  }
+
+  public entry fun start_game() {
+    // pass_money(dealer_money)
+    // suffle_card
+
+  }
+  
   public entry fun shuffle_cards(game_table: &mut GameTable, ctx: &mut TxContext) {
 
   }
+
+
+// ------------------------------------------------------------------------------------------------------------
+
+  
 
   fun change_sequence_number(sequence_number: u64, ctx: &mut TxContext) {
 
@@ -260,9 +309,7 @@ module blackjack_game::blackjack {
   
 
   // dealer action from BE
-  public entry fun start_game() {
-  }
-  
+
   public entry fun end_game() {
   }
 
@@ -273,12 +320,7 @@ module blackjack_game::blackjack {
   
 
   // player action from FE
-  public entry fun ready_game() {
-    // transfer ready object to game table
-    // transfer or share an object? (choose later)
-    // bet some sui
-  }
-
+ 
   public entry fun bet() {
     // transfer sui object to money box
   }
