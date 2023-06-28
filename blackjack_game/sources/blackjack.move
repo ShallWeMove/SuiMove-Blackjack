@@ -10,8 +10,6 @@ module blackjack_game::blackjack {
   use std::vector;
   use sui::dynamic_object_field;
   use std::bcs;
-
-
   
   // game identity
   struct GameInfo has key {
@@ -199,7 +197,7 @@ module blackjack_game::blackjack {
   
 
   
-  public entry fun create_user_hand(game: &GameInfo, ctx: &mut TxContext) {
+  public entry fun create_player_hand(game: &GameInfo, ctx: &mut TxContext) {
     let sender = tx_context::sender(ctx);
     let game_id = object::id(game);
 
