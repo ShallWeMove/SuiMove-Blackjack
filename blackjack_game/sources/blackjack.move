@@ -35,6 +35,7 @@ module blackjack_game::blackjack {
     id: UID,
     account: address,
     cards: vector<Option<ID>>,
+    is_my_turn: bool,
     game_id: ID,
   }
 
@@ -58,7 +59,8 @@ module blackjack_game::blackjack {
   // TODO : sui -> casino chips
   struct MoneyBox has key, store {
     id: UID,
-    stake: vector<Option<Coin<SUI>>>, 
+    // stake: vector<Option<Coin<SUI>>>, 
+    stake: vector<Option<ID>>, 
     game_id: ID,
   }   
 
@@ -134,6 +136,7 @@ module blackjack_game::blackjack {
       id : object::new(ctx),
       account: sender,
       cards: vector[option::none()],
+      is_my_turn: false,
       game_id: game_id,
     }
   }
@@ -207,6 +210,7 @@ module blackjack_game::blackjack {
         id : object::new(ctx),
         account: sender,
         cards: vector[option::none()],
+        is_my_turn: false,
         game_id: game_id,
       },
       sender
@@ -226,8 +230,6 @@ module blackjack_game::blackjack {
     // let money = pay::split(&mut coin, bet_amount, ctx);
     // split_money(player_money)
     bet_player_money(game_table, money, ctx);
-
-
   }
 
   fun pass_hand(game_table: &mut GameTable, player_hand: Hand, ctx: &mut TxContext) {
@@ -238,11 +240,9 @@ module blackjack_game::blackjack {
 
   fun bet_player_money(game_table: &mut GameTable, money: Coin<SUI>, ctx: &mut TxContext) {
     let money_box = dynamic_object_field::borrow_mut<vector<u8>,MoneyBox>(&mut game_table.id, b"money_box");
+    let money_id = object::id(&money);
+    vector::push_back<Option<ID>>(&mut money_box.stake, option::some(money_id));
     dynamic_object_field::add(&mut money_box.id, b"player_money", money);
-
-    // let money_id = object::uid_to_inner(&money.id);
-    // vector::push_back<Option<Coin<SUI>>>(&mut money_box.stake, option::some(money));
-
   }
 
   fun check_id(game_info: &GameInfo, id: ID) {
@@ -311,11 +311,11 @@ module blackjack_game::blackjack {
   // dealer action from BE
 
   public entry fun end_game() {
+    // remove player_hand
   }
 
   public entry fun get_card() {
-     // bet()
-     // next turn
+     // transfer
   }
   
 
