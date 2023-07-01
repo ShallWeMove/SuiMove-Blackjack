@@ -25,6 +25,7 @@ module blackjack_game::blackjack {
     player_hand: Option<ID>,
     dealer_hand: ID,
     card_deck: ID,
+    used_card_deck: ID,
     money_box: ID,
     is_playing: u64,
     game_id: ID,
@@ -104,6 +105,11 @@ module blackjack_game::blackjack {
     let card_deck_id = object::uid_to_inner(&card_deck.id);
     dynamic_object_field::add(&mut game_table_id, b"card_deck", card_deck);
 
+
+    let used_card_deck = create_card_deck(game, 0, ctx); 
+    let used_card_deck_id = object::uid_to_inner(&used_card_deck.id);
+    dynamic_object_field::add(&mut game_table_id, b"used_card_deck", used_card_deck);
+
     let money_box = create_money_box(game, ctx);
     let money_box_id = object::uid_to_inner(&money_box.id);
     dynamic_object_field::add(&mut game_table_id, b"money_box", money_box);
@@ -113,6 +119,7 @@ module blackjack_game::blackjack {
         player_hand: option::none(),
         dealer_hand: dealer_hand_id,
         card_deck: card_deck_id,
+        used_card_deck: used_card_deck_id,
         money_box: money_box_id,
         is_playing : 0,
         game_id: game_id,
