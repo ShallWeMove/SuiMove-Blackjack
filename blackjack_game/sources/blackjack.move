@@ -201,15 +201,15 @@ module blackjack_game::blackjack {
 
 
 
-  // fun change_card_number(card_deck: CardDeck, card_number_want_to_change: vector<u8>, ctx: &mut TxContext) {
-
-  // }
-
-  
+  public entry fun change_card_number(card: &mut Card, card_number_want_to_change: vector<u8>, ctx: &mut TxContext) {
+    card.card_number = card_number_want_to_change;
+  }
 
   
 
   
+
+  // player action from FE
   public entry fun create_player_hand(game: &GameInfo, ctx: &mut TxContext) {
     let sender = tx_context::sender(ctx);
     let game_id = object::id(game);
@@ -230,8 +230,8 @@ module blackjack_game::blackjack {
   // transfer player hand to game table and bet some money
   public entry fun ready_game(game: &GameInfo, game_table: &mut GameTable, player_hand: Hand, money: Coin<SUI>, ctx: &mut TxContext) {
     // check game id
-    check_id(game, game_table.game_id);
-    check_id(game, player_hand.game_id);
+    check_game_id(game, game_table.game_id);
+    check_game_id(game, player_hand.game_id);
 
     // pass_hand(player_hand)
     pass_hand(game_table, player_hand, ctx);
@@ -254,7 +254,7 @@ module blackjack_game::blackjack {
     dynamic_object_field::add(&mut money_box.id, b"player_money", money);
   }
 
-  fun check_id(game_info: &GameInfo, id: ID) {
+  fun check_game_id(game_info: &GameInfo, id: ID) {
     assert!(id(game_info) == id, 403); // TODO: error code
   }
 
@@ -262,15 +262,46 @@ module blackjack_game::blackjack {
     object::id(game_info)
   }
 
-  public entry fun start_game() {
-    // pass_money(dealer_money)
-    // suffle_card
+  // public entry fun cancel_ready_game() {}
 
+
+  // dealer action from BE
+  public entry fun start_game(game: &GameInfo, game_table: &mut GameTable, player_address: address,  ctx: &mut TxContext) {
+    check_game_id(game, game_table.game_id);
+    // check whether account address of player hand in the game table is equal to player address from parameter
+    let player_hand = dynamic_object_field::borrow<vector<u8>, Hand>(&mut game_table.id, b"player_hand");
+    check_address(player_hand.account, player_address);
+    
+    // from now game in progress
+    game_table.is_playing = 1;
+    // pass_money(dealer_money)
+
+    // suffle_card(?)
+
+    // open_card
+    // pass_card_to(player)
+    // open_card
+    // pass_card_to(dealer)
+    // open_card
+    // pass_card_to(player)
+
+    // pass_card_to(dealer)
+    
+  }
+
+  fun check_address(a: address, b: address) {
+    assert!(a == b, 403);
+  }
+
+  fun pass_card_to() {
   }
   
+  // dealer action from BE
   public entry fun shuffle_cards(game_table: &mut GameTable, ctx: &mut TxContext) {
 
   }
+
+  
 
 
 // ------------------------------------------------------------------------------------------------------------
@@ -294,8 +325,7 @@ module blackjack_game::blackjack {
 
 
 
-  fun give_card_to() {
-  }
+  
 
  
 
