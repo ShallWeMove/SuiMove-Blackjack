@@ -35,6 +35,7 @@ module blackjack_game::blackjack {
     id: UID,
     account: address,
     cards: vector<Option<ID>>,
+    is_my_turn: bool,
     game_id: ID,
   }
 
@@ -58,7 +59,8 @@ module blackjack_game::blackjack {
   // TODO : sui -> casino chips
   struct MoneyBox has key, store {
     id: UID,
-    stake: vector<Option<Coin<SUI>>>, 
+    // stake: vector<Option<Coin<SUI>>>, 
+    stake: vector<Option<ID>>, 
     game_id: ID,
   }   
 
@@ -119,6 +121,9 @@ module blackjack_game::blackjack {
     // TODO : fill card deck
     fill_card_deck(&mut game_table, ctx);
 
+    // TODO : suffle card deck
+    // shuffle_card_deck(&mut game_table, ctx);
+
     
     // create game table and transfer to dealer(sender)
     transfer::transfer(
@@ -134,6 +139,7 @@ module blackjack_game::blackjack {
       id : object::new(ctx),
       account: sender,
       cards: vector[option::none()],
+      is_my_turn: false,
       game_id: game_id,
     }
   }
@@ -164,7 +170,8 @@ module blackjack_game::blackjack {
  
     let i : u64 = 0;
     while (i < card_deck.total_cards_number) {
-      // TODO : insert encrypt_function(i) : vector<u8> {}
+      // TODO : flip the card created and make is_opened false
+      // insert encrypt_function(i) : vector<u8> {}
       let bytes_i = bcs::to_bytes(&i);
       // let bytes_i = bcs::to_bytes(&b"card_number");
       
@@ -174,7 +181,6 @@ module blackjack_game::blackjack {
       vector::push_back<Option<ID>>(&mut card_deck.cards, option::some(card_id));
       i = i + 1;
     }
-
   }
 
   fun create_card(card_number: vector<u8>, sequence_number: u64, card_deck_id: ID, ctx: &mut TxContext) : Card {
@@ -187,17 +193,23 @@ module blackjack_game::blackjack {
     }
   }
 
-  // fun change_card_number(card_deck: CardDeck, card_number_want_to_change: vector<u8>, ctx: &mut TxContext) {
+  // TODO : encrypt card number with card number and timestamp
+  // fun encrypt_card_number(card: Card, card_number_u64: u64, ctx: &mut TxContext) :Card {}
 
-  // }
+  // TODO : shuffle card deck
+  // fun shuffle_card_dec(game_table: &mut GameTable, ctx: &mut TxContext) {}
 
-  // fun encrypt_card_number(card: Card, card_number_u64: u64, ctx: &mut TxContext) : Card {
 
-  // }
+
+  public entry fun change_card_number(card: &mut Card, card_number_want_to_change: vector<u8>, ctx: &mut TxContext) {
+    card.card_number = card_number_want_to_change;
+  }
 
   
 
   
+
+  // player action from FE
   public entry fun create_player_hand(game: &GameInfo, ctx: &mut TxContext) {
     let sender = tx_context::sender(ctx);
     let game_id = object::id(game);
@@ -207,6 +219,7 @@ module blackjack_game::blackjack {
         id : object::new(ctx),
         account: sender,
         cards: vector[option::none()],
+        is_my_turn: false,
         game_id: game_id,
       },
       sender
@@ -217,17 +230,15 @@ module blackjack_game::blackjack {
   // transfer player hand to game table and bet some money
   public entry fun ready_game(game: &GameInfo, game_table: &mut GameTable, player_hand: Hand, money: Coin<SUI>, ctx: &mut TxContext) {
     // check game id
-    check_id(game, game_table.game_id);
-    check_id(game, player_hand.game_id);
+    check_game_id(game, game_table.game_id);
+    check_game_id(game, player_hand.game_id);
 
     // pass_hand(player_hand)
     pass_hand(game_table, player_hand, ctx);
 
+    // TODO : split_money(player_money)
     // let money = pay::split(&mut coin, bet_amount, ctx);
-    // split_money(player_money)
     bet_player_money(game_table, money, ctx);
-
-
   }
 
   fun pass_hand(game_table: &mut GameTable, player_hand: Hand, ctx: &mut TxContext) {
@@ -238,14 +249,12 @@ module blackjack_game::blackjack {
 
   fun bet_player_money(game_table: &mut GameTable, money: Coin<SUI>, ctx: &mut TxContext) {
     let money_box = dynamic_object_field::borrow_mut<vector<u8>,MoneyBox>(&mut game_table.id, b"money_box");
+    let money_id = object::id(&money);
+    vector::push_back<Option<ID>>(&mut money_box.stake, option::some(money_id));
     dynamic_object_field::add(&mut money_box.id, b"player_money", money);
-
-    // let money_id = object::uid_to_inner(&money.id);
-    // vector::push_back<Option<Coin<SUI>>>(&mut money_box.stake, option::some(money));
-
   }
 
-  fun check_id(game_info: &GameInfo, id: ID) {
+  fun check_game_id(game_info: &GameInfo, id: ID) {
     assert!(id(game_info) == id, 403); // TODO: error code
   }
 
@@ -253,15 +262,46 @@ module blackjack_game::blackjack {
     object::id(game_info)
   }
 
-  public entry fun start_game() {
-    // pass_money(dealer_money)
-    // suffle_card
+  // public entry fun cancel_ready_game() {}
 
+
+  // dealer action from BE
+  public entry fun start_game(game: &GameInfo, game_table: &mut GameTable, player_address: address,  ctx: &mut TxContext) {
+    check_game_id(game, game_table.game_id);
+    // check whether account address of player hand in the game table is equal to player address from parameter
+    let player_hand = dynamic_object_field::borrow<vector<u8>, Hand>(&mut game_table.id, b"player_hand");
+    check_address(player_hand.account, player_address);
+    
+    // from now game in progress
+    game_table.is_playing = 1;
+    // pass_money(dealer_money)
+
+    // suffle_card(?)
+
+    // open_card
+    // pass_card_to(player)
+    // open_card
+    // pass_card_to(dealer)
+    // open_card
+    // pass_card_to(player)
+
+    // pass_card_to(dealer)
+    
+  }
+
+  fun check_address(a: address, b: address) {
+    assert!(a == b, 403);
+  }
+
+  fun pass_card_to() {
   }
   
+  // dealer action from BE
   public entry fun shuffle_cards(game_table: &mut GameTable, ctx: &mut TxContext) {
 
   }
+
+  
 
 
 // ------------------------------------------------------------------------------------------------------------
@@ -285,8 +325,7 @@ module blackjack_game::blackjack {
 
 
 
-  fun give_card_to() {
-  }
+  
 
  
 
@@ -311,11 +350,11 @@ module blackjack_game::blackjack {
   // dealer action from BE
 
   public entry fun end_game() {
+    // remove player_hand
   }
 
   public entry fun get_card() {
-     // bet()
-     // next turn
+     // transfer
   }
   
 
