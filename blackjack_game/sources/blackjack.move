@@ -65,6 +65,7 @@ module blackjack_game::blackjack {
     game_id: ID,
   }   
 
+
   // when package is published, init function will be executed
   fun init(ctx: &mut TxContext) {
     create_game(ctx);
@@ -100,11 +101,10 @@ module blackjack_game::blackjack {
     let dealer_hand_id = object::uid_to_inner(&dealer_hand.id);
     dynamic_object_field::add(&mut game_table_id, b"dealer_hand", dealer_hand);
 
-    let number_of_cards : u64 = 2;
+    let number_of_cards : u64 = 5;
     let card_deck = create_card_deck(game, number_of_cards, ctx); 
     let card_deck_id = object::uid_to_inner(&card_deck.id);
     dynamic_object_field::add(&mut game_table_id, b"card_deck", card_deck);
-
 
     let used_card_deck = create_card_deck(game, 0, ctx); 
     let used_card_deck_id = object::uid_to_inner(&used_card_deck.id);
@@ -204,7 +204,10 @@ module blackjack_game::blackjack {
   // fun encrypt_card_number(card: Card, card_number_u64: u64, ctx: &mut TxContext) :Card {}
 
   // TODO : shuffle card deck
-  // fun shuffle_card_dec(game_table: &mut GameTable, ctx: &mut TxContext) {}
+  // fun shuffle_card_dec(game_table: &mut GameTable, ctx: &mut TxContext) {
+  //   let card_deck = dynamic_object_field::remove<vector<u8>, CardDeck> (&mut game_table.id, b"card_deck");
+
+  // }
 
 
 
@@ -286,13 +289,14 @@ module blackjack_game::blackjack {
     // suffle_card(?)
 
     // open_card
-    // pass_card_to(player)
-    // open_card
-    // pass_card_to(dealer)
-    // open_card
-    // pass_card_to(player)
+    // pass_card_to(player, sequence_number=1)
 
-    // pass_card_to(dealer)
+    // open_card
+    // pass_card_to(dealer, sequence_number=2)
+    // open_card
+    // pass_card_to(player, sequence_number=3)
+
+    // pass_card_to(dealer, sequence_number=4)
     
   }
 
@@ -300,8 +304,8 @@ module blackjack_game::blackjack {
     assert!(a == b, 403);
   }
 
-  fun pass_card_to() {
-  }
+  // fun pass_card_to(hand: Hand, card_deck: CardDeck, sequence_number: u64, ctx: &mut TxContext) {
+  // }
   
   // dealer action from BE
   public entry fun shuffle_cards(game_table: &mut GameTable, ctx: &mut TxContext) {
