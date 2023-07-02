@@ -12,9 +12,9 @@ function WalletButton() {
 
     useEffect(() => {
         if (wallet.status == 'connected') {
-            console.log('wallet status', wallet.status)
-            console.log('wallet name', wallet.name)
-            console.log('wallet address', wallet.account.address)
+            console.log('wallet status: ', wallet.status)
+            console.log('wallet address: ', wallet.account.address)
+            console.log('wallect balance: ',)
             navigate("/game")
         } else {
             console.log('wallet status', wallet.status)
@@ -24,15 +24,15 @@ function WalletButton() {
 
     return (
         <ConnectButton
-            // The BaseError instance has properties like {code, message, details}
-            // for developers to further customize their error handling.
-            onConnectError={(err) => {
-                if (err.code === ErrorCode.WALLET__CONNECT_ERROR__USER_REJECTED) {
-                    console.warn('user rejected the connection to ' + err.details?.wallet);
-                } else {
-                    console.warn('unknown connect error: ', err);
-                }
-            }}
+        // The BaseError instance has properties like {code, message, details}
+        // for developers to further customize their error handling.
+        // onConnectError={(err) => {
+        //     if (err.code === ErrorCode.WALLET__CONNECT_ERROR__USER_REJECTED) {
+        //         console.warn('user rejected the connection to ' + err.details?.wallet);
+        //     } else {
+        //         console.warn('unknown connect error: ', err);
+        //     }
+        // }}
         >Connect Your Wallet</ConnectButton>
     );
 }
