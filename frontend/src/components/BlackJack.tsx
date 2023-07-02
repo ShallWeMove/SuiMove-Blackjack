@@ -9,61 +9,59 @@ type Card = {
 const suits = ['hearts', 'diamonds', 'clubs', 'spades'];
 const values = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10]; // values for 2-10, J, Q, K
 
-const getCard = (): Card => {
-    const suit = suits[Math.floor(Math.random() * 4)];
-    const value = values[Math.floor(Math.random() * 13)];
-    return { suit, value };
-}
+// Create a WebSocket connection
+const socket = new WebSocket('ws://localhost:8080');
 
-const calculateScore = (cards: Card[]): number => {
-    return cards.reduce((score, card) => score + card.value, 0);
-}
-
-const BlackJack: React.FC<{ resetGame: () => void }> = ({ resetGame }) => {
-    const [playerCards, setPlayerCards] = useState<Card[]>([getCard(), getCard()]);
-    const [dealerCards, setDealerCards] = useState<Card[]>([getCard()]);
+const BlackJack: React.FC = () => {
+    const [playerCards, setPlayerCards] = useState<Card[]>([]);
+    const [dealerCards, setDealerCards] = useState<Card[]>([]);
     const [gameOver, setGameOver] = useState(false);
     const [message, setMessage] = useState('');
 
+    // Handle incoming WebSocket messages
     useEffect(() => {
-        if (calculateScore(playerCards) > 21) {
-            setGameOver(true);
-            setMessage('Player busted! Dealer wins.');
-        }
-    }, [playerCards]);
+        socket.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+
+            switch (data.flag) {
+                case 'player card open':
+                    setPlayerCards(data.args);
+                    break;
+                case 'shuffle done':
+                    // handle shuffle done
+                    break;
+                case 'playerFirst done':
+                case 'dealerFirst done':
+                case 'playerSecond done':
+                case 'dealerSecond done':
+                    // handle card open
+                    break;
+                case 'Go done':
+                    // handle Go done
+                    break;
+                case 'Stop done':
+                    // handle Stop done
+                    break;
+                default:
+                    break;
+            }
+        };
+
+        // Send game start message on component mount
+        socket.send(JSON.stringify({ flag: 'game start' }));
+    }, []);
 
     const handleHit = () => {
-        setPlayerCards(prev => [...prev, getCard()]);
+        socket.send(JSON.stringify({ flag: 'Go' }));
     }
 
     const handleStand = () => {
-        let newDealerCards = [...dealerCards];
-        while (calculateScore(newDealerCards) < 17) {
-            newDealerCards.push(getCard());
-        }
-        setDealerCards(newDealerCards);
-        setGameOver(true);
+        socket.send(JSON.stringify({ flag: 'Stop' }));
     }
 
     const handlePlayAgain = () => {
-        resetGame();
+        socket.send(JSON.stringify({ flag: 'game start' }));
     }
-
-    useEffect(() => {
-        const playerScore = calculateScore(playerCards);
-        const dealerScore = calculateScore(dealerCards);
-        if (gameOver) {
-            if (!message) {
-                if (dealerScore > 21) {
-                    setMessage('Dealer busted! Player wins.');
-                } else if (playerScore > dealerScore) {
-                    setMessage('Player wins!');
-                } else {
-                    setMessage('Dealer wins!');
-                }
-            }
-        }
-    }, [gameOver, playerCards, dealerCards, message]);
 
     return (
         <Box>
