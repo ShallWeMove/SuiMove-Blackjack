@@ -11,7 +11,7 @@ module blackjack_game::blackjack {
   use std::vector;
   use sui::dynamic_object_field;
   use std::bcs;
-  
+
   // game identity
   struct GameInfo has key {
     id: UID,
@@ -20,8 +20,11 @@ module blackjack_game::blackjack {
 
   // GameTable is essential object to play blackjack
   // it wrap objects like below
+  // is_playing = 0 : not ready / 2 : game ready / 10 : game is playing
   struct GameTable has key, store {
     id: UID,
+    player_address: Option<address>,
+    dealer_address: address,
     player_hand: Option<ID>,
     dealer_hand: ID,
     card_deck: ID,
@@ -64,6 +67,10 @@ module blackjack_game::blackjack {
     stake: vector<Option<ID>>, 
     game_id: ID,
   }   
+  
+  const GAME_NOT_READY : u64 = 0;
+  const GAME_READY_STATE : u64 = 1;
+  const GAME_IS_PLAYING : u64 = 2;
 
 
   // when package is published, init function will be executed
@@ -116,6 +123,8 @@ module blackjack_game::blackjack {
 
     let game_table = GameTable {
         id: game_table_id,
+        player_address: option::none(),
+        dealer_address: sender,
         player_hand: option::none(),
         dealer_hand: dealer_hand_id,
         card_deck: card_deck_id,
@@ -126,9 +135,7 @@ module blackjack_game::blackjack {
       };
 
     // create game table and transfer to dealer(sender)
-    transfer::transfer(
-      game_table
-      , sender);
+    transfer::share_object(game_table);
   }
 
   fun create_hand(game: &GameInfo, ctx: &mut TxContext) :Hand {
@@ -164,8 +171,16 @@ module blackjack_game::blackjack {
     }
   }
 
+  fun check_is_dealer(game_table: &mut GameTable, ctx: &mut TxContext) {
+    let sender = tx_context::sender(ctx);
+    assert!(game_table.dealer_address == sender, 403);
+
+  }
+
   // TODO : vector<vector<u8>>? vector<u8> ? select one
+  // dealer action from BE
   public entry fun fill_card_deck(game_table: &mut GameTable, encrypted_number_array: vector<String>, ctx: &mut TxContext) {
+    check_is_dealer(game_table, ctx);
 
     let card_deck = dynamic_object_field::borrow_mut<vector<u8>, CardDeck> (&mut game_table.id, b"card_deck");
  
@@ -206,7 +221,10 @@ module blackjack_game::blackjack {
   }
 
   // dealer action from BE
+  // can execute this function only when game is ready
   public entry fun shuffle_cards(game_table: &mut GameTable, sequence_number_array: vector<u8>, ctx: &mut TxContext) {
+    check_is_dealer(game_table, ctx);
+    check_is_game_ready(game_table);
     let card_deck = dynamic_object_field::borrow_mut<vector<u8>, CardDeck> (&mut game_table.id, b"card_deck");
 
     let i : u64 = 0;
@@ -221,7 +239,8 @@ module blackjack_game::blackjack {
  
   }
 
-  public entry fun change_card_number(card: &mut Card, card_number_want_to_change: vector<u8>, ctx: &mut TxContext) {
+  public entry fun change_card_number(game_table: &mut GameTable, card: &mut Card, card_number_want_to_change: vector<u8>, ctx: &mut TxContext) {
+    check_is_dealer(game_table, ctx);
     card.card_number = card_number_want_to_change;
   }
 
@@ -255,12 +274,16 @@ module blackjack_game::blackjack {
     // TODO : split_money(player_money)
     // let money = pay::split(&mut coin, bet_amount, ctx);
     bet_player_money(game_table, money, ctx);
+
+    game_table.is_playing = GAME_READY_STATE;
   }
 
   fun pass_hand(game_table: &mut GameTable, player_hand: Hand, ctx: &mut TxContext) {
+    let sender = tx_context::sender(ctx);
     let player_hand_id = object::uid_to_inner(&player_hand.id);
     dynamic_object_field::add(&mut game_table.id, b"player_hand", player_hand);
     game_table.player_hand = option::some(player_hand_id);
+    game_table.player_address = option::some(sender);
   }
 
   fun bet_player_money(game_table: &mut GameTable, money: Coin<SUI>, ctx: &mut TxContext) {
@@ -268,6 +291,13 @@ module blackjack_game::blackjack {
     let money_id = object::id(&money);
     vector::push_back<Option<ID>>(&mut money_box.stake, option::some(money_id));
     dynamic_object_field::add(&mut money_box.id, b"player_money", money);
+  }
+  
+ fun bet_delear_money(game_table: &mut GameTable, money: Coin<SUI>, ctx: &mut TxContext) {
+    let money_box = dynamic_object_field::borrow_mut<vector<u8>,MoneyBox>(&mut game_table.id, b"money_box");
+    let money_id = object::id(&money);
+    vector::push_back<Option<ID>>(&mut money_box.stake, option::some(money_id));
+    dynamic_object_field::add(&mut money_box.id, b"delear_money", money);
   }
 
   fun check_game_id(game_info: &GameInfo, id: ID) {
@@ -282,14 +312,19 @@ module blackjack_game::blackjack {
 
 
   // dealer action from BE
-  public entry fun start_game(game: &GameInfo, game_table: &mut GameTable, player_address: address,  ctx: &mut TxContext) {
+  public entry fun start_game(game: &GameInfo, game_table: &mut GameTable, money: Coin<SUI>, player_address: address,  ctx: &mut TxContext) {
     check_game_id(game, game_table.game_id);
+    // check if game is ready
+    check_is_game_ready(game_table);
     // check whether account address of player hand in the game table is equal to player address from parameter
-    let player_hand = dynamic_object_field::borrow<vector<u8>, Hand>(&mut game_table.id, b"player_hand");
-    check_address(player_hand.account, player_address);
+    // let player_hand = dynamic_object_field::borrow<vector<u8>, Hand>(&mut game_table.id, b"player_hand");
+    check_address(game_table.player_address, option::some(player_address));
+    
     
     // from now game in progress
-    game_table.is_playing = 1;
+    game_table.is_playing = GAME_IS_PLAYING;
+
+    bet_delear_money(game_table, money, ctx);
     // pass_money(dealer_money)
 
     // open_card
@@ -304,8 +339,16 @@ module blackjack_game::blackjack {
     
   }
 
-  fun check_address(a: address, b: address) {
+  fun check_address(a: Option<address>, b: Option<address>) {
     assert!(a == b, 403);
+  }
+
+  fun check_is_game_ready(game_table: &mut GameTable) {
+    assert!(game_table.is_playing == GAME_READY_STATE, 403);
+  }
+
+  fun check_is_game_playing(game_table: &mut GameTable) {
+    assert!(game_table.is_playing == GAME_IS_PLAYING, 403);
   }
 
   // fun pass_card_to(hand: Hand, card_deck: CardDeck, sequence_number: u64, ctx: &mut TxContext) {
