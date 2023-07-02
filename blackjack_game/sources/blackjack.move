@@ -125,13 +125,6 @@ module blackjack_game::blackjack {
         game_id: game_id,
       };
 
-    // TODO : fill card deck
-    fill_card_deck(&mut game_table, ctx);
-
-    // TODO : suffle card deck
-    // shuffle_card_deck(&mut game_table, ctx);
-
-    
     // create game table and transfer to dealer(sender)
     transfer::transfer(
       game_table
@@ -171,18 +164,30 @@ module blackjack_game::blackjack {
     }
   }
 
-  fun fill_card_deck(game_table: &mut GameTable, ctx: &mut TxContext) {
+  // TODO : vector<vector<u8>>? vector<u8> ? select one
+  public entry fun fill_card_deck(game_table: &mut GameTable, encrypted_number_array: vector<String>, ctx: &mut TxContext) {
 
     let card_deck = dynamic_object_field::borrow_mut<vector<u8>, CardDeck> (&mut game_table.id, b"card_deck");
  
     let i : u64 = 0;
     while (i < card_deck.total_cards_number) {
-      // TODO : flip the card created and make is_opened false
-      // insert encrypt_function(i) : vector<u8> {}
-      let bytes_i = bcs::to_bytes(&i);
-      // let bytes_i = bcs::to_bytes(&b"card_number");
-      
-      let card = create_card(bytes_i, i, object::uid_to_inner(&card_deck.id), ctx);
+      // For vector<u8>
+    //   let number_of_characters_of_encrypted_number = 8;
+    //   let j : u64 = 0;
+    //   let encrypted_number = vector<u8>[];
+    //   while (j < number_of_characters_of_encrypted_number) {
+    //     let character = vector::pop_back(&mut encrypted_number_array);
+    //     vector::push_back(&mut encrypted_number,character);
+    //     j = j + 1;
+    //   };
+
+      // For vector<vector<u8>>
+      let encrypted_number_string = vector::pop_back(&mut encrypted_number_array);
+      let encrypted_number = string::bytes(&encrypted_number_string);
+
+
+      let sequence_number = i;
+      let card = create_card(*encrypted_number, sequence_number, object::uid_to_inner(&card_deck.id), ctx);
       let card_id = object::uid_to_inner(&card.id);
       dynamic_object_field::add(&mut card_deck.id, i, card);
       vector::push_back<Option<ID>>(&mut card_deck.cards, option::some(card_id));
@@ -200,24 +205,25 @@ module blackjack_game::blackjack {
     }
   }
 
-  // TODO : encrypt card number with card number and timestamp
-  // fun encrypt_card_number(card: Card, card_number_u64: u64, ctx: &mut TxContext) :Card {}
+  // dealer action from BE
+  public entry fun shuffle_cards(game_table: &mut GameTable, sequence_number_array: vector<u8>, ctx: &mut TxContext) {
+    let card_deck = dynamic_object_field::borrow_mut<vector<u8>, CardDeck> (&mut game_table.id, b"card_deck");
 
-  // TODO : shuffle card deck
-  // fun shuffle_card_dec(game_table: &mut GameTable, ctx: &mut TxContext) {
-  //   let card_deck = dynamic_object_field::remove<vector<u8>, CardDeck> (&mut game_table.id, b"card_deck");
+    let i : u64 = 0;
+    while (i < card_deck.total_cards_number) {
+      let sequence_number_u8 = vector::pop_back(&mut sequence_number_array);
+      let sequence_number_u64 = (sequence_number_u8 as u64);
+      let card = dynamic_object_field::borrow_mut<u64, Card> (&mut card_deck.id, i);
+      card.sequence_number = sequence_number_u64;
 
-  // }
-
-
+      i = i + 1;
+    }
+ 
+  }
 
   public entry fun change_card_number(card: &mut Card, card_number_want_to_change: vector<u8>, ctx: &mut TxContext) {
     card.card_number = card_number_want_to_change;
   }
-
-  
-
-  
 
   // player action from FE
   public entry fun create_player_hand(game: &GameInfo, ctx: &mut TxContext) {
@@ -286,8 +292,6 @@ module blackjack_game::blackjack {
     game_table.is_playing = 1;
     // pass_money(dealer_money)
 
-    // suffle_card(?)
-
     // open_card
     // pass_card_to(player, sequence_number=1)
 
@@ -307,10 +311,7 @@ module blackjack_game::blackjack {
   // fun pass_card_to(hand: Hand, card_deck: CardDeck, sequence_number: u64, ctx: &mut TxContext) {
   // }
   
-  // dealer action from BE
-  public entry fun shuffle_cards(game_table: &mut GameTable, ctx: &mut TxContext) {
 
-  }
 
   
 

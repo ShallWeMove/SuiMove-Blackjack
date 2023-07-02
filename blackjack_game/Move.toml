@@ -1,7 +1,7 @@
 [package]
 name = "blackjack_game"
 version = "0.0.1"
-published-at = "0x70662804769816b52619549c023fc91ce8a207c926b64620486ca84e0103136c"
+published-at = "0xf9c697c9b0cd87efdfe87fb37b96bbae7fe019f35b201bc9c259534e3becf3a5"
 
 [dependencies]
 Sui = { git = "https://github.com/MystenLabs/sui.git", subdir = "crates/sui-framework/packages/sui-framework", rev = "testnet" }
