@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { useTheme, styled, alpha } from "@mui/material";
-import { ColorModeContext, tokens } from "../theme";
-import { Typography, Box, TextField, Button } from "@mui/material";
-import BlackJack from "./BlackJack.tsx";
+import { useTheme } from "@mui/material";
+import { tokens } from "../theme";
+import { Box } from "@mui/material";
+import BlackJack from "../components/BlackJack.tsx";
+import BettingAmount from "../components/BettingAmount";
 
 const Game = () => {
     const theme = useTheme();
@@ -24,13 +25,13 @@ const Game = () => {
         console.log("betting amount: ", bettingAmount);
     }, [confirmed, error, bettingAmount]);
 
-    const handleChange = (e) => {
-        setBettingAmount(e.target.value);
+    const handleStartButtonClick = () => {
+        setConfirmed(true);
     }
 
-    const handleStartButtonClick = (e) => {
-        setConfirmed(true)
-        console.log(confirmed)
+    const resetGame = () => {
+        setBettingAmount("");
+        setConfirmed(false);
     }
 
     return (
@@ -47,73 +48,19 @@ const Game = () => {
             {
                 confirmed ?
                     <Box>
-                        <BlackJack />
+                        <BlackJack resetGame={resetGame} />
                     </Box>
                     :
-                    <Box sx={{
-                        width: "23.8125rem",
-                        height: "19rem",
-                        boxShadow: 6,
-                        bgcolor: "#FFF",
-                        borderRadius: "30px",
-                        display: "flex",
-                        flexDirection: "column",
-                        alignItems: "center",
-                        justifyContent: "center"
-                    }}>
-                        <Typography variant="h1" sx={{
-                            color: "#5D5A88",
-                            fontWeight: "bold"
-                        }}>
-                            Betting Amount
-                        </Typography>
-                        <TextField
-                            id="betting-amount"
-                            label="Please enter the betting amount."
-                            error={error}
-                            helperText={error ? "Please input a valid number" : ""}
-                            value={bettingAmount}
-                            onChange={handleChange}
-                            InputProps={{
-                                sx: {
-                                    backgroundColor: "#E5E5E5",
-                                    color: "#121827",
-                                    '&::placeholder': {
-                                        color: "#121827",
-                                    },
-                                    borderRadius: "30px"
-                                },
-                            }}
-                            InputLabelProps={{
-                                sx: {
-                                    color: '#ADABC3'
-                                },
-                            }}
-                            sx={{
-                                width: "20.875rem",
-                                height: "2.53119rem",
-                                marginBottom: 4,
-                                marginTop: 6,
-                                borderRadius: '30px',
-                            }}
-                        />
-                        <Button
-                            variant="contained"
-                            disabled={error || bettingAmount === ""}
-                            sx={{
-                                width: "20.875rem",
-                                height: "3.53119rem",
-                                borderRadius: "30px"
-                            }}
-                            onClick={handleStartButtonClick}
-                        >
-                            Game Start
-                        </Button>
-                    </Box>
+                    <BettingAmount
+                        setBettingAmount={setBettingAmount}
+                        error={error}
+                        handleStartButtonClick={handleStartButtonClick}
+                        bettingAmount={bettingAmount}
+                    />
             }
-
-        </Box >
+        </Box>
     )
 }
 
-export default Game
+export default Game;
+

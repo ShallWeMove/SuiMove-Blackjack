@@ -19,7 +19,7 @@ const calculateScore = (cards: Card[]): number => {
     return cards.reduce((score, card) => score + card.value, 0);
 }
 
-const BlackJack: React.FC = () => {
+const BlackJack: React.FC<{ resetGame: () => void }> = ({ resetGame }) => {
     const [playerCards, setPlayerCards] = useState<Card[]>([getCard(), getCard()]);
     const [dealerCards, setDealerCards] = useState<Card[]>([getCard()]);
     const [gameOver, setGameOver] = useState(false);
@@ -46,10 +46,7 @@ const BlackJack: React.FC = () => {
     }
 
     const handlePlayAgain = () => {
-        setPlayerCards([getCard(), getCard()]);
-        setDealerCards([getCard()]);
-        setGameOver(false);
-        setMessage('');
+        resetGame();
     }
 
     useEffect(() => {
