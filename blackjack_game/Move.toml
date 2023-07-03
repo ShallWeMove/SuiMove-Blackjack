@@ -1,10 +1,9 @@
 [package]
 name = "blackjack_game"
 version = "0.0.1"
-published-at = "0xf9c697c9b0cd87efdfe87fb37b96bbae7fe019f35b201bc9c259534e3becf3a5"
 
 [dependencies]
-Sui = { git = "https://github.com/MystenLabs/sui.git", subdir = "crates/sui-framework/packages/sui-framework", rev = "testnet" }
+Sui = { git = "https://github.com/MystenLabs/sui.git", subdir = "crates/sui-framework/packages/sui-framework", rev = "framework/testnet" }
 
 [addresses]
 blackjack_game = "0x0"
