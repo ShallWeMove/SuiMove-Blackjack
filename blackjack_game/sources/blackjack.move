@@ -360,9 +360,18 @@ module blackjack_game::blackjack {
   }
 
 
-  // fun pass_card_to(hand: Hand, card_deck: CardDeck, sequence_number: u64, ctx: &mut TxContext) {
-  // }
-  
+  // let x : u64, y : u64
+  // y = 123 * x + 12345 
+  // x = (y - 12345)/123
+  fun encrypt_card_number(card_number: u64): u64 {
+    let encrypted_number = 123 * card_number + 12345;
+    encrypted_number
+  }
+
+  fun decrypt_card_number(encrypted_number: u64): u64 {
+    let decrypted_number = (encrypted_number - 12345) / 123;
+    decrypted_number
+  }
 
 
   
@@ -380,11 +389,7 @@ module blackjack_game::blackjack {
 
   // }
 
-  fun encrypt_card_number() {
-  }
 
-  fun decrypt_card_number() {
-  }
 
 
 
