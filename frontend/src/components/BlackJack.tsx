@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Button } from '@mui/material';
+import BackgroundImage from "../images/background.png";
 
 type Card = {
     suit: string,
@@ -64,7 +65,15 @@ const BlackJack: React.FC = () => {
     }
 
     return (
-        <Box>
+        <Box
+            sx={{
+                backgroundImage: `url(${BackgroundImage})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                height: '88vh',
+                width: '100vw'
+            }}
+        >
             <h2>Blackjack Game</h2>
 
             <h3>Player's cards:</h3>
