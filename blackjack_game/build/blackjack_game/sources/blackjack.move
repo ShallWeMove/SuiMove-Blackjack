@@ -220,7 +220,7 @@ module blackjack_game::blackjack {
       id : object::new(ctx),
       card_number : card_number,
       sequence_number : sequence_number,
-      is_open : true,
+      is_open : false,
       card_deck_id : card_deck_id,
     }
   }
@@ -229,7 +229,6 @@ module blackjack_game::blackjack {
   // can execute this function only when game is ready
   public entry fun shuffle_card_deck(game_table: &mut GameTable, sequence_number_array: vector<u8>, ctx: &mut TxContext) {
     check_is_dealer(game_table, ctx);
-    // assert!(game_table.is_playing == GAME_READY_STATE, 403);
     let card_deck = dynamic_object_field::borrow_mut<vector<u8>, CardDeck> (&mut game_table.id, b"card_deck");
     assert!(card_deck.is_filled == true, 403);
     vector::reverse<u8>(&mut sequence_number_array);
@@ -278,11 +277,9 @@ module blackjack_game::blackjack {
     check_game_id(game, game_table.game_id);
     check_game_id(game, player_hand.game_id);
 
-    // pass_hand(player_hand)
+    // pass player hand to the game table
     pass_hand(game_table, player_hand, ctx);
 
-    // TODO : split_money(player_money)
-    // let money = pay::split(&mut coin, bet_amount, ctx);
     bet_player_money(game_table, money, ctx);
 
     game_table.is_playing = GAME_READY_STATE;
@@ -303,13 +300,6 @@ module blackjack_game::blackjack {
     dynamic_object_field::add(&mut money_box.id, b"player_money", money);
   }
   
- fun bet_delear_money(game_table: &mut GameTable, money: Coin<SUI>, ctx: &mut TxContext) {
-    let money_box = dynamic_object_field::borrow_mut<vector<u8>,MoneyBox>(&mut game_table.id, b"money_box");
-    let money_id = object::id(&money);
-    vector::push_back<Option<ID>>(&mut money_box.stake, option::some(money_id));
-    dynamic_object_field::add(&mut money_box.id, b"delear_money", money);
-  }
-
   fun check_game_id(game: &GameInfo, id: ID) {
     assert!(id(game) == id, 403); // TODO: error code
   }
@@ -322,37 +312,53 @@ module blackjack_game::blackjack {
 
 
   // dealer action from BE
-  public entry fun start_game(game: &GameInfo, game_table: &mut GameTable, money: Coin<SUI>, player_address: address,  ctx: &mut TxContext) {
-    check_game_id(game, game_table.game_id);
-    // check if game is not ready
+  public entry fun start_game(game_table: &mut GameTable, money: Coin<SUI>, player_address: address,  ctx: &mut TxContext) {
+    // check if game is ready
     assert!(game_table.is_playing == GAME_READY_STATE, 403);
-    // check whether account address of player hand in the game table is equal to player address from parameter
-    // let player_hand = dynamic_object_field::borrow<vector<u8>, Hand>(&mut game_table.id, b"player_hand");
-    check_address_equal(game_table.player_address, option::some(player_address));
-    
-    
+    // check whether player address in the game table is equal to player address from parameter
+    assert!(game_table.player_address == option::some(player_address), 403);
+    // pass dealer money to money box
+    bet_delear_money(game_table, money, ctx);
     // from now game in progress
     game_table.is_playing = GAME_IS_PLAYING;
 
-    // pass dealer money to money box
-    bet_delear_money(game_table, money, ctx);
+    let card_deck = dynamic_object_field::remove<vector<u8>, CardDeck> (&mut game_table.id, b"card_deck");
+    let player_hand = dynamic_object_field::remove<vector<u8>, Hand> (&mut game_table.id, b"player_hand");
+    let dealer_hand = dynamic_object_field::remove<vector<u8>, Hand> (&mut game_table.id, b"dealer_hand");
+
+    // pass_card_to(player, sequence_number=0)
+    let player_card_1 : Card = dynamic_object_field::remove(&mut card_deck.id, 0);
+    player_card_1.is_open = true;
+    vector::push_back<Option<ID>>(&mut card_deck.cards, option::some(object::id(&player_card_1)));
+    dynamic_object_field::add(&mut player_hand.id, 0, player_card_1);
+    // pass_card_to(dealer, sequence_number=1)
+    let dealer_card_1 : Card = dynamic_object_field::remove(&mut card_deck.id, 1);
+    dealer_card_1.is_open = true;
+    vector::push_back<Option<ID>>(&mut card_deck.cards, option::some(object::id(&dealer_card_1)));
+    dynamic_object_field::add(&mut dealer_hand.id, 0, dealer_card_1);
+    // pass_card_to(player, sequence_number=2)
+    let player_card_2 : Card = dynamic_object_field::remove(&mut card_deck.id, 2);
+    player_card_2.is_open = true;
+    vector::push_back<Option<ID>>(&mut card_deck.cards, option::some(object::id(&player_card_2)));
+    dynamic_object_field::add(&mut player_hand.id, 1, player_card_2);
+    // pass_card_to(dealer, sequence_number=3)
+    let dealer_card_2 : Card = dynamic_object_field::remove(&mut card_deck.id, 3);
+    vector::push_back<Option<ID>>(&mut card_deck.cards, option::some(object::id(&dealer_card_2)));
+    dynamic_object_field::add(&mut dealer_hand.id, 1, dealer_card_2);
 
 
-    // open_card
-    // pass_card_to(player, sequence_number=1)
-
-    // open_card
-    // pass_card_to(dealer, sequence_number=2)
-    // open_card
-    // pass_card_to(player, sequence_number=3)
-
-    // pass_card_to(dealer, sequence_number=4)
-    
+    dynamic_object_field::add(&mut game_table.id, b"card_deck", card_deck);
+    dynamic_object_field::add(&mut game_table.id, b"player_hand", player_hand);
+    dynamic_object_field::add(&mut game_table.id, b"dealer_hand", dealer_hand);    
   }
 
-  fun check_address_equal(a: Option<address>, b: Option<address>) {
-    assert!(a == b, 403);
+  fun bet_delear_money(game_table: &mut GameTable, money: Coin<SUI>, ctx: &mut TxContext) {
+    let money_box = dynamic_object_field::borrow_mut<vector<u8>,MoneyBox>(&mut game_table.id, b"money_box");
+    let money_id = object::id(&money);
+    vector::push_back<Option<ID>>(&mut money_box.stake, option::some(money_id));
+    dynamic_object_field::add(&mut money_box.id, b"delear_money", money);
   }
+
 
   // fun pass_card_to(hand: Hand, card_deck: CardDeck, sequence_number: u64, ctx: &mut TxContext) {
   // }
