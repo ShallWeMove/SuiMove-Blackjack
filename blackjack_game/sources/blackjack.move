@@ -434,7 +434,15 @@ module blackjack_game::blackjack {
     dynamic_object_field::add(&mut game_table.id, b"player_hand", player_hand);
   }
 
+  public entry fun stop_card(game_table: &mut GameTable, ctx: &mut TxContext) {
+    
+  }
+
   fun check_win_or_lose() {
+
+  }
+
+  fun end_game() {
 
   }
 
@@ -485,9 +493,9 @@ module blackjack_game::blackjack {
 
   // dealer action from BE
 
-  public entry fun end_game() {
-    // remove player_hand
-  }
+  // public entry fun end_game() {
+  //   // remove player_hand
+  // }
 
   public entry fun get_card() {
      // transfer
