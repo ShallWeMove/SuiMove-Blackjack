@@ -63,6 +63,7 @@ module blackjack_game::blackjack {
     card_deck_id: ID,
   }
   // TODO : sui -> casino chips
+  // place to store betting money
   struct MoneyBox has key, store {
     id: UID,
     // stake: vector<Option<Coin<SUI>>>, 

@@ -2,10 +2,18 @@
 
 # Objects
 ## GameTable 
+// GameTable is essential object to play blackjack <br>
+// it wrap objects like below <br>
+// is_playing = 0 : not ready / 2 : game ready / 10 : game is playing<br>
 ## Hand
+// player and delear with Hand can hold some cards<br>
 ## CardDeck
+// a set of cards, total_cards_number refers to the quantity of cards in a deck.<br>
 ## Card
-## MoneyBox    
+// When card is open, card number is number. <br>
+// In other hand, when card is flipped over, card number is some cryptogram<br>
+## MoneyBox
+// place to store betting money<br>
 
 # Functions
 ## - new_game()
