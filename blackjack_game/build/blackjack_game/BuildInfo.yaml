@@ -5,7 +5,7 @@ compiled_package_info:
     blackjack_game: "0000000000000000000000000000000000000000000000000000000000000000"
     std: "0000000000000000000000000000000000000000000000000000000000000001"
     sui: "0000000000000000000000000000000000000000000000000000000000000002"
-  source_digest: 6837E8F52D7CF1E80F9EB22EB62CF4AF16B553B93EEFBE1904B044A4579CEB97
+  source_digest: CFEA0EEE377916D28AF7BD9FAE736B19DCEC8FE69503C16FD6AF2D54DEA61EA5
   build_flags:
     dev_mode: false
     test_mode: false
@@ -15,7 +15,6 @@ compiled_package_info:
     force_recompilation: false
     lock_file: "./Move.lock"
     additional_named_addresses: {}
-    architecture: ~
     fetch_deps_only: false
     skip_fetch_latest_git_deps: false
 dependencies:
