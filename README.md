@@ -48,13 +48,22 @@
         - [Card...]
     - MoneyBox
         - [Coin<SUI>...]
+## DealerHand
+## CardDeck
+## Money
 ## - new_game()
 ## - create_game_table()
+## - start_game()
+## - go_card()
+## - stop_card()
 # Player (Account, Client)
+## PlayerHand
 - PlayerHand
     - [Card...]
+## - ready_game()
 
 # Architecture
 ## FE
+
 ## BE
 ## MOVE
