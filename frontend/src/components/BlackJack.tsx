@@ -1,11 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Button } from '@mui/material';
 import BackgroundImage from "../images/background.png";
-import getCard from "../images/buttons/getCard.png";
-import ready from "../images/buttons/ready.png";
-import shuffle from "../images/buttons/shuffle.png";
-import start from "../images/buttons/start.png";
-import stop from "../images/buttons/stop.png";
+import card from "../images/cards/card.png";
 
 type Card = {
     suit: string,
@@ -108,6 +104,106 @@ const BlackJack: React.FC = () => {
                     <Button variant="contained" onClick={handleStand}>Stand</Button>
                 </div>
             )}
+
+            {/* Dealer Cards Box */}
+            <Box
+            sx={{
+                position: "fixed",
+                left: "50vw",
+                top: "20vh",
+                width: '200px',
+                height: '200px',
+                transform: 'translateX(-100px)',
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                paddingRight: '15px',
+            }}
+            >
+                <div 
+                    style={{
+                        width: '60px',
+                        height: '90px',
+                        backgroundImage: `url(${card})`,
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center',
+                        position: 'absolute',
+                        transform: 'rotate(180deg)',
+                    }}
+                />
+                <div 
+                    style={{
+                        width: '60px',
+                        height: '90px',
+                        backgroundImage: `url(${card})`,
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center',
+                        transform: 'translateX(-10px) translateY(-5px) rotate(180deg)',
+                        position: 'absolute',
+                    }}
+                />
+                <div 
+                    style={{
+                        width: '60px',
+                        height: '90px',
+                        backgroundImage: `url(${card})`,
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center',
+                        transform: 'translateX(-20px) translateY(-10px) rotate(180deg)',
+                        position: 'absolute',
+                    }}
+                />
+            </Box>
+
+
+            {/* Player Cards Box */}
+            <Box
+            sx={{
+                position: "fixed",
+                left: "50vw",
+                bottom: "15vh",
+                width: '200px',
+                height: '200px',
+                transform: 'translateX(-100px)',
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                paddingRight: '15px',
+            }}
+            >
+                <div 
+                    style={{
+                        width: '60px',
+                        height: '90px',
+                        backgroundImage: `url(${card})`,
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center',
+                        position: 'absolute',
+                    }}
+                />
+                <div 
+                    style={{
+                        width: '60px',
+                        height: '90px',
+                        backgroundImage: `url(${card})`,
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center',
+                        transform: 'translateX(10px) translateY(-5px)',
+                        position: 'absolute',
+                    }}
+                />
+                <div 
+                    style={{
+                        width: '60px',
+                        height: '90px',
+                        backgroundImage: `url(${card})`,
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center',
+                        transform: 'translateX(20px) translateY(-10px)',
+                        position: 'absolute',
+                    }}
+                />
+            </Box>
 
             <Box
             sx={{
