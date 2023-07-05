@@ -26,6 +26,17 @@ const BlackJack: React.FC = () => {
             const data = JSON.parse(event.data);
 
             switch (data.flag) {
+                case 'start game done':
+                    console.log("game start done!!!!!");
+                    break;
+                case 'ready game done':
+                    console.log("game ready done!!!!!");
+                    break;
+                case 'get card done':
+                    console.log("get card done!!!!!");
+                    break;
+
+
                 case 'player card open':
                     setPlayerCards(data.args);
                     break;
@@ -50,8 +61,15 @@ const BlackJack: React.FC = () => {
         };
 
         // Send game start message on component mount
-        socket.send(JSON.stringify({ flag: 'game start' }));
+        // socket.send(JSON.stringify({ flag: 'game ready' }));
     }, []);
+    const handleGameReady = () => {
+        socket.send(JSON.stringify({ flag: 'game ready' }));
+    }
+
+    const handleGameStart = () => {
+        socket.send(JSON.stringify({ flag: 'game start' }));
+    }
 
     const handleHit = () => {
         socket.send(JSON.stringify({ flag: 'Go' }));
@@ -100,6 +118,8 @@ const BlackJack: React.FC = () => {
                 </div>
             ) : (
                 <div>
+                    <Button variant="contained" onClick={handleGameReady}>Game Ready</Button>
+                    <Button variant="contained" onClick={handleGameStart}>Game Start</Button>
                     <Button variant="contained" onClick={handleHit}>Hit</Button>
                     <Button variant="contained" onClick={handleStand}>Stand</Button>
                 </div>

@@ -65,7 +65,7 @@ const BettingAmount = ({ setBettingAmount, error, handleStartButtonClick, bettin
                 }}
                 onClick={handleStartButtonClick}
             >
-                Game Ready
+                Go To Game
             </Button>
         </Box>
     )
