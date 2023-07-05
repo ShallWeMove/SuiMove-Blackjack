@@ -4,6 +4,7 @@ import { tokens } from "../theme";
 import { Box } from "@mui/material";
 import BlackJack from "../components/BlackJack.tsx";
 import BettingAmount from "../components/BettingAmount";
+import bg_landing from "../images/bg_landing.png";
 
 const Game = () => {
     const theme = useTheme();
@@ -42,7 +43,10 @@ const Game = () => {
                 justifyContent: "center",
                 alignItems: "center",
                 justifyContent: "space-around",
-                height: "80vh",
+                height: "100vh",
+                backgroundImage: `url(${bg_landing})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
             }}
         >
             {

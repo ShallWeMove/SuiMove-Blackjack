@@ -11,6 +11,8 @@ import { Box } from '@mui/material';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
 import { ColorModeContext, tokens } from "../theme";
+import card from "../images/cards/card.png";
+import { Link } from 'react-router-dom';
 
 const Navbar = () => {
 
@@ -25,13 +27,16 @@ const Navbar = () => {
     return (
         <AppBar position="static"
             sx={{
-                backgroundColor: colors.background[200],
+                // backgroundColor: colors.background[200],
+                backgroundColor: "rgba(255, 255, 255, 0)",
                 height: "7.36569rem",
                 display: "flex",
                 justifyContent: "center",
+                position: "fixed",
+                boxShadow: "none",
             }}>
             <Toolbar>
-                <IconButton
+                {/* <IconButton
                     size="large"
                     edge="start"
                     color="inherit"
@@ -41,9 +46,12 @@ const Navbar = () => {
                     }}
                 >
                     <DiamondOutlinedIcon />
-                </IconButton>
+                </IconButton> */}
+                <Link to="/">
+                    <img src={card} alt="card" style={{ height: "3.68284rem", width: "3.68284rem" }} />
+                </Link>
                 <Typography variant="h3" component="div" sx={{ flexGrow: 1, color: "#0054E7" }}>
-                    Shall We Move
+                    
                 </Typography>
                 {/* <Box sx={{ display: 'flex', alignItems: 'center' }}>
                     <IconButton color="inherit" onClick={handleDarkModeToggle}>
