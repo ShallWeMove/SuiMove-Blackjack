@@ -96,6 +96,7 @@ dealer or anyone who wanna be a dealer can create new game
 
 
 # Dealer (Account, BE)
+## Objects
 ### GameTable 
 - GameTable
     - PlayerHand
@@ -113,15 +114,18 @@ dealer or anyone who wanna be a dealer can create new game
 ### MoneyBox
 - MoneyBox
     - Stake : [Coin<SUI>...]
+## Functions
 ### new_game()
 ### create_game_table()
 ### start_game()
 ### go_card()
 ### stop_card()
 # Player (Account, Client)
+## Objects
 ### PlayerHand
 - PlayerHand
     - [Card...]
+## Functions
 ### ready_game()
 
 # Architecture
