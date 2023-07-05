@@ -2,7 +2,7 @@ import React from 'react'
 import { Box, useTheme } from "@mui/material";
 import { ColorModeContext, tokens } from "../theme";
 import { Typography } from "@mui/material";
-import bg_landing from "../images/bg_landing.png";
+import bg_landing from "../images/bg_landing.jpg";
 
 const Landing = () => {
     const theme = useTheme();
