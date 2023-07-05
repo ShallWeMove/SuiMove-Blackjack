@@ -1,19 +1,28 @@
 import React from 'react'
-import { useTheme } from "@mui/material";
+import { Box, useTheme } from "@mui/material";
 import { ColorModeContext, tokens } from "../theme";
 import { Typography } from "@mui/material";
+import bg_landing from "../images/bg_landing.png";
 
 const Landing = () => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
     return (
-        <div>
-            <Typography sx={{
+        <Box
+        sx={{
+            backgroundImage: `url(${bg_landing})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            height: '100vh',
+            width: '100vw'
+        }}
+    >
+            {/* <Typography sx={{
                 color: colors.greenAccent[400]
             }}>
                 This is Landing
-            </Typography>
-        </div>
+            </Typography> */}
+        </Box>
     )
 }
 
