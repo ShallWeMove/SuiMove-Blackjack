@@ -10,7 +10,8 @@ import {
     TransactionArgument
 } from "@mysten/sui.js";
 import dotenv from "dotenv";
-import { decrypt } from './encrypt';
+import WebSocket from 'ws';
+// import { decrypt } from './encrypt';
   
 dotenv.config();
   
@@ -38,45 +39,79 @@ export const getSigner = (
     return new RawSigner(keypair, provider);
 };
 
-const moveCall = async (target: `${string}::${string}::${string}`, signer: RawSigner, typeArgument: string[], argument: TransactionArgument[]) => {
+const moveCall = async (target: `${string}::${string}::${string}`, signer: RawSigner, argument: TransactionArgument[]) => {
+    console.log(target)
+    // console.log(typeArgument)
+    console.log(argument)
     const tx = new TransactionBlock();
     tx.setGasBudget(parseInt(process.env.GAS_BUDGET!));
     tx.moveCall({
         target: target,
         arguments: argument,
-        typeArguments: typeArgument
     });
+    console.log(tx.blockData)
     const result = await signer.signAndExecuteTransactionBlock({
         transactionBlock: tx,
     });
     console.log({ result });
     return result;
+    // return "Asf" 
 };
 
 
-export const startGame = async(signer: RawSigner) => {
+export const startGame = async(signer: RawSigner, address: string, ws: WebSocket) => {
     // const result = await moveCall('0x::blackjack::start_game', signer, ['a', 'b'], TransactionArgument[])
 
     // return result
+    const tx = new TransactionBlock()
+    const [coin] = tx.splitCoins(tx.gas, [tx.pure(10000)]);
+    tx.setGasBudget(parseInt(process.env.GAS_BUDGET!));
+    tx.moveCall({
+        target: '0x447b130c2b20c1dba06e268e4e6d265abe2c1d24dad568b124d3b1bd9b7d3025::blackjack::start_game',
+        arguments: [coin, tx.object(process.env.GAME_TABLE!), tx.pure(address)],
+    });
+    const result = await signer.signAndExecuteTransactionBlock({
+        transactionBlock: tx,
+    });
+    console.log(result.objectChanges);
+    const data = {
+        flag: 'start game done',
+    };
+    ws.send(JSON.stringify(data))
 }
 
-export const gameReady = async(signer: RawSigner) => {
-    // const result = await moveCall('0x::blackjack::game_ready', signer, ['a', 'b'], TransactionArgument[])
-
-    // return result
+export const gameReady = async(signer: RawSigner, ws: WebSocket) => {
+    const tx = new TransactionBlock()
+    tx.setGasBudget(parseInt(process.env.GAS_BUDGET!));
+    tx.moveCall({
+        target: '0x447b130c2b20c1dba06e268e4e6d265abe2c1d24dad568b124d3b1bd9b7d3025::blackjack::create_game_table',
+        arguments: [tx.object(process.env.GAME_INFO!)],
+    });
+    const result = await signer.signAndExecuteTransactionBlock({
+        transactionBlock: tx,
+    });
+    console.log(result.objectChanges);
+    const data = {
+        flag: 'game ready done',
+    };
+    ws.send(JSON.stringify(data))
 }
 
-export const getCard = async(signer: RawSigner, ishidden: boolean) => {
-    if(ishidden) {
-        // const result = await moveCall('0x::blackjack::get_card', signer, ['a', 'b'], TransactionArgument[])
-        
-        // return result
-    }
-    else {
-        // const result = await moveCall('0x::blackjack::get_card', signer, ['a', 'b'], TransactionArgument[])
-        // const num = decrypt(result)
-        // return num
-    }
+export const getCard = async(signer: RawSigner, ws: WebSocket) => {
+    const tx = new TransactionBlock()
+    tx.setGasBudget(parseInt(process.env.GAS_BUDGET!));
+    tx.moveCall({
+        target: '0x447b130c2b20c1dba06e268e4e6d265abe2c1d24dad568b124d3b1bd9b7d3025::blackjack::go_card',
+        arguments: [tx.object(process.env.GAME_TABLE!)],
+    });
+    const result = await signer.signAndExecuteTransactionBlock({
+        transactionBlock: tx,
+    });
+    console.log(result.objectChanges);
+    const data = {
+        flag: 'start game done',
+    };
+    ws.send(JSON.stringify(data))
 }
 
 export const endGame = async(signer: RawSigner) => {
