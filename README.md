@@ -2,6 +2,13 @@
 ShalleWeMove is <strong>Decentralized Casino</strong> of SUI ecosystem. <br>
 Enjoy <strong>Blackjack</strong> at ShallWeMove🔥!!
 
+[Get Started](#get-started) <br/>
+[Architecture](#architecture) <br/>
+[Objects](#objects) <br/>
+[Fucntions](#functions) <br/>
+[Dealer](#dealer-account-be) <br/>
+[Player](#player-account-client) <br/>
+
 # Get Started
 ## Connect Your Wallet
 ![play_1](https://github.com/ShallWeMove/SuiMove-Blackjack/assets/72509938/b432a14c-36ba-4883-9f28-092962f9a190)
