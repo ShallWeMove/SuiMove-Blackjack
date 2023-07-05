@@ -108,7 +108,7 @@ export const gameReady = async(signer: RawSigner, ws: WebSocket) => {
 
 export const getCard = async(signer: RawSigner, ws: WebSocket) => {
     const tx = new TransactionBlock()
-    tx.setGasBudget(parseInt(process.env.GAS_BUDGET!));
+    tx.setGasBudget(30000000);
     tx.moveCall({
         target: '0x447b130c2b20c1dba06e268e4e6d265abe2c1d24dad568b124d3b1bd9b7d3025::blackjack::go_card',
         arguments: [tx.object(process.env.GAME_TABLE!)],
