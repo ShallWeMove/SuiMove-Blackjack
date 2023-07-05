@@ -1,5 +1,5 @@
 # 🂡 SuiMove-Blackjack 🂡
-ShalleWeMove is <strong>Decentralized Casino</strong> of SUI ecosystem. <br>
+ShallWeMove is <strong>Decentralized Casino</strong> of SUI ecosystem. <br>
 Enjoy <strong>Blackjack</strong> at ShallWeMove🔥!!
 
 [Get Started](#get-started) <br/>
