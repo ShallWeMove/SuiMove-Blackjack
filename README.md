@@ -10,16 +10,23 @@ Enjoy <strong>Blackjack</strong> at ShallWeMove🔥!!
 ![play_2](https://github.com/ShallWeMove/SuiMove-Blackjack/assets/72509938/d8d4e823-4b02-455f-b7e7-5eb8577e7599)
 
 ## Play Blackjack!
-![play_3](https://github.com/ShallWeMove/SuiMove-Blackjack/assets/72509938/6fe393d5-3c5c-4e8f-889b-568fe774eccc)
+![play_3](https://github.com/ShallWeMove/SuiMove-Blackjack/assets/72509938/eb2e5225-c86b-4fad-b30f-28ad75108c53)
 
 
 
 # Architecture
-<img width="1141" alt="Screenshot 2023-07-04 at 22 01 06" src="https://github.com/ShallWeMove/SuiMove-Blackjack/assets/62167347/dd62065a-29a9-41b3-ad70-8923d70e87cb">
 Main logic of ShallWeMove Blackjack is developed by SUI Move. <br />
 All players can observe the <strong>smart contracts of ShallWeMove</strong> and enjoy <strong>transparent blackjack game</strong> at Decentralized Casino.<br /><br />
+<img width="1141" alt="Screenshot 2023-07-04 at 22 01 06" src="https://github.com/ShallWeMove/SuiMove-Blackjack/assets/62167347/dd62065a-29a9-41b3-ad70-8923d70e87cb">
 
 # Objects
+To ensure transparency and fairness of blackjack game, ShallWeMove utilized the <strong>Object of SUI</strong>. <br />
+There are <strong>5 types of objects</strong> for ShallWeMove Blackjack game. They enables decentralized casino which operates blackjack game <strong>totally onchain</strong>.
+- GameTable
+- Hand
+- CardDeck
+- Card
+- MoneyBox
 ## GameTable
 ``` 
 GameTable is essential object to play blackjack
