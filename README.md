@@ -10,7 +10,7 @@ Enjoy <strong>Blackjack</strong> at ShallWeMove🔥!!
 ![play_2](https://github.com/ShallWeMove/SuiMove-Blackjack/assets/72509938/d8d4e823-4b02-455f-b7e7-5eb8577e7599)
 
 ## Play Blackjack!
-![play_3](https://github.com/ShallWeMove/SuiMove-Blackjack/assets/72509938/eb2e5225-c86b-4fad-b30f-28ad75108c53)
+![play_3](https://github.com/ShallWeMove/SuiMove-Blackjack/assets/72509938/d89d01ec-65cb-44fe-8e69-6a57a8a4277b)
 
 
 
