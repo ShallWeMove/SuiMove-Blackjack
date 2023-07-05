@@ -96,25 +96,31 @@ dealer or anyone who wanna be a dealer can create new game
 
 
 # Dealer (Account, BE)
-## GameTable 
+### GameTable 
 - GameTable
     - PlayerHand
     - DealerHand
     - CardDeck
-        - [Card...]
+        - Cards : [Card...]
     - MoneyBox
-        - [Coin<SUI>...]
-## DealerHand
-## CardDeck
-## Money
-## new_game()
-## create_game_table()
-## start_game()
-## go_card()
-## stop_card()
+        - Stake : [Coin<SUI>...]
+### DealerHand
+- DelaerHand
+    - Cards : [Card...]
+### CardDeck
+- CardDeck
+    - Cards :[Card...]
+### MoneyBox
+- MoneyBox
+    - Stake : [Coin<SUI>...]
+### new_game()
+### create_game_table()
+### start_game()
+### go_card()
+### stop_card()
 # Player (Account, Client)
-## PlayerHand
+### PlayerHand
 - PlayerHand
     - [Card...]
-## ready_game()
+### ready_game()
 

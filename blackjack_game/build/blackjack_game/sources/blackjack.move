@@ -63,6 +63,7 @@ module blackjack_game::blackjack {
     card_deck_id: ID,
   }
   // TODO : sui -> casino chips
+  // place to store betting money
   struct MoneyBox has key, store {
     id: UID,
     // stake: vector<Option<Coin<SUI>>>, 
@@ -385,8 +386,8 @@ module blackjack_game::blackjack {
     let hand_sequence_number = dealer_hand.total_cards_number;
     let dealer_card_2 : Card = dynamic_object_field::remove(&mut card_deck.id, sequence_number);
     vector::pop_back<Option<ID>> (&mut card_deck.cards);
-    let decrypted_card_number = decrypt_card_number(dealer_card_2.card_number);
-    dealer_card_2.card_number = decrypted_card_number;
+    // let decrypted_card_number = decrypt_card_number(dealer_card_2.card_number);
+    // dealer_card_2.card_number = decrypted_card_number;
     vector::push_back<Option<ID>>(&mut dealer_hand.cards, option::some(object::id(&dealer_card_2)));
     dynamic_object_field::add(&mut dealer_hand.id, hand_sequence_number, dealer_card_2);
     dealer_hand.total_cards_number = dealer_hand.total_cards_number + 1;
