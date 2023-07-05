@@ -1,0 +1,6 @@
+{
+  "TESTNET_ENDPOINT": "https://sui-testnet.nodeinfra.com",
+  "PLAYER_ADDRESS": "0xdd235ff1e61e1d6f204eb567d1b4b5eca752dc2ce05d8bb23ccb82654f76c8ce",
+  "PACKAGE_OBJECT_ID": "0x447b130c2b20c1dba06e268e4e6d265abe2c1d24dad568b124d3b1bd9b7d3025",
+  "GAMETABLE_OBJECT_ID" : "0x3ae2b4d3ff1d1abbcf9be7fc88b75b6574ee0a6b768bd6ba9f9fcef2eda65fa9"
+}
