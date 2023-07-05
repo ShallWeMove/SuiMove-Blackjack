@@ -1,5 +1,12 @@
 # SuiMove-Blackjack
 
+# Architecture
+<img width="1141" alt="Screenshot 2023-07-04 at 22 01 06" src="https://github.com/ShallWeMove/SuiMove-Blackjack/assets/62167347/dd62065a-29a9-41b3-ad70-8923d70e87cb">
+
+## FE
+## BE
+## MOVE
+
 # Objects
 ## GameTable 
 // GameTable is essential object to play blackjack <br>
@@ -54,7 +61,3 @@
 - PlayerHand
     - [Card...]
 
-# Architecture
-## FE
-## BE
-## MOVE
