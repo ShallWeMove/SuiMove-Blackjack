@@ -1,7 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Button } from '@mui/material';
+import { Box, Button, Typography } from '@mui/material';
 import BackgroundImage from "../images/background.jpg";
 import card from "../images/cards/card.png";
+// import gameTableInfo from "../pages/Game";
+// import cardDeckInfo from "../pages/Game";
+// import dealerHandInfo from "../pages/Game";
+// import playerHandInfo from "../pages/Game";
+
 
 type Card = {
     suit: string,
@@ -14,7 +19,8 @@ const values = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10]; // values for 2-10, 
 // Create a WebSocket connection
 const socket = new WebSocket('ws://localhost:8080');
 
-const BlackJack: React.FC = () => {
+// const BlackJack: React.FC = () => {
+const BlackJack = ({gameTableInfo, cardDeckInfo, dealerHandInfo, playerHandInfo}) => {
     const [playerCards, setPlayerCards] = useState<Card[]>([]);
     const [dealerCards, setDealerCards] = useState<Card[]>([]);
     const [gameOver, setGameOver] = useState(false);
@@ -96,6 +102,18 @@ const BlackJack: React.FC = () => {
             }}
         >
             <h2>Blackjack Game</h2>
+            <Typography>dealer hand : {gameTableInfo.dealer_hand} total card : {dealerHandInfo.total_cards_number}</Typography>
+            <Typography>dealer cards</Typography>
+            {dealerHandInfo.cards.map((card)=>(<Typography>{card}</Typography>))}
+
+            <Typography>player hand : {gameTableInfo.player_hand} total card : {playerHandInfo.total_cards_number}</Typography>
+            <Typography>player cards</Typography>
+            {playerHandInfo.cards.map((card)=>(<Typography>{card}</Typography>))}
+
+            <Typography>card deck : {gameTableInfo.card_deck} total card : {cardDeckInfo.total_cards_number}</Typography>
+            <Typography>card deck cards</Typography>
+            {cardDeckInfo.cards.map((card)=>(<Typography>{card}</Typography>))}
+            
 
             <h3>Player's cards:</h3>
             <ul>

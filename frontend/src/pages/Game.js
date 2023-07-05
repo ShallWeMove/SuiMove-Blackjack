@@ -16,8 +16,10 @@ const Game = () => {
     const [error, setError] = useState(false);
     const [confirmed, setConfirmed] = useState(false);
 
-    const [playerObjects, setPlayerObjects] = useState([]);
-    const [cardDeckObjectId, setCardDeckObjectId] = useState("");
+    const [gameTableInfo, setGameTableInfo] = useState({});
+    const [cardDeckInfo, setCardDeckInfo] = useState({});
+    const [dealerHandInfo, setDealerHandInfo] = useState({});
+    const [playerHandInfo, setPlayerHandInfo] = useState({});
 
     // const tx = new TransactionBlock();
     // tx.setGasBudget(parseInt(process.env.GAS_BUDGET!));
@@ -42,7 +44,7 @@ const Game = () => {
     
     const handleStartButtonClick = () => {
         setConfirmed(true);
-        getObject(config.GAMETABLE_OBJECT_ID);
+        getGameTableObject(config.GAMETABLE_OBJECT_ID);
         // TODO: 
     }
 
@@ -50,7 +52,6 @@ const Game = () => {
         setBettingAmount("");
         setConfirmed(false);
     }
-
 
 
     async function getObject(object_id) {
@@ -71,19 +72,45 @@ const Game = () => {
                 },
             ]
         });
-        console.log(response);
-        const card_deck = response.data.result.data.content.fields.card_deck;
-        const dealer_hand = response.data.result.data.content.fields.dealer_hand;
-        const player_hand = response.data.result.data.content.fields.player_hand;
+        // console.log(response);
+        return response;
+    }
 
-        // const objects = response.data.result.data.map(e => {
-        //     const obj = {id: e.data.content.fields.id.id, card_deck_id: e.data.content.fields.card_deck};
-        //     return obj;
-        // });
+    async function getGameTableObject(object_id) {
+        const response = await axios.post(config.TESTNET_ENDPOINT, {
+            "jsonrpc": "2.0",
+            "id": 1,
+            "method": "sui_getObject",
+            "params": [
+                object_id,
+                {
+                    "showType": true,
+                    "showOwner": true,
+                    "showPreviousTransaction": false,
+                    "showDisplay": false,
+                    "showContent": true,
+                    "showBcs": false,
+                    "showStorageRebate": false
+                },
+            ]
+        });
+        console.log("game table",response);
+        setGameTableInfo(response.data.result.data.content.fields);
 
-        // console.log(objects);
-        
-        setCardDeckObjectId(card_deck);
+        const card_deck_id = await response.data.result.data.content.fields.card_deck;
+        const dealer_hand_id = await response.data.result.data.content.fields.dealer_hand;
+        const player_hand_id = await response.data.result.data.content.fields.player_hand;
+
+        // setCardDeckObjectId(card_deck);
+        const card_deck_response = await getObject(card_deck_id);
+        console.log("card deck", card_deck_response)
+        setCardDeckInfo(card_deck_response.data.result.data.content.fields);
+        const dealer_hand_response = await getObject(dealer_hand_id);
+        console.log("dealer hand", dealer_hand_response)
+        setDealerHandInfo(dealer_hand_response.data.result.data.content.fields);
+        const player_hand_response = await getObject(player_hand_id);
+        console.log("player hand", player_hand_response)
+        setPlayerHandInfo(player_hand_response.data.result.data.content.fields);
     }
 
     return (
@@ -103,7 +130,13 @@ const Game = () => {
             {
                 confirmed ?
                     <Box>
-                        <BlackJack resetGame={resetGame} />
+                        <BlackJack 
+                        resetGame={resetGame} 
+                        gameTableInfo={gameTableInfo}
+                        cardDeckInfo={cardDeckInfo}
+                        dealerHandInfo={dealerHandInfo}
+                        playerHandInfo={playerHandInfo}
+                        />
                     </Box>
                     :
                     <BettingAmount
