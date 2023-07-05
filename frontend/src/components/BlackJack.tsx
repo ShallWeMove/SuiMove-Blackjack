@@ -70,8 +70,10 @@ const BlackJack: React.FC = () => {
                 backgroundImage: `url(${BackgroundImage})`,
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
-                height: '88vh',
-                width: '100vw'
+                height: '100vh',
+                width: '100vw',
+                paddingTop: '14vh',
+                paddingX: '50px',
             }}
         >
             <h2>Blackjack Game</h2>
