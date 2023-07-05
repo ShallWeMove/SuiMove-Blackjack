@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Button } from '@mui/material';
-import BackgroundImage from "../images/background.png";
+import BackgroundImage from "../images/background.jpg";
 import card from "../images/cards/card.png";
 
 type Card = {

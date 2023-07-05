@@ -4,7 +4,7 @@ import { tokens } from "../theme";
 import { Box } from "@mui/material";
 import BlackJack from "../components/BlackJack.tsx";
 import BettingAmount from "../components/BettingAmount";
-import bg_landing from "../images/bg_landing.png";
+import bg_landing from "../images/bg_landing.jpg";
 
 const Game = () => {
     const theme = useTheme();
