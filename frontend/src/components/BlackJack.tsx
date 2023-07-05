@@ -118,10 +118,10 @@ const BlackJack: React.FC = () => {
                 </div>
             ) : (
                 <div>
-                    <Button variant="contained" onClick={handleGameReady}>Game Ready</Button>
+                    {/* <Button variant="contained" onClick={handleGameReady}>Game Ready</Button>
                     <Button variant="contained" onClick={handleGameStart}>Game Start</Button>
                     <Button variant="contained" onClick={handleHit}>Hit</Button>
-                    <Button variant="contained" onClick={handleStand}>Stand</Button>
+                    <Button variant="contained" onClick={handleStand}>Stand</Button> */}
                 </div>
             )}
 
@@ -235,11 +235,10 @@ const BlackJack: React.FC = () => {
                 bottom: '50px',
                 left: '20vw',
             }}>
-                <Button variant="contained" color='secondary' sx={{ width: '120px', fontWeight: '800' }}>Get Card</Button>
-                <Button variant="contained" color='secondary' sx={{ width: '120px', fontWeight: '800' }}>Ready</Button>
-                <Button variant="contained" color='secondary' sx={{ width: '120px', fontWeight: '800' }}>Shuffle</Button>
-                <Button variant="contained" color='secondary' sx={{ width: '120px', fontWeight: '800' }}>Start</Button>
-                <Button variant="contained" color='secondary' sx={{ width: '120px', fontWeight: '800' }}>Stop</Button>
+                <Button variant="contained" color='secondary' sx={{ width: '120px', fontWeight: '800' }} onClick={handleGameReady}>Game Ready</Button>
+                <Button variant="contained" color='secondary' sx={{ width: '120px', fontWeight: '800' }}onClick={handleGameStart}>Game Start</Button>
+                <Button variant="contained" color='secondary' sx={{ width: '120px', fontWeight: '800' }}onClick={handleHit}>Hit</Button>
+                <Button variant="contained" color='secondary' sx={{ width: '120px', fontWeight: '800' }}onClick={handleStand}>Stand</Button>
             </Box>
         </Box>
     );
