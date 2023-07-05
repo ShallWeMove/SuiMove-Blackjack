@@ -1,6 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Button } from '@mui/material';
 import BackgroundImage from "../images/background.png";
+import getCard from "../images/buttons/getCard.png";
+import ready from "../images/buttons/ready.png";
+import shuffle from "../images/buttons/shuffle.png";
+import start from "../images/buttons/start.png";
+import stop from "../images/buttons/stop.png";
 
 type Card = {
     suit: string,
@@ -103,6 +108,23 @@ const BlackJack: React.FC = () => {
                     <Button variant="contained" onClick={handleStand}>Stand</Button>
                 </div>
             )}
+
+            <Box
+            sx={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                width: '60vw',
+                position: 'fixed',
+                bottom: '50px',
+                left: '20vw',
+            }}>
+                <Button variant="contained" color='secondary' sx={{ width: '120px', fontWeight: '800' }}>Get Card</Button>
+                <Button variant="contained" color='secondary' sx={{ width: '120px', fontWeight: '800' }}>Ready</Button>
+                <Button variant="contained" color='secondary' sx={{ width: '120px', fontWeight: '800' }}>Shuffle</Button>
+                <Button variant="contained" color='secondary' sx={{ width: '120px', fontWeight: '800' }}>Start</Button>
+                <Button variant="contained" color='secondary' sx={{ width: '120px', fontWeight: '800' }}>Stop</Button>
+            </Box>
         </Box>
     );
 }
