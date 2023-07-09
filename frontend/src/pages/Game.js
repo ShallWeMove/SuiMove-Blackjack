@@ -121,6 +121,7 @@ const Game = () => {
                         gameTableObjectId={gameTableObjectId}
                         isPlaying={isPlaying}
                         setIsPlaying={setIsPlaying}
+                        getObject={getObject}
                         />
                     </Box>
                     :

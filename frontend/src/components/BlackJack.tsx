@@ -1,17 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Button, Typography } from '@mui/material';
 import BackgroundImage from "../images/background.jpg";
-import card from "../images/cards/card.png";
 import config from "../config.json";
 import { useWallet } from '@suiet/wallet-kit';
 import {TransactionBlock } from '@mysten/sui.js';
 import GameTableInfo from './GameTableInfo';
-
-
+import { SuiSignAndExecuteTransactionBlockInput } from "@mysten/wallet-standard"
+import CardDeck from './CardDeck';
+import DealerCardsBox from './DealerCardsBox';
+import PlayerCardsBox from './PlayerCardsBox';
 
 type Card = {
-    suit: string,
-    value: number
+    id: string,
+    card_number: number,
+    sequence_number: number,
+    is_open: boolean,
 };
 
 const suits = ['hearts', 'diamonds', 'clubs', 'spades'];
@@ -27,6 +30,7 @@ const BlackJack = ({
     dealerHandData, 
     playerHandData, 
     getGameTableObject, 
+    getObject,
     gameTableObjectId, 
     isPlaying,
 }) => {
@@ -35,7 +39,40 @@ const BlackJack = ({
     const [gameOver, setGameOver] = useState(false);
     const [message, setMessage] = useState('');
 
-    const wallet = useWallet();
+
+    // const wallet = useWallet();
+
+    // const tx = new TransactionBlock();
+    // const [coin] = tx.splitCoins(tx.gas, [tx.pure(10000)]);
+    // tx.moveCall({
+    //     target: '0x447b130c2b20c1dba06e268e4e6d265abe2c1d24dad568b124d3b1bd9b7d3025::blackjack::start_game',
+    //     arguments: [coin, tx.object(config.GAMETABLE_OBJECT_ID!), tx.pure(wallet.address)],
+    // });
+
+    // const stx: SuiSignAndExecuteTransactionBlockInput = {
+    //     transactionBlock: tx,
+    //     account: wallet.account!,
+    //     chain: 'sui:testnet'
+    // }
+    
+    // wallet.signAndExecuteTransactionBlock(stx)
+    
+    // async function setCards(cardsData, setCardsFunction) {
+    //     let cardList : Card[];
+    //     cardsData.cards.map(async (card_id) => {
+    //         const response = await getObject(card_id);
+    //         let card : Card = {
+    //             id : card_id,
+    //             card_number: response.data.result.data.content.fields.card_number,
+    //             sequence_number: response.data.result.data.content.fields.sequence_number,
+    //             is_open: response.data.result.data.content.fields.is_open,
+    //         }
+
+    //     });
+
+    //     setCardsFunction(cardList);
+    // }
+    
 
     // Handle incoming WebSocket messages
     useEffect(() => {
@@ -55,7 +92,6 @@ const BlackJack = ({
 
 
                 case 'player card open':
-                    setPlayerCards(data.args);
                     break;
                 case 'shuffle done':
                     // handle shuffle done
@@ -151,16 +187,12 @@ const BlackJack = ({
 
             <h3>Player's cards:</h3>
             <ul>
-                {playerCards.map((card, i) => (
-                    <li key={i}>{`${card.value} of ${card.suit}`}</li>
-                ))}
+                {/* {playerHandData.cards.map((card)=>(<Typography>{card}</Typography>))} */}
             </ul>
 
             <h3>Dealer's cards:</h3>
             <ul>
-                {dealerCards.map((card, i) => (
-                    <li key={i}>{`${card.value} of ${card.suit}`}</li>
-                ))}
+                {/* {dealerHandData.cards.map((card)=>(<Typography>{card}</Typography>))} */}
             </ul>
 
             {gameOver ? (
@@ -179,102 +211,37 @@ const BlackJack = ({
 
 
             {/* Card Deck */}
-            <Box
-            sx={{
-                position: "fixed",
-                right: "5vw",
-                top: "30vh",
-                width: '200px',
-                height: '200px',
-                transform: 'translateX(-100px)',
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                paddingRight: '15px',
-            }}
-            >
-                {cardDeckData.cards.map((c, i) => (
-                    <Box 
-                        key={i}
-                        sx={{
-                            width: '60px',
-                            height: '90px',
-                            backgroundImage: `url(${card})`,
-                            backgroundSize: 'cover',
-                            backgroundPosition: 'center',
-                            transform: `translateX(${-8*i}px) translateY(${3*i}px)`,
-                            position: 'absolute',
-                            cursor: 'pointer',
-                            "&:hover": {
-                                transform: `translateX(${-8*i}px) translateY(${3*i}px) scale(1.1)`,
-                            }
-                        }}
-                    />
-                ))}
-            </Box>
-            
+            {isPlaying >= 1 
+            ? 
+            <CardDeck 
+            cardDeckData={cardDeckData}
+            getObject={getObject}
+            /> 
+            : 
+            <Box/>
+            }
 
             {/* Dealer Cards Box */}
-            <Box
-            sx={{
-                position: "fixed",
-                left: "50vw",
-                top: "20vh",
-                width: '200px',
-                height: '200px',
-                transform: 'translateX(-100px)',
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                paddingRight: '15px',
-            }}
-            >
-                {dealerHandData.cards.length > 0 && dealerHandData.cards[0] && dealerHandData.cards.map((c, i) => (
-                    <div 
-                        key={i}
-                        style={{
-                            width: '60px',
-                            height: '90px',
-                            backgroundImage: `url(${card})`,
-                            backgroundSize: 'cover',
-                            backgroundPosition: 'center',
-                            transform: `translateX(${6*i}px) translateY(${-3*i}px)`,
-                            position: 'absolute',
-                        }}
-                    />
-                ))}
-            </Box>
+            {isPlaying == 2 
+            ? 
+            <DealerCardsBox 
+            dealerHandData={dealerHandData}
+            getObject={getObject}
+            /> 
+            : 
+            <Box/>
+            }
 
             {/* Player Cards Box */}
-            <Box
-            sx={{
-                position: "fixed",
-                left: "50vw",
-                bottom: "15vh",
-                width: '200px',
-                height: '200px',
-                transform: 'translateX(-100px)',
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                paddingRight: '15px',
-            }}
-            >
-                {playerHandData.cards.length > 0 && playerHandData.cards[0] && playerHandData.cards.map((c, i) => (
-                    <div 
-                        key={i}
-                        style={{
-                            width: '60px',
-                            height: '90px',
-                            backgroundImage: `url(${card})`,
-                            backgroundSize: 'cover',
-                            backgroundPosition: 'center',
-                            transform: `translateX(${6*i}px) translateY(${-3*i}px) rotate(180deg)`,
-                            position: 'absolute',
-                        }}
-                    />
-                ))}
-            </Box>
+            {isPlaying == 2 
+            ? 
+            <PlayerCardsBox 
+            playerHandData={playerHandData}
+            getObject={getObject}
+            /> 
+            : 
+            <Box/>
+            }
 
             <Box
             sx={{
