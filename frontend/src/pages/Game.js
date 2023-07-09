@@ -12,44 +12,28 @@ const Game = () => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
 
-    const [bettingAmount, setBettingAmount] = useState("");
-    const [error, setError] = useState(false);
+    const [gameTableObjectId, setGameTableObjectId] = useState("");
     const [confirmed, setConfirmed] = useState(false);
 
     const [gameTableInfo, setGameTableInfo] = useState({});
+    const [isPlaying, setIsPlaying] = useState(0);
     const [cardDeckInfo, setCardDeckInfo] = useState({});
     const [dealerHandInfo, setDealerHandInfo] = useState({});
     const [playerHandInfo, setPlayerHandInfo] = useState({});
 
-    // const tx = new TransactionBlock();
-    // tx.setGasBudget(parseInt(process.env.GAS_BUDGET!));
-    // tx.moveCall({
-    //     target: target,
-    //     arguments: argument,
-    // });
-
-    
-
-    useEffect(() => {
-        if (bettingAmount !== "") {
-            setError(isNaN(bettingAmount) || bettingAmount % 1 !== 0 || bettingAmount <= 0);
-        }
-    }, [bettingAmount]);
-
     useEffect(() => {
         console.log("confirmed: ", confirmed);
-        console.log("error: ", error);
-        console.log("betting amount: ", bettingAmount);
-    }, [confirmed, error, bettingAmount]);
+        console.log("Gametable Object Id: ", gameTableObjectId);
+    }, [confirmed, gameTableObjectId]);
     
-    const handleStartButtonClick = () => {
-        setConfirmed(true);
-        getGameTableObject(config.GAMETABLE_OBJECT_ID);
+    const handleGoToGameButtonClick = () => {
+        
+        getGameTableObject(gameTableObjectId);
         // TODO: 
     }
 
     const resetGame = () => {
-        setBettingAmount("");
+        setGameTableObjectId("");
         setConfirmed(false);
     }
 
@@ -76,41 +60,40 @@ const Game = () => {
         return response;
     }
 
-    async function getGameTableObject(object_id) {
-        const response = await axios.post(config.TESTNET_ENDPOINT, {
-            "jsonrpc": "2.0",
-            "id": 1,
-            "method": "sui_getObject",
-            "params": [
-                object_id,
-                {
-                    "showType": true,
-                    "showOwner": true,
-                    "showPreviousTransaction": false,
-                    "showDisplay": false,
-                    "showContent": true,
-                    "showBcs": false,
-                    "showStorageRebate": false
-                },
-            ]
-        });
+    async function getGameTableObject(gametable_object_id) {
+
+        const response = await getObject(gametable_object_id)
         console.log("game table",response);
-        setGameTableInfo(response.data.result.data.content.fields);
 
-        const card_deck_id = await response.data.result.data.content.fields.card_deck;
-        const dealer_hand_id = await response.data.result.data.content.fields.dealer_hand;
-        const player_hand_id = await response.data.result.data.content.fields.player_hand;
+        try {
+            setGameTableInfo(response.data.result.data.content.fields);
+            const is_playing = response.data.result.data.content.fields.is_playing;
+            setIsPlaying(is_playing)
+            setConfirmed(true);
+        } catch(err) {
+            console.log("error for getting game table information");
+            setConfirmed(false);
+        }
+        
+        const READY=1;
 
-        // setCardDeckObjectId(card_deck);
-        const card_deck_response = await getObject(card_deck_id);
-        console.log("card deck", card_deck_response)
-        setCardDeckInfo(card_deck_response.data.result.data.content.fields);
-        const dealer_hand_response = await getObject(dealer_hand_id);
-        console.log("dealer hand", dealer_hand_response)
-        setDealerHandInfo(dealer_hand_response.data.result.data.content.fields);
-        const player_hand_response = await getObject(player_hand_id);
-        console.log("player hand", player_hand_response)
-        setPlayerHandInfo(player_hand_response.data.result.data.content.fields);
+        if (isPlaying >= READY) {
+            const card_deck_id = await response.data.result.data.content.fields.card_deck;
+            const dealer_hand_id = await response.data.result.data.content.fields.dealer_hand;
+            const player_hand_id = await response.data.result.data.content.fields.player_hand;
+
+            // setCardDeckObjectId(card_deck);
+            const card_deck_response = await getObject(card_deck_id);
+            console.log("card deck", card_deck_response)
+            setCardDeckInfo(card_deck_response.data.result.data.content.fields);
+            const dealer_hand_response = await getObject(dealer_hand_id);
+            console.log("dealer hand", dealer_hand_response)
+            setDealerHandInfo(dealer_hand_response.data.result.data.content.fields);
+            const player_hand_response = await getObject(player_hand_id);
+            console.log("player hand", player_hand_response)
+            setPlayerHandInfo(player_hand_response.data.result.data.content.fields);
+        }
+        
     }
 
     return (
@@ -136,14 +119,15 @@ const Game = () => {
                         cardDeckInfo={cardDeckInfo}
                         dealerHandInfo={dealerHandInfo}
                         playerHandInfo={playerHandInfo}
+                        getGameTableObject={getGameTableObject}
+                        gameTableObjectId={gameTableObjectId}
                         />
                     </Box>
                     :
                     <BettingAmount
-                        setBettingAmount={setBettingAmount}
-                        error={error}
-                        handleStartButtonClick={handleStartButtonClick}
-                        bettingAmount={bettingAmount}
+                        setGameTableObjectId={setGameTableObjectId}
+                        handleGoToGameButtonClick={handleGoToGameButtonClick}
+                        gameTableObjectId={gameTableObjectId}
                     />
             }
         </Box>
