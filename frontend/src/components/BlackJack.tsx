@@ -139,14 +139,14 @@ const BlackJack = ({
             <h2>Blackjack Game Table : {gameTableObjectId}</h2>
             <h2>Playing : {isPlaying == 0 ? "Not Ready" : isPlaying == 1? "Ready" : "Playing"}</h2>
 
-            {/* {isPlaying>0 ? 
+            {isPlaying>0 ? 
             <GameTableInfo
                 gameTableData={gameTableData}
                 cardDeckData={cardDeckData}
                 dealerHandData={dealerHandData}
                 playerHandData={playerHandData}
             /> 
-            : <Typography>Not Ready</Typography>} */}
+            : <Typography>Not Ready</Typography>}
             
 
             <h3>Player's cards:</h3>
@@ -244,7 +244,6 @@ const BlackJack = ({
                     />
                 ))}
             </Box>
-
 
             {/* Player Cards Box */}
             <Box
