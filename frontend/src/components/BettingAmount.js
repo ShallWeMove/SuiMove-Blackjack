@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Typography, Box, TextField, Button } from "@mui/material";
 
-const BettingAmount = ({ setGameTableObjectId, error, handleGoToGameButtonClick, gameTableObjectId }) => {
+const BettingAmount = ({ setGameTableObjectId, handleGoToGameButtonClick, gameTableObjectId }) => {
 
     const handleChange = (e) => {
         setGameTableObjectId(e.target.value);
@@ -23,7 +23,6 @@ const BettingAmount = ({ setGameTableObjectId, error, handleGoToGameButtonClick,
                 color: "#5D5A88",
                 fontWeight: "bold"
             }}>
-                {/* Betting Amount */}
                 GameTable Object ID
             </Typography>
             <TextField
