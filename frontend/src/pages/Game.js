@@ -15,11 +15,11 @@ const Game = () => {
     const [gameTableObjectId, setGameTableObjectId] = useState("");
     const [confirmed, setConfirmed] = useState(false);
 
-    const [gameTableInfo, setGameTableInfo] = useState({});
+    const [gameTableData, setGameTableData] = useState({});
     const [isPlaying, setIsPlaying] = useState(0);
-    const [cardDeckInfo, setCardDeckInfo] = useState({});
-    const [dealerHandInfo, setDealerHandInfo] = useState({});
-    const [playerHandInfo, setPlayerHandInfo] = useState({});
+    const [cardDeckData, setCardDeckData] = useState({});
+    const [dealerHandData, setDealerHandData] = useState({});
+    const [playerHandData, setPlayerHandData] = useState({});
 
     useEffect(() => {
         console.log("confirmed: ", confirmed);
@@ -66,34 +66,32 @@ const Game = () => {
         console.log("game table",response);
 
         try {
-            setGameTableInfo(response.data.result.data.content.fields);
+            setGameTableData(response.data.result.data.content.fields);
             const is_playing = response.data.result.data.content.fields.is_playing;
-            setIsPlaying(is_playing)
+            setIsPlaying(is_playing);
+            
+            const READY=1;
+            if (is_playing >= READY) {
+                const card_deck_id = await response.data.result.data.content.fields.card_deck;
+                const dealer_hand_id = await response.data.result.data.content.fields.dealer_hand;
+                const player_hand_id = await response.data.result.data.content.fields.player_hand;
+    
+                // setCardDeckObjectId(card_deck);
+                const card_deck_response = await getObject(card_deck_id);
+                console.log("card deck", card_deck_response)
+                setCardDeckData(card_deck_response.data.result.data.content.fields);
+                const dealer_hand_response = await getObject(dealer_hand_id);
+                console.log("dealer hand", dealer_hand_response)
+                setDealerHandData(dealer_hand_response.data.result.data.content.fields);
+                const player_hand_response = await getObject(player_hand_id);
+                console.log("player hand", player_hand_response)
+                setPlayerHandData(player_hand_response.data.result.data.content.fields);
+            }
             setConfirmed(true);
         } catch(err) {
             console.log("error for getting game table information");
             setConfirmed(false);
         }
-        
-        const READY=1;
-
-        if (isPlaying >= READY) {
-            const card_deck_id = await response.data.result.data.content.fields.card_deck;
-            const dealer_hand_id = await response.data.result.data.content.fields.dealer_hand;
-            const player_hand_id = await response.data.result.data.content.fields.player_hand;
-
-            // setCardDeckObjectId(card_deck);
-            const card_deck_response = await getObject(card_deck_id);
-            console.log("card deck", card_deck_response)
-            setCardDeckInfo(card_deck_response.data.result.data.content.fields);
-            const dealer_hand_response = await getObject(dealer_hand_id);
-            console.log("dealer hand", dealer_hand_response)
-            setDealerHandInfo(dealer_hand_response.data.result.data.content.fields);
-            const player_hand_response = await getObject(player_hand_id);
-            console.log("player hand", player_hand_response)
-            setPlayerHandInfo(player_hand_response.data.result.data.content.fields);
-        }
-        
     }
 
     return (
@@ -115,12 +113,14 @@ const Game = () => {
                     <Box>
                         <BlackJack 
                         resetGame={resetGame} 
-                        gameTableInfo={gameTableInfo}
-                        cardDeckInfo={cardDeckInfo}
-                        dealerHandInfo={dealerHandInfo}
-                        playerHandInfo={playerHandInfo}
+                        gameTableData={gameTableData}
+                        cardDeckData={cardDeckData}
+                        dealerHandData={dealerHandData}
+                        playerHandData={playerHandData}
                         getGameTableObject={getGameTableObject}
                         gameTableObjectId={gameTableObjectId}
+                        isPlaying={isPlaying}
+                        setIsPlaying={setIsPlaying}
                         />
                     </Box>
                     :
