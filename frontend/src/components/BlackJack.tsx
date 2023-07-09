@@ -124,22 +124,6 @@ const BlackJack = ({
         getGameTableObject(config.GAMETABLE_OBJECT_ID);
     }
 
-    // const gameTableInfo = () => {
-    //     return <Box>
-    //         <Typography>dealer hand : {gameTableData.dealer_hand} total card : {dealerHandData.total_cards_number}</Typography>
-    //         <Typography>dealer cards</Typography>
-    //         {dealerHandData.cards.map((card)=>(<Typography>{card}</Typography>))}
-
-    //         <Typography>player hand : {gameTableData.player_hand} total card : {playerHandData.total_cards_number}</Typography>
-    //         <Typography>player cards</Typography>
-    //         {playerHandData.cards.map((card)=>(<Typography>{card}</Typography>))}
-
-    //         <Typography>card deck : {gameTableData.card_deck} total card : {cardDeckData.total_cards_number}</Typography>
-    //         <Typography>card deck cards</Typography>
-    //         {cardDeckData.cards.map((card)=>(<Typography>{card}</Typography>))}
-    //     </Box>
-    // }
-
     return (
         <Box
             sx={{
@@ -155,14 +139,14 @@ const BlackJack = ({
             <h2>Blackjack Game Table : {gameTableObjectId}</h2>
             <h2>Playing : {isPlaying == 0 ? "Not Ready" : isPlaying == 1? "Ready" : "Playing"}</h2>
 
-            {isPlaying>0 ? 
+            {/* {isPlaying>0 ? 
             <GameTableInfo
                 gameTableData={gameTableData}
                 cardDeckData={cardDeckData}
                 dealerHandData={dealerHandData}
                 playerHandData={playerHandData}
             /> 
-            : <Typography>Not Ready</Typography>}
+            : <Typography>Not Ready</Typography>} */}
             
 
             <h3>Player's cards:</h3>
@@ -193,6 +177,43 @@ const BlackJack = ({
                 </div>
             )}
 
+
+            {/* Card Deck */}
+            <Box
+            sx={{
+                position: "fixed",
+                right: "5vw",
+                top: "30vh",
+                width: '200px',
+                height: '200px',
+                transform: 'translateX(-100px)',
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                paddingRight: '15px',
+            }}
+            >
+                {cardDeckData.cards.map((c, i) => (
+                    <Box 
+                        key={i}
+                        sx={{
+                            width: '60px',
+                            height: '90px',
+                            backgroundImage: `url(${card})`,
+                            backgroundSize: 'cover',
+                            backgroundPosition: 'center',
+                            transform: `translateX(${-8*i}px) translateY(${3*i}px)`,
+                            position: 'absolute',
+                            cursor: 'pointer',
+                            "&:hover": {
+                                transform: `translateX(${-8*i}px) translateY(${3*i}px) scale(1.1)`,
+                            }
+                        }}
+                    />
+                ))}
+            </Box>
+            
+
             {/* Dealer Cards Box */}
             <Box
             sx={{
@@ -208,39 +229,20 @@ const BlackJack = ({
                 paddingRight: '15px',
             }}
             >
-                <div 
-                    style={{
-                        width: '60px',
-                        height: '90px',
-                        backgroundImage: `url(${card})`,
-                        backgroundSize: 'cover',
-                        backgroundPosition: 'center',
-                        position: 'absolute',
-                        transform: 'rotate(180deg)',
-                    }}
-                />
-                <div 
-                    style={{
-                        width: '60px',
-                        height: '90px',
-                        backgroundImage: `url(${card})`,
-                        backgroundSize: 'cover',
-                        backgroundPosition: 'center',
-                        transform: 'translateX(-10px) translateY(-5px) rotate(180deg)',
-                        position: 'absolute',
-                    }}
-                />
-                <div 
-                    style={{
-                        width: '60px',
-                        height: '90px',
-                        backgroundImage: `url(${card})`,
-                        backgroundSize: 'cover',
-                        backgroundPosition: 'center',
-                        transform: 'translateX(-20px) translateY(-10px) rotate(180deg)',
-                        position: 'absolute',
-                    }}
-                />
+                {dealerHandData.cards.length > 0 && dealerHandData.cards[0] && dealerHandData.cards.map((c, i) => (
+                    <div 
+                        key={i}
+                        style={{
+                            width: '60px',
+                            height: '90px',
+                            backgroundImage: `url(${card})`,
+                            backgroundSize: 'cover',
+                            backgroundPosition: 'center',
+                            transform: `translateX(${6*i}px) translateY(${-3*i}px)`,
+                            position: 'absolute',
+                        }}
+                    />
+                ))}
             </Box>
 
 
@@ -259,38 +261,20 @@ const BlackJack = ({
                 paddingRight: '15px',
             }}
             >
-                <div 
-                    style={{
-                        width: '60px',
-                        height: '90px',
-                        backgroundImage: `url(${card})`,
-                        backgroundSize: 'cover',
-                        backgroundPosition: 'center',
-                        position: 'absolute',
-                    }}
-                />
-                <div 
-                    style={{
-                        width: '60px',
-                        height: '90px',
-                        backgroundImage: `url(${card})`,
-                        backgroundSize: 'cover',
-                        backgroundPosition: 'center',
-                        transform: 'translateX(10px) translateY(-5px)',
-                        position: 'absolute',
-                    }}
-                />
-                <div 
-                    style={{
-                        width: '60px',
-                        height: '90px',
-                        backgroundImage: `url(${card})`,
-                        backgroundSize: 'cover',
-                        backgroundPosition: 'center',
-                        transform: 'translateX(20px) translateY(-10px)',
-                        position: 'absolute',
-                    }}
-                />
+                {playerHandData.cards.length > 0 && playerHandData.cards[0] && playerHandData.cards.map((c, i) => (
+                    <div 
+                        key={i}
+                        style={{
+                            width: '60px',
+                            height: '90px',
+                            backgroundImage: `url(${card})`,
+                            backgroundSize: 'cover',
+                            backgroundPosition: 'center',
+                            transform: `translateX(${6*i}px) translateY(${-3*i}px) rotate(180deg)`,
+                            position: 'absolute',
+                        }}
+                    />
+                ))}
             </Box>
 
             <Box
