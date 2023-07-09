@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Box, Button, Typography } from '@mui/material';
 import BackgroundImage from "../images/background.jpg";
 import card from "../images/cards/card.png";
-// import gameTableInfo from "../pages/Game";
-// import cardDeckInfo from "../pages/Game";
-// import dealerHandInfo from "../pages/Game";
-// import playerHandInfo from "../pages/Game";
+import config from "../config.json";
+import { useWallet } from '@suiet/wallet-kit';
+import {TransactionBlock } from '@mysten/sui.js';
+
 
 
 type Card = {
@@ -20,11 +20,13 @@ const values = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10]; // values for 2-10, 
 const socket = new WebSocket('ws://localhost:8080');
 
 // const BlackJack: React.FC = () => {
-const BlackJack = ({gameTableInfo, cardDeckInfo, dealerHandInfo, playerHandInfo}) => {
+const BlackJack = ({gameTableInfo, cardDeckInfo, dealerHandInfo, playerHandInfo, getGameTableObject, gameTableObjectId}) => {
     const [playerCards, setPlayerCards] = useState<Card[]>([]);
     const [dealerCards, setDealerCards] = useState<Card[]>([]);
     const [gameOver, setGameOver] = useState(false);
     const [message, setMessage] = useState('');
+
+    const wallet = useWallet();
 
     // Handle incoming WebSocket messages
     useEffect(() => {
@@ -61,6 +63,7 @@ const BlackJack = ({gameTableInfo, cardDeckInfo, dealerHandInfo, playerHandInfo}
                 case 'Stop done':
                     // handle Stop done
                     break;
+
                 default:
                     break;
             }
@@ -68,25 +71,47 @@ const BlackJack = ({gameTableInfo, cardDeckInfo, dealerHandInfo, playerHandInfo}
 
         // Send game start message on component mount
         // socket.send(JSON.stringify({ flag: 'game ready' }));
+        // console.log("USE EFFECT of BlackJack!!")
     }, []);
+
     const handleGameReady = () => {
         socket.send(JSON.stringify({ flag: 'game ready' }));
+        getGameTableObject(config.GAMETABLE_OBJECT_ID);
+        // gameReady();
+    }
+
+    const gameReady = async() => {
+        const tx = new TransactionBlock()
+        const [coin] = tx.splitCoins(tx.gas, [tx.pure(10000)])
+        tx.setGasBudget(30000000);
+        tx.moveCall({
+            target: '0x447b130c2b20c1dba06e268e4e6d265abe2c1d24dad568b124d3b1bd9b7d3025::blackjack::ready_game',
+            // arguments: [tx.object({Object: {ImmOrOwned:{objectId: "0xfa6cce6584e9a90754a49cf5bfca5a0082f2a44161685287e87d333563286676", version: 465653, digest: "8onXEDVjZqatzhPMaK87SW7r3Lm8C6PTYqYKmSV77GU7`" }}}), tx.object(process.env.GAME_TABLE!), coin],
+            arguments: [tx.object(process.env.GAME_INFO!), tx.object(process.env.GAME_TABLE!), coin],
+        });
+        const result = await wallet.signAndEsetGameTableObjectIdxecuteTransactionBlock({
+            transactionBlock: tx,
+        });
     }
 
     const handleGameStart = () => {
         socket.send(JSON.stringify({ flag: 'game start' }));
+        getGameTableObject(config.GAMETABLE_OBJECT_ID);
     }
 
     const handleHit = () => {
         socket.send(JSON.stringify({ flag: 'Go' }));
+        getGameTableObject(config.GAMETABLE_OBJECT_ID);
     }
 
     const handleStand = () => {
         socket.send(JSON.stringify({ flag: 'Stop' }));
+        getGameTableObject(config.GAMETABLE_OBJECT_ID);
     }
 
     const handlePlayAgain = () => {
         socket.send(JSON.stringify({ flag: 'game start' }));
+        getGameTableObject(config.GAMETABLE_OBJECT_ID);
     }
 
     return (
@@ -101,8 +126,8 @@ const BlackJack = ({gameTableInfo, cardDeckInfo, dealerHandInfo, playerHandInfo}
                 paddingX: '50px',
             }}
         >
-            <h2>Blackjack Game</h2>
-            <Typography>dealer hand : {gameTableInfo.dealer_hand} total card : {dealerHandInfo.total_cards_number}</Typography>
+            <h2>Blackjack Game Table : {gameTableObjectId}</h2>
+            {/* <Typography>dealer hand : {gameTableInfo.dealer_hand} total card : {dealerHandInfo.total_cards_number}</Typography>
             <Typography>dealer cards</Typography>
             {dealerHandInfo.cards.map((card)=>(<Typography>{card}</Typography>))}
 
@@ -112,7 +137,7 @@ const BlackJack = ({gameTableInfo, cardDeckInfo, dealerHandInfo, playerHandInfo}
 
             <Typography>card deck : {gameTableInfo.card_deck} total card : {cardDeckInfo.total_cards_number}</Typography>
             <Typography>card deck cards</Typography>
-            {cardDeckInfo.cards.map((card)=>(<Typography>{card}</Typography>))}
+            {cardDeckInfo.cards.map((card)=>(<Typography>{card}</Typography>))} */}
             
 
             <h3>Player's cards:</h3>
