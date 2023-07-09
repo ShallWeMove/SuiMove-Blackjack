@@ -243,7 +243,6 @@ const BlackJack = ({
                 />
             </Box>
 
-
             {/* Player Cards Box */}
             <Box
             sx={{
