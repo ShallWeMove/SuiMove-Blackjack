@@ -334,7 +334,7 @@ module blackjack_game::blackjack {
     // check whether player address in the game table is equal to player address from parameter
     assert!(game_table.player_address == option::some(player_address), 403);
     // pass dealer money to money box
-    bet_delear_money(game_table, money, ctx);
+    bet_dealer_money(game_table, money, ctx);
     // from now game in progress
     game_table.is_playing = GAME_IS_PLAYING;
 
@@ -400,11 +400,11 @@ module blackjack_game::blackjack {
     dynamic_object_field::add(&mut game_table.id, b"dealer_hand", dealer_hand);    
   }
 
-  fun bet_delear_money(game_table: &mut GameTable, money: Coin<SUI>, ctx: &mut TxContext) {
+  fun bet_dealer_money(game_table: &mut GameTable, money: Coin<SUI>, ctx: &mut TxContext) {
     let money_box = dynamic_object_field::borrow_mut<vector<u8>,MoneyBox>(&mut game_table.id, b"money_box");
     let money_id = object::id(&money);
     vector::push_back<Option<ID>>(&mut money_box.stake, option::some(money_id));
-    dynamic_object_field::add(&mut money_box.id, b"delear_money", money);
+    dynamic_object_field::add(&mut money_box.id, b"dealer_money", money);
   }
 
   fun decrypt_card_number(encrypted_number: u64): u64 {
