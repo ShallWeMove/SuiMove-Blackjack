@@ -1,7 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Button } from '@mui/material';
+import { Box, Button, Typography } from '@mui/material';
 import BackgroundImage from "../images/background.jpg";
 import card from "../images/cards/card.png";
+import config from "../config.json";
+import { useWallet } from '@suiet/wallet-kit';
+import {TransactionBlock } from '@mysten/sui.js';
+import GameTableInfo from './GameTableInfo';
+
+
 
 type Card = {
     suit: string,
@@ -14,11 +20,22 @@ const values = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10]; // values for 2-10, 
 // Create a WebSocket connection
 const socket = new WebSocket('ws://localhost:8080');
 
-const BlackJack: React.FC = () => {
+// const BlackJack: React.FC = () => {
+const BlackJack = ({
+    gameTableData, 
+    cardDeckData, 
+    dealerHandData, 
+    playerHandData, 
+    getGameTableObject, 
+    gameTableObjectId, 
+    isPlaying,
+}) => {
     const [playerCards, setPlayerCards] = useState<Card[]>([]);
     const [dealerCards, setDealerCards] = useState<Card[]>([]);
     const [gameOver, setGameOver] = useState(false);
     const [message, setMessage] = useState('');
+
+    const wallet = useWallet();
 
     // Handle incoming WebSocket messages
     useEffect(() => {
@@ -26,6 +43,17 @@ const BlackJack: React.FC = () => {
             const data = JSON.parse(event.data);
 
             switch (data.flag) {
+                case 'start game done':
+                    console.log("game start done!!!!!");
+                    break;
+                case 'ready game done':
+                    console.log("game ready done!!!!!");
+                    break;
+                case 'get card done':
+                    console.log("get card done!!!!!");
+                    break;
+
+
                 case 'player card open':
                     setPlayerCards(data.args);
                     break;
@@ -44,26 +72,73 @@ const BlackJack: React.FC = () => {
                 case 'Stop done':
                     // handle Stop done
                     break;
+
                 default:
                     break;
             }
         };
 
         // Send game start message on component mount
-        socket.send(JSON.stringify({ flag: 'game start' }));
+        // socket.send(JSON.stringify({ flag: 'game ready' }));
+        // console.log("USE EFFECT of BlackJack!!")
     }, []);
+
+    const handleGameReady = () => {
+        socket.send(JSON.stringify({ flag: 'game ready' }));
+        console.log('here is handleGameReady')
+        getGameTableObject(gameTableObjectId);
+        // gameReady();
+    }
+
+    // const gameReady = async() => {
+    //     const tx = new TransactionBlock()
+    //     const [coin] = tx.splitCoins(tx.gas, [tx.pure(10000)])
+    //     tx.setGasBudget(30000000);
+    //     tx.moveCall({
+    //         target: '0x447b130c2b20c1dba06e268e4e6d265abe2c1d24dad568b124d3b1bd9b7d3025::blackjack::ready_game',
+    //         // arguments: [tx.object({Object: {ImmOrOwned:{objectId: "0xfa6cce6584e9a90754a49cf5bfca5a0082f2a44161685287e87d333563286676", version: 465653, digest: "8onXEDVjZqatzhPMaK87SW7r3Lm8C6PTYqYKmSV77GU7`" }}}), tx.object(process.env.GAME_TABLE!), coin],
+    //         arguments: [tx.object(process.env.GAME_INFO!), tx.object(process.env.GAME_TABLE!), coin],
+    //     });
+    //     const result = await wallet.signAndEsetGameTableObjectIdxecuteTransactionBlock({
+    //         transactionBlock: tx,
+    //     });
+    // }
+
+    const handleGameStart = () => {
+        socket.send(JSON.stringify({ flag: 'game start' }));
+        getGameTableObject(config.GAMETABLE_OBJECT_ID);
+    }
 
     const handleHit = () => {
         socket.send(JSON.stringify({ flag: 'Go' }));
+        getGameTableObject(config.GAMETABLE_OBJECT_ID);
     }
 
     const handleStand = () => {
         socket.send(JSON.stringify({ flag: 'Stop' }));
+        getGameTableObject(config.GAMETABLE_OBJECT_ID);
     }
 
     const handlePlayAgain = () => {
         socket.send(JSON.stringify({ flag: 'game start' }));
+        getGameTableObject(config.GAMETABLE_OBJECT_ID);
     }
+
+    // const gameTableInfo = () => {
+    //     return <Box>
+    //         <Typography>dealer hand : {gameTableData.dealer_hand} total card : {dealerHandData.total_cards_number}</Typography>
+    //         <Typography>dealer cards</Typography>
+    //         {dealerHandData.cards.map((card)=>(<Typography>{card}</Typography>))}
+
+    //         <Typography>player hand : {gameTableData.player_hand} total card : {playerHandData.total_cards_number}</Typography>
+    //         <Typography>player cards</Typography>
+    //         {playerHandData.cards.map((card)=>(<Typography>{card}</Typography>))}
+
+    //         <Typography>card deck : {gameTableData.card_deck} total card : {cardDeckData.total_cards_number}</Typography>
+    //         <Typography>card deck cards</Typography>
+    //         {cardDeckData.cards.map((card)=>(<Typography>{card}</Typography>))}
+    //     </Box>
+    // }
 
     return (
         <Box
@@ -77,7 +152,18 @@ const BlackJack: React.FC = () => {
                 paddingX: '50px',
             }}
         >
-            <h2>Blackjack Game</h2>
+            <h2>Blackjack Game Table : {gameTableObjectId}</h2>
+            <h2>Playing : {isPlaying == 0 ? "Not Ready" : isPlaying == 1? "Ready" : "Playing"}</h2>
+
+            {isPlaying>0 ? 
+            <GameTableInfo
+                gameTableData={gameTableData}
+                cardDeckData={cardDeckData}
+                dealerHandData={dealerHandData}
+                playerHandData={playerHandData}
+            /> 
+            : <Typography>Not Ready</Typography>}
+            
 
             <h3>Player's cards:</h3>
             <ul>
@@ -100,8 +186,10 @@ const BlackJack: React.FC = () => {
                 </div>
             ) : (
                 <div>
+                    {/* <Button variant="contained" onClick={handleGameReady}>Game Ready</Button>
+                    <Button variant="contained" onClick={handleGameStart}>Game Start</Button>
                     <Button variant="contained" onClick={handleHit}>Hit</Button>
-                    <Button variant="contained" onClick={handleStand}>Stand</Button>
+                    <Button variant="contained" onClick={handleStand}>Stand</Button> */}
                 </div>
             )}
 
@@ -215,11 +303,10 @@ const BlackJack: React.FC = () => {
                 bottom: '50px',
                 left: '20vw',
             }}>
-                <Button variant="contained" color='secondary' sx={{ width: '120px', fontWeight: '800' }}>Get Card</Button>
-                <Button variant="contained" color='secondary' sx={{ width: '120px', fontWeight: '800' }}>Ready</Button>
-                <Button variant="contained" color='secondary' sx={{ width: '120px', fontWeight: '800' }}>Shuffle</Button>
-                <Button variant="contained" color='secondary' sx={{ width: '120px', fontWeight: '800' }}>Start</Button>
-                <Button variant="contained" color='secondary' sx={{ width: '120px', fontWeight: '800' }}>Stop</Button>
+                <Button variant="contained" color='secondary' sx={{ width: '120px', fontWeight: '800' }} onClick={handleGameReady}>Game Ready</Button>
+                <Button variant="contained" color='secondary' sx={{ width: '120px', fontWeight: '800' }}onClick={handleGameStart}>Game Start</Button>
+                <Button variant="contained" color='secondary' sx={{ width: '120px', fontWeight: '800' }}onClick={handleHit}>Hit</Button>
+                <Button variant="contained" color='secondary' sx={{ width: '120px', fontWeight: '800' }}onClick={handleStand}>Stand</Button>
             </Box>
         </Box>
     );

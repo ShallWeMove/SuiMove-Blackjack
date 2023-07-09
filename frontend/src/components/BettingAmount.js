@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Typography, Box, TextField, Button } from "@mui/material";
 
-const BettingAmount = ({ setBettingAmount, error, handleStartButtonClick, bettingAmount }) => {
+const BettingAmount = ({ setGameTableObjectId, handleGoToGameButtonClick, gameTableObjectId }) => {
 
     const handleChange = (e) => {
-        setBettingAmount(e.target.value);
+        setGameTableObjectId(e.target.value);
     }
 
     return (
@@ -23,14 +23,12 @@ const BettingAmount = ({ setBettingAmount, error, handleStartButtonClick, bettin
                 color: "#5D5A88",
                 fontWeight: "bold"
             }}>
-                Betting Amount
+                GameTable Object ID
             </Typography>
             <TextField
-                id="betting-amount"
-                label="Please enter the betting amount."
-                error={error}
-                helperText={error ? "Please input a valid number" : ""}
-                value={bettingAmount}
+                id="gametable-object-id"
+                label="Please enter the gametable object id."
+                value={gameTableObjectId}
                 onChange={handleChange}
                 InputProps={{
                     sx: {
@@ -57,15 +55,14 @@ const BettingAmount = ({ setBettingAmount, error, handleStartButtonClick, bettin
             />
             <Button
                 variant="contained"
-                disabled={error || bettingAmount === ""}
                 sx={{
                     width: "20.875rem",
                     height: "3.53119rem",
                     borderRadius: "30px"
                 }}
-                onClick={handleStartButtonClick}
+                onClick={handleGoToGameButtonClick}
             >
-                Game Ready
+                Go To Game
             </Button>
         </Box>
     )
