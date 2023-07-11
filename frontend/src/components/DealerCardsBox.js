@@ -5,7 +5,6 @@ import card from "../images/cards/card.png";
 
 const DealerCardsBox = ({
     dealerHandData, 
-    getObject,
 }) => {
 
     return (
@@ -37,15 +36,6 @@ const DealerCardsBox = ({
                 }}
             />
         ))}
-        {/* <ul>
-            {
-                dealerHandData.cards.map((c, i) => {
-                    return  <Typography key={i}>{c}</Typography>
-                })
-            // )
-            }
-        </ul> */}
-        
         </Box> 
     )
 }

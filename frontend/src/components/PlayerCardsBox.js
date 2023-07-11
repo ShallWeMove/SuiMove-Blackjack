@@ -5,7 +5,6 @@ import card from "../images/cards/card.png";
 
 const PlayerCardsBox = ({
     playerHandData, 
-    getObject,
 }) => {
 
     return (
@@ -37,11 +36,6 @@ const PlayerCardsBox = ({
                     }}
                 />
             ))}
-            {/* <ul>
-                {playerHandData.cards.map((c, i) => {
-                    return <Typography key={i}>{c}</Typography>
-                })}
-            </ul> */}
         </Box> 
     )
 }

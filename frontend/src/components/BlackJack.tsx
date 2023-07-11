@@ -29,8 +29,7 @@ const BlackJack = ({
     cardDeckData, 
     dealerHandData, 
     playerHandData, 
-    getGameTableObject, 
-    getObject,
+    getGameTableObjectData, 
     gameTableObjectId, 
     isPlaying,
 }) => {
@@ -40,22 +39,7 @@ const BlackJack = ({
     const [message, setMessage] = useState('');
 
 
-    // const wallet = useWallet();
-
-    // const tx = new TransactionBlock();
-    // const [coin] = tx.splitCoins(tx.gas, [tx.pure(10000)]);
-    // tx.moveCall({
-    //     target: '0x447b130c2b20c1dba06e268e4e6d265abe2c1d24dad568b124d3b1bd9b7d3025::blackjack::start_game',
-    //     arguments: [coin, tx.object(config.GAMETABLE_OBJECT_ID!), tx.pure(wallet.address)],
-    // });
-
-    // const stx: SuiSignAndExecuteTransactionBlockInput = {
-    //     transactionBlock: tx,
-    //     account: wallet.account!,
-    //     chain: 'sui:testnet'
-    // }
     
-    // wallet.signAndExecuteTransactionBlock(stx)
     
     // async function setCards(cardsData, setCardsFunction) {
     //     let cardList : Card[];
@@ -90,21 +74,6 @@ const BlackJack = ({
                     console.log("get card done!!!!!");
                     break;
 
-
-                case 'player card open':
-                    break;
-                case 'shuffle done':
-                    // handle shuffle done
-                    break;
-                case 'playerFirst done':
-                case 'dealerFirst done':
-                case 'playerSecond done':
-                case 'dealerSecond done':
-                    // handle card open
-                    break;
-                case 'Go done':
-                    // handle Go done
-                    break;
                 case 'Stop done':
                     // handle Stop done
                     break;
@@ -119,45 +88,52 @@ const BlackJack = ({
         // console.log("USE EFFECT of BlackJack!!")
     }, []);
 
-    const handleGameReady = () => {
-        socket.send(JSON.stringify({ flag: 'game ready' }));
-        console.log('here is handleGameReady')
-        getGameTableObject(gameTableObjectId);
-        // gameReady();
+
+    const wallet = useWallet();
+
+    // 작동 안 함...ㅜ
+    const gameReady = async() => {
+        const tx = new TransactionBlock();
+        const [coin] = tx.splitCoins(tx.gas, [tx.pure(10000)]);
+        tx.moveCall({
+            target: '0x4b3bfa005ed21de65788549977512c2e4761bdd7640e9ed5ff240b8b1fd9f2ea::blackjack::ready_game',
+            arguments: [coin, tx.object(gameTableObjectId), tx.pure(wallet.address)],
+        });
+
+        const stx: SuiSignAndExecuteTransactionBlockInput = {
+            transactionBlock: tx,
+            account: wallet.account!,
+            chain: 'sui:testnet'
+        }
+
+        wallet.signAndExecuteTransactionBlock(stx).then()
     }
 
-    // const gameReady = async() => {
-    //     const tx = new TransactionBlock()
-    //     const [coin] = tx.splitCoins(tx.gas, [tx.pure(10000)])
-    //     tx.setGasBudget(30000000);
-    //     tx.moveCall({
-    //         target: '0x447b130c2b20c1dba06e268e4e6d265abe2c1d24dad568b124d3b1bd9b7d3025::blackjack::ready_game',
-    //         // arguments: [tx.object({Object: {ImmOrOwned:{objectId: "0xfa6cce6584e9a90754a49cf5bfca5a0082f2a44161685287e87d333563286676", version: 465653, digest: "8onXEDVjZqatzhPMaK87SW7r3Lm8C6PTYqYKmSV77GU7`" }}}), tx.object(process.env.GAME_TABLE!), coin],
-    //         arguments: [tx.object(process.env.GAME_INFO!), tx.object(process.env.GAME_TABLE!), coin],
-    //     });
-    //     const result = await wallet.signAndEsetGameTableObjectIdxecuteTransactionBlock({
-    //         transactionBlock: tx,
-    //     });
-    // }
+    const handleGameReady = async () => {
+        // socket.send(JSON.stringify({ flag: 'game ready' }));
+        await gameReady();
+        console.log('here is handleGameReady')
+        getGameTableObjectData(gameTableObjectId);
+    }
 
     const handleGameStart = () => {
         socket.send(JSON.stringify({ flag: 'game start' }));
-        getGameTableObject(config.GAMETABLE_OBJECT_ID);
+        getGameTableObjectData(gameTableObjectId);
     }
 
-    const handleHit = () => {
+    const handleHit = async () => {
         socket.send(JSON.stringify({ flag: 'Go' }));
-        getGameTableObject(config.GAMETABLE_OBJECT_ID);
+        getGameTableObjectData(gameTableObjectId);
     }
 
     const handleStand = () => {
         socket.send(JSON.stringify({ flag: 'Stop' }));
-        getGameTableObject(config.GAMETABLE_OBJECT_ID);
+        getGameTableObjectData(gameTableObjectId);
     }
 
     const handlePlayAgain = () => {
         socket.send(JSON.stringify({ flag: 'game start' }));
-        getGameTableObject(config.GAMETABLE_OBJECT_ID);
+        getGameTableObjectData(gameTableObjectId);
     }
 
     return (
@@ -187,61 +163,26 @@ const BlackJack = ({
 
             <h3>Player's cards:</h3>
             <ul>
-                {/* {playerHandData.cards.map((card)=>(<Typography>{card}</Typography>))} */}
+                {playerHandData.cards.map((card)=>(<Typography>{card}</Typography>))}
             </ul>
 
             <h3>Dealer's cards:</h3>
             <ul>
-                {/* {dealerHandData.cards.map((card)=>(<Typography>{card}</Typography>))} */}
+                {dealerHandData.cards.map((card)=>(<Typography>{card}</Typography>))}
             </ul>
-
-            {gameOver ? (
-                <div>
-                    <p>{message}</p>
-                    <Button variant="contained" onClick={handlePlayAgain}>Play Again</Button>
-                </div>
-            ) : (
-                <div>
-                    {/* <Button variant="contained" onClick={handleGameReady}>Game Ready</Button>
-                    <Button variant="contained" onClick={handleGameStart}>Game Start</Button>
-                    <Button variant="contained" onClick={handleHit}>Hit</Button>
-                    <Button variant="contained" onClick={handleStand}>Stand</Button> */}
-                </div>
-            )}
 
 
             {/* Card Deck */}
             {isPlaying >= 1 
-            ? 
-            <CardDeck 
-            cardDeckData={cardDeckData}
-            getObject={getObject}
-            /> 
-            : 
-            <Box/>
-            }
+            ? <CardDeck cardDeckData={cardDeckData}/> : <Box/>}
 
             {/* Dealer Cards Box */}
             {isPlaying == 2 
-            ? 
-            <DealerCardsBox 
-            dealerHandData={dealerHandData}
-            getObject={getObject}
-            /> 
-            : 
-            <Box/>
-            }
+            ?  <DealerCardsBox dealerHandData={dealerHandData}/> : <Box/> }
 
             {/* Player Cards Box */}
             {isPlaying == 2 
-            ? 
-            <PlayerCardsBox 
-            playerHandData={playerHandData}
-            getObject={getObject}
-            /> 
-            : 
-            <Box/>
-            }
+            ?  <PlayerCardsBox playerHandData={playerHandData}/> : <Box/> }
 
             <Box
             sx={{
