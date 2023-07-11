@@ -5,7 +5,6 @@ import card from "../images/cards/card.png";
 
 const CardDeck = ({
     cardDeckData, 
-    getObject,
 }) => {
 
     return (
