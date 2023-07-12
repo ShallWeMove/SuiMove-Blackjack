@@ -163,12 +163,12 @@ const BlackJack = ({
 
             <h3>Player's cards:</h3>
             <ul>
-                {playerHandData.cards.map((card)=>(<Typography>{card}</Typography>))}
+                {playerHandData.cards?.map((card)=>(<Typography>{card}</Typography>))}
             </ul>
 
             <h3>Dealer's cards:</h3>
             <ul>
-                {dealerHandData.cards.map((card)=>(<Typography>{card}</Typography>))}
+                {dealerHandData.cards?.map((card)=>(<Typography>{card}</Typography>))}
             </ul>
 
 
