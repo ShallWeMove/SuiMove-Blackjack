@@ -14,7 +14,7 @@ function WalletButton() {
         if (wallet.status == 'connected') {
             console.log('wallet status: ', wallet.status)
             console.log('wallet address: ', wallet.account.address)
-            console.log('wallect balance: ',)
+            console.log('wallect balance: ', wallet)
             navigate("/game")
         } else {
             console.log('wallet status', wallet.status)

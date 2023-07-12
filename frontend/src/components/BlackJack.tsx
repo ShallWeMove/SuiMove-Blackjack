@@ -95,23 +95,24 @@ const BlackJack = ({
     const gameReady = async() => {
         const tx = new TransactionBlock();
         const [coin] = tx.splitCoins(tx.gas, [tx.pure(10000)]);
+        // tx.pure(wallet.address)
         tx.moveCall({
             target: '0x4b3bfa005ed21de65788549977512c2e4761bdd7640e9ed5ff240b8b1fd9f2ea::blackjack::ready_game',
-            arguments: [coin, tx.object(gameTableObjectId), tx.pure(wallet.address)],
+            arguments: [tx.object(config.GAME_INFO_OBJECT_ID), tx.object(gameTableObjectId) , coin],
         });
 
-        const stx: SuiSignAndExecuteTransactionBlockInput = {
+        const stx: Omit<SuiSignAndExecuteTransactionBlockInput,'sui:testnet'> = {
             transactionBlock: tx,
             account: wallet.account!,
             chain: 'sui:testnet'
         }
 
-        wallet.signAndExecuteTransactionBlock(stx).then()
+        console.log(await wallet.signAndExecuteTransactionBlock(stx))
     }
 
-    const handleGameReady = async () => {
+    const handleGameReady = () => {
         // socket.send(JSON.stringify({ flag: 'game ready' }));
-        await gameReady();
+        gameReady();
         console.log('here is handleGameReady')
         getGameTableObjectData(gameTableObjectId);
     }
@@ -161,14 +162,16 @@ const BlackJack = ({
             : <Typography>Not Ready</Typography>}
             
 
+            {/* 디버깅용 */}
             <h3>Player's cards:</h3>
             <ul>
-                {playerHandData.cards?.map((card)=>(<Typography>{card}</Typography>))}
+                {isPlaying == 2 ? 
+                playerHandData.cards.map((card, i)=>(<Typography key={i}>{card}</Typography>)) : <Box/>}
             </ul>
-
             <h3>Dealer's cards:</h3>
             <ul>
-                {dealerHandData.cards?.map((card)=>(<Typography>{card}</Typography>))}
+                {isPlaying == 2 ? 
+                dealerHandData.cards.map((card, i)=>(<Typography key={i}>{card}</Typography>)) : <Box/>}
             </ul>
 
 

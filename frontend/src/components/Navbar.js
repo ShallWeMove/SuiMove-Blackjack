@@ -62,7 +62,7 @@ const Navbar = () => {
                         }
                     </IconButton>
                 </Box> */}
-                <WalletProvider>
+                <WalletProvider chains={[{id:"sui:testnet", name:"Sui Testnet", rpcUrl:"https://sui-testnet.nodeinfra.com"}]}>
                     <WalletButton />
                 </WalletProvider>
             </Toolbar>
