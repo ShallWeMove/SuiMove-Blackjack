@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Button, Typography } from '@mui/material';
+import { Box, Button, Input, Typography } from '@mui/material';
 import BackgroundImage from "../images/background.jpg";
 import config from "../config.json";
 import { useWallet } from '@suiet/wallet-kit';
@@ -38,25 +38,16 @@ const BlackJack = ({
     const [gameOver, setGameOver] = useState(false);
     const [message, setMessage] = useState('');
 
+    const wallet = useWallet();
 
-    
-    
-    // async function setCards(cardsData, setCardsFunction) {
-    //     let cardList : Card[];
-    //     cardsData.cards.map(async (card_id) => {
-    //         const response = await getObject(card_id);
-    //         let card : Card = {
-    //             id : card_id,
-    //             card_number: response.data.result.data.content.fields.card_number,
-    //             sequence_number: response.data.result.data.content.fields.sequence_number,
-    //             is_open: response.data.result.data.content.fields.is_open,
-    //         }
-
-    //     });
-
-    //     setCardsFunction(cardList);
-    // }
-    
+    useEffect(() => {
+        if (wallet.status === 'connected') {
+            console.log('blackjack wallet status: ', wallet.status)
+            console.log('blackjack wallect balance: ', wallet.address)
+        } else {
+            console.log('blackjack wallet status', wallet.status)
+        }
+    }, [wallet.connected])
 
     // Handle incoming WebSocket messages
     useEffect(() => {
@@ -65,12 +56,11 @@ const BlackJack = ({
 
             switch (data.flag) {
                 case 'start game done':
+                    getGameTableObjectData(gameTableObjectId);
                     console.log("game start done!!!!!");
                     break;
-                case 'ready game done':
-                    console.log("game ready done!!!!!");
-                    break;
                 case 'get card done':
+                    getGameTableObjectData(gameTableObjectId);
                     console.log("get card done!!!!!");
                     break;
 
@@ -89,15 +79,16 @@ const BlackJack = ({
     }, []);
 
 
-    const wallet = useWallet();
+    
 
     // 작동 안 함...ㅜ 
     const gameReady = async() => {
         const tx = new TransactionBlock();
         const [coin] = tx.splitCoins(tx.gas, [tx.pure(10000)]);
-        // tx.pure(wallet.address)
+        tx.setGasBudget(parseInt("10000000"));
+        const package_module_function = "0xc7e14d7894e8a75a0fcf947850b7af8477f7cbf494d690dc584b7ef172cea502::blackjack::ready_game"
         tx.moveCall({
-            target: '0x4b3bfa005ed21de65788549977512c2e4761bdd7640e9ed5ff240b8b1fd9f2ea::blackjack::ready_game',
+            target: package_module_function,
             arguments: [tx.object(config.GAME_INFO_OBJECT_ID), tx.object(gameTableObjectId) , coin],
         });
 
@@ -110,15 +101,20 @@ const BlackJack = ({
         console.log(await wallet.signAndExecuteTransactionBlock(stx))
     }
 
-    const handleGameReady = () => {
+    const handleGameReady = async () => {
         // socket.send(JSON.stringify({ flag: 'game ready' }));
-        gameReady();
-        console.log('here is handleGameReady')
-        getGameTableObjectData(gameTableObjectId);
+        await gameReady();
+        await getGameTableObjectData(gameTableObjectId);
+        console.log('game ready done!!!!!')
     }
 
     const handleGameStart = () => {
-        socket.send(JSON.stringify({ flag: 'game start' }));
+        socket.send(JSON.stringify({ 
+            flag: 'game start', 
+            gameTableObjectId: gameTableObjectId,
+            playerAddress: gameTableObjectId 
+        
+        }));
         getGameTableObjectData(gameTableObjectId);
     }
 

@@ -40,7 +40,6 @@ export default async function fetchGameTableObject(
     try {
         setGameTableData(response.data.result.data.content.fields);
         const is_playing = response.data.result.data.content.fields.is_playing;
-        setIsPlaying(is_playing);
         
         const READY=1;
         if (is_playing >= READY) {
@@ -59,6 +58,7 @@ export default async function fetchGameTableObject(
             console.log("player hand", player_hand_response)
             setPlayerHandData(player_hand_response.data.result.data.content.fields);
         }
+        setIsPlaying(is_playing);
         setConfirmed(true);
     } catch(err) {
         console.log("error for getting game table information");

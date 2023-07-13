@@ -6,6 +6,7 @@ import BlackJack from "../components/BlackJack.tsx";
 import BettingAmount from "../components/BettingAmount";
 import bg_landing from "../images/bg_landing.jpg";
 import fetchGameTableObject from "../components/GetFunctions"
+import { useWallet } from '@suiet/wallet-kit';
 
 const Game = () => {
     const theme = useTheme();
