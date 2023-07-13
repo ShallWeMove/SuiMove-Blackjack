@@ -12,8 +12,6 @@ import {
 import dotenv from "dotenv";
 import { version } from "os";
 import WebSocket from 'ws';
-// import config from '../../frontend/src/config.json'
-// import { decrypt } from './encrypt';
   
 dotenv.config();
   
@@ -61,19 +59,16 @@ const moveCall = async (target: `${string}::${string}::${string}`, signer: RawSi
 };
 
 
-export const startGame = async(signer: RawSigner, address: string, ws: WebSocket) => {
-    // const result = await moveCall('0x::blackjack::start_game', signer, ['a', 'b'], TransactionArgument[])
-
-    // return result
+export const startGame = async(signer: RawSigner, address: string, package_id:string, game_table_id: string,  ws: WebSocket) => {
     const tx = new TransactionBlock()
     const [coin] = tx.splitCoins(tx.gas, [tx.pure(10000)]);
-    // tx.setGasBudget(parseInt(process.env.GAS_BUDGET!));
     tx.setGasBudget(30000000);
+    const module = "blackjack"
+    const function_name = "start_game"
+
     tx.moveCall({
-        // need package id
-        target: '0x447b130c2b20c1dba06e268e4e6d265abe2c1d24dad568b124d3b1bd9b7d3025::blackjack::start_game',
-        // need game table id
-        arguments: [tx.object(process.env.GAME_TABLE!), coin, tx.pure(address)],
+        target: `${package_id}::${module}::${function_name}`,
+        arguments: [tx.object(game_table_id), coin, tx.pure(address)],
     });
     const result = await signer.signAndExecuteTransactionBlock({
         transactionBlock: tx,
@@ -85,33 +80,14 @@ export const startGame = async(signer: RawSigner, address: string, ws: WebSocket
     ws.send(JSON.stringify(data))
 }
 
-export const gameReady = async(signer: RawSigner, ws: WebSocket) => {
-    const tx = new TransactionBlock()
-    let i = 0;
-    // tx.setGasBudget(parseInt(process.env.GAS_BUDGET!));
-    const [coin] = tx.splitCoins(tx.gas, [tx.pure(10000)])
-    tx.setGasBudget(30000000);
-    tx.moveCall({
-        target: '0x447b130c2b20c1dba06e268e4e6d265abe2c1d24dad568b124d3b1bd9b7d3025::blackjack::ready_game',
-        // arguments: [tx.object({Object: {ImmOrOwned:{objectId: "0xfa6cce6584e9a90754a49cf5bfca5a0082f2a44161685287e87d333563286676", version: 465653, digest: "8onXEDVjZqatzhPMaK87SW7r3Lm8C6PTYqYKmSV77GU7`" }}}), tx.object(process.env.GAME_TABLE!), coin],
-        arguments: [tx.object(process.env.GAME_INFO!), tx.object(process.env.GAME_TABLE!), coin],
-    });
-    const result = await signer.signAndExecuteTransactionBlock({
-        transactionBlock: tx,
-    });
-    // console.log(result.objectChanges);
-    const data = {
-        flag: 'ready game done',
-    };
-    ws.send(JSON.stringify(data))
-}
-
-export const getCard = async(signer: RawSigner, ws: WebSocket) => {
+export const goCard = async(signer: RawSigner, package_id:string, game_table_id:string, ws: WebSocket) => {
     const tx = new TransactionBlock()
     tx.setGasBudget(30000000);
+    const module = "blackjack"
+    const function_name = "go_card"
     tx.moveCall({
-        target: '0x447b130c2b20c1dba06e268e4e6d265abe2c1d24dad568b124d3b1bd9b7d3025::blackjack::go_card',
-        arguments: [tx.object(process.env.GAME_TABLE!)],
+        target: `${package_id}::${module}::${function_name}`,
+        arguments: [tx.object(game_table_id), tx.pure(1)],
     });
     const result = await signer.signAndExecuteTransactionBlock({
         transactionBlock: tx,
@@ -123,8 +99,22 @@ export const getCard = async(signer: RawSigner, ws: WebSocket) => {
     ws.send(JSON.stringify(data))
 }
 
-export const endGame = async(signer: RawSigner) => {
-    // const result = await moveCall('0x::blackjack::end_game', signer, ['a', 'b'], TransactionArgument[])
-
-    // return result
+export const endGame = async(signer: RawSigner, package_id:string, game_table_id:string, ws: WebSocket) => {
+    // const tx = new TransactionBlock()
+    // tx.setGasBudget(30000000);
+    // const module = "blackjack"
+    // const function_name = "stop"
+    // tx.moveCall({
+    //     target: `${package_id}::${module}::${function_name}`,
+    //     // arguments: [tx.object(game_table_id), tx.pure(1)],
+    //     arguments: [tx.object(game_table_id), tx.pure(1)],
+    // });
+    // const result = await signer.signAndExecuteTransactionBlock({
+    //     transactionBlock: tx,
+    // });
+    // console.log(result.objectChanges);
+    const data = {
+        flag: 'stop game done',
+    };
+    ws.send(JSON.stringify(data))
 }
