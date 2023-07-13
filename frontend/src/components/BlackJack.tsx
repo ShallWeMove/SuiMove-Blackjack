@@ -17,9 +17,6 @@ type Card = {
     is_open: boolean,
 };
 
-const suits = ['hearts', 'diamonds', 'clubs', 'spades'];
-const values = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10]; // values for 2-10, J, Q, K
-
 // Create a WebSocket connection
 const socket = new WebSocket('ws://localhost:8080');
 
@@ -64,8 +61,10 @@ const BlackJack = ({
                     console.log("get card done!!!!!");
                     break;
 
-                case 'Stop done':
+                case 'stop game done':
                     // handle Stop done
+                    getGameTableObjectData(gameTableObjectId);
+                    console.log("game stop done!!!!!");
                     break;
 
                 default:
@@ -73,22 +72,18 @@ const BlackJack = ({
             }
         };
 
-        // Send game start message on component mount
-        // socket.send(JSON.stringify({ flag: 'game ready' }));
-        // console.log("USE EFFECT of BlackJack!!")
     }, []);
 
-
-    
-
-    // 작동 안 함...ㅜ 
+    // now this function works!
     const gameReady = async() => {
         const tx = new TransactionBlock();
         const [coin] = tx.splitCoins(tx.gas, [tx.pure(10000)]);
-        tx.setGasBudget(parseInt("10000000"));
-        const package_module_function = "0xc7e14d7894e8a75a0fcf947850b7af8477f7cbf494d690dc584b7ef172cea502::blackjack::ready_game"
+        tx.setGasBudget(30000000);
+        const package_id = config.PACKAGE_OBJECT_ID;
+        const module = "blackjack"
+        const function_name = "ready_game"
         tx.moveCall({
-            target: package_module_function,
+            target: `${package_id}::${module}::${function_name}`,
             arguments: [tx.object(config.GAME_INFO_OBJECT_ID), tx.object(gameTableObjectId) , coin],
         });
 
@@ -102,7 +97,6 @@ const BlackJack = ({
     }
 
     const handleGameReady = async () => {
-        // socket.send(JSON.stringify({ flag: 'game ready' }));
         await gameReady();
         await getGameTableObjectData(gameTableObjectId);
         console.log('game ready done!!!!!')
@@ -110,27 +104,29 @@ const BlackJack = ({
 
     const handleGameStart = () => {
         socket.send(JSON.stringify({ 
-            flag: 'game start', 
+            flag: 'Start Game', 
+            packageObjectId: config.PACKAGE_OBJECT_ID,
             gameTableObjectId: gameTableObjectId,
-            playerAddress: gameTableObjectId 
-        
+            playerAddress: wallet.address 
         }));
-        getGameTableObjectData(gameTableObjectId);
     }
 
     const handleHit = async () => {
-        socket.send(JSON.stringify({ flag: 'Go' }));
-        getGameTableObjectData(gameTableObjectId);
+        socket.send(JSON.stringify({ 
+            flag: 'Go Card',
+            packageObjectId: config.PACKAGE_OBJECT_ID,
+            gameTableObjectId: gameTableObjectId,
+            playerAddress: wallet.address 
+    }));
     }
 
     const handleStand = () => {
-        socket.send(JSON.stringify({ flag: 'Stop' }));
-        getGameTableObjectData(gameTableObjectId);
-    }
-
-    const handlePlayAgain = () => {
-        socket.send(JSON.stringify({ flag: 'game start' }));
-        getGameTableObjectData(gameTableObjectId);
+        socket.send(JSON.stringify({ 
+            flag: 'Stop Game',
+            packageObjectId: config.PACKAGE_OBJECT_ID,
+            gameTableObjectId: gameTableObjectId,
+            playerAddress: wallet.address 
+        }));
     }
 
     console.log("Player Hands: ", playerHandData.cards)
