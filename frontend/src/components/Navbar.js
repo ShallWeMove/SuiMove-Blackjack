@@ -4,7 +4,7 @@ import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import WalletButton from './WalletButton';
-import { WalletProvider } from '@suiet/wallet-kit';
+import { WalletProvider, useWallet } from '@suiet/wallet-kit';
 import DiamondOutlinedIcon from '@mui/icons-material/DiamondOutlined';
 import { createTheme, ThemeProvider, useTheme } from '@mui/material/styles';
 import { Box } from '@mui/material';
@@ -53,6 +53,7 @@ const Navbar = () => {
                 <Typography variant="h3" component="div" sx={{ flexGrow: 1, color: "#0054E7" }}>
                     
                 </Typography>
+                
                 {/* <Box sx={{ display: 'flex', alignItems: 'center' }}>
                     <IconButton color="inherit" onClick={handleDarkModeToggle}>
                         {theme.palette.mode === 'dark' ?
@@ -62,9 +63,7 @@ const Navbar = () => {
                         }
                     </IconButton>
                 </Box> */}
-                <WalletProvider chains={[{id:"sui:testnet", name:"Sui Testnet", rpcUrl:"https://sui-testnet.nodeinfra.com"}]}>
-                    <WalletButton />
-                </WalletProvider>
+                    <WalletButton/>
             </Toolbar>
         </AppBar>
     );

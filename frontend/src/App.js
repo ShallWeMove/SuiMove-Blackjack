@@ -6,6 +6,7 @@ import Landing from './pages/Landing';
 import { ColorModeContext, useMode } from "./theme";
 import { ThemeProvider } from '@mui/material/styles';
 import { CssBaseline } from '@mui/material';
+import { WalletProvider, useWallet } from '@suiet/wallet-kit';
 
 export default function App() {
   const [theme, colorMode] = useMode();
@@ -15,11 +16,13 @@ export default function App() {
       <ColorModeContext.Provider value={colorMode}>
         <CssBaseline />
         <Box sx={{ flexGrow: 1 }}>
-          <Navbar />
-          <Routes>
-            <Route path="/" element={<Landing />} />
-            <Route path="/game" element={<Game />} />
-          </Routes>
+          <WalletProvider>
+            <Navbar />
+            <Routes>
+              <Route path="/" element={<Landing />} />
+              <Route path="/game" element={<Game />} />
+            </Routes>
+          </WalletProvider>
         </Box>
       </ColorModeContext.Provider>
     </ThemeProvider>
