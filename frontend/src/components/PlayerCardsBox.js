@@ -26,7 +26,11 @@ const PlayerCardsBox = ({
         }}
         >
             {playerHandData.cards.map((c, i) => (
-               <Card key={i} index={i} open={true} type={types[i%4]} num={i+2} />
+                i === 0 ? (
+                    null
+                ) : (
+                    <Card key={i} index={i} open={true} type={types[i%4]} num={i+2} />
+                )
             ))}
         </Box> 
     )
