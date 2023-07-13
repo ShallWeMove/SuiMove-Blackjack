@@ -91,7 +91,7 @@ const BlackJack = ({
 
     const wallet = useWallet();
 
-    // 작동 안 함...ㅜ
+    // 작동 안 함...ㅜ 
     const gameReady = async() => {
         const tx = new TransactionBlock();
         const [coin] = tx.splitCoins(tx.gas, [tx.pure(10000)]);
@@ -136,6 +136,8 @@ const BlackJack = ({
         socket.send(JSON.stringify({ flag: 'game start' }));
         getGameTableObjectData(gameTableObjectId);
     }
+
+    console.log("Player Hands: ", playerHandData.cards)
 
     return (
         <Box

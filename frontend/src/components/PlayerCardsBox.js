@@ -1,11 +1,13 @@
 import React from 'react';
-import {Box, Typography} from "@mui/material";
-import card from "../images/cards/card.png";
+import { Box } from "@mui/material";
+import Card from './Card';
 
 
 const PlayerCardsBox = ({
     playerHandData, 
 }) => {
+
+    const types = ["heart", "spade", "diamond", "clover"];
 
     return (
         <Box
@@ -13,28 +15,18 @@ const PlayerCardsBox = ({
             position: "fixed",
             left: "50vw",
             bottom: "15vh",
-            width: '200px',
+            marginX: 'auto',
+            width: '1200px',
             height: '200px',
-            transform: 'translateX(-100px)',
+            transform: 'translateX(-600px)',
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
-            paddingRight: '15px',
+            gap: '20px',
         }}
         >
             {playerHandData.cards.map((c, i) => (
-                <div 
-                    key={i}
-                    style={{
-                        width: '60px',
-                        height: '90px',
-                        backgroundImage: `url(${card})`,
-                        backgroundSize: 'cover',
-                        backgroundPosition: 'center',
-                        transform: `translateX(${6*i}px) translateY(${-3*i}px)`,
-                        position: 'absolute',
-                    }}
-                />
+               <Card key={i} index={i} open={true} type={types[i%4]} num={i+2} />
             ))}
         </Box> 
     )
