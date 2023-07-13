@@ -24,13 +24,13 @@ const DealerCardsBox = ({
         }}
         >
             {dealerHandData.cards.map((c, i) => (
-            <>
-                {i === 0 ? (
+                i === 0 ? (
+                    null
+                ) : i === 1 ? (
                     <Card key={i} index={i} open={true} />
                 ) : (
                     <Card key={i} index={i} />
-                )}
-            </>
+                )
         ))}
         </Box> 
     )
