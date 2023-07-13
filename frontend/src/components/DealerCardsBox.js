@@ -1,6 +1,7 @@
 import React from 'react';
 import {Box, Typography} from "@mui/material";
 import card from "../images/cards/card.png";
+import Card from './Card';
 
 
 const DealerCardsBox = ({
@@ -12,29 +13,24 @@ const DealerCardsBox = ({
         sx={{
             position: "fixed",
             left: "50vw",
-            top: "20vh",
+            top: "30vh",
             width: '200px',
             height: '200px',
             transform: 'translateX(-100px)',
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
-            paddingRight: '15px',
+            gap: '20px',
         }}
         >
             {dealerHandData.cards.map((c, i) => (
-                <div 
-                key={i}
-                style={{
-                    width: '60px',
-                    height: '90px',
-                    backgroundImage: `url(${card})`,
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center',
-                    transform: `translateX(${6*i}px) translateY(${-3*i}px)`,
-                    position: 'absolute',
-                }}
-            />
+            <>
+                {i === 0 ? (
+                    <Card key={i} index={i} open={true} />
+                ) : (
+                    <Card key={i} index={i} />
+                )}
+            </>
         ))}
         </Box> 
     )
