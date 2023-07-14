@@ -9,6 +9,7 @@ import { SuiSignAndExecuteTransactionBlockInput } from "@mysten/wallet-standard"
 import CardDeck from './CardDeck';
 import DealerCardsBox from './DealerCardsBox';
 import PlayerCardsBox from './PlayerCardsBox';
+import SideBar from './SideBar';
 
 type Card = {
     id: string,
@@ -180,6 +181,7 @@ const BlackJack = ({
             {/* Player Cards Box */}
             {isPlaying == 2 
             ?  <PlayerCardsBox playerHandData={playerHandData}/> : <Box/> }
+            {<SideBar/>}
 
             <Box
             sx={{
