@@ -6,11 +6,11 @@ export default function SideBar() {
   const [socket, setSocket] = useState(null);
 
   useEffect(() => {
-    const ws = new WebSocket('ws://localhost:8765');
+    const ws = new WebSocket('ws://localhost:8080');
 
 
     ws.onmessage = (event) => {
-      toast(event.data, { autoClose: 10000 });
+      toast(event.data.digest, { autoClose: 10000 });
     };
 
     ws.onclose = () => {
