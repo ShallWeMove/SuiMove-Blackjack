@@ -10,7 +10,8 @@ export default function SideBar() {
 
 
     ws.onmessage = (event) => {
-      toast(event.data.digest, { autoClose: 10000 });
+      const data = JSON.parse(event.data)
+      toast(data.digest, { autoClose: 10000 });
     };
 
     ws.onclose = () => {
