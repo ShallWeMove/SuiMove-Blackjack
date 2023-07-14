@@ -71,6 +71,7 @@ export async function fetchGameTableObject(
     setPlayerHandData,
     setGameTableConfirmed,
     setLoading,
+    setBettingAmount,
     ) {
 
     const gametable_response = await getObject(gametable_object_id);
@@ -99,9 +100,7 @@ export async function fetchGameTableObject(
             // set Card Deck, Dealer Hand, Player Hand
             setCardDeckData(card_deck);
             setDealerHandData(dealer_hand);
-            console.log(1)
             setPlayerHandData(player_hand);
-            console.log(2)
         }
         setIsPlaying(is_playing);
         setGameTableConfirmed(true);
