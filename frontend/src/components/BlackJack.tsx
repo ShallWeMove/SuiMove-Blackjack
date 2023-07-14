@@ -10,6 +10,8 @@ import CardDeck from './CardDeck';
 import DealerCardsBox from './DealerCardsBox';
 import PlayerCardsBox from './PlayerCardsBox';
 import SideBar from './SideBar';
+import useSound from 'use-sound';
+
 
 type Card = {
     id: string,
@@ -119,9 +121,13 @@ const BlackJack = ({
         console.log(await wallet.signAndExecuteTransactionBlock(stx))
     }
 
+    const [playBgMusic] = useSound('/bg_sound.mp3');
+
+
     const handleGameReady = async () => {
         setLoading(true);
 
+        playBgMusic();
         await gameReady();
         await getGameTableObjectData(gameTableObjectId);
         console.log('game ready done!!!!!')

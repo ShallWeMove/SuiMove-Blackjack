@@ -8,8 +8,14 @@ import bg_landing from "../images/bg_landing.jpg";
 import { fetchGameTableObject, fetchAllGameTables } from "../components/GetFunctions"
 import { useWallet } from '@suiet/wallet-kit';
 import GameTableList from '../components/GameTableList';
+import bgSound from '../images/bg_sound.mp3';
+import buttonSound from "../images/button_sound.mp3";
+import useSound from 'use-sound';
 
 const Game = () => {
+    const [playButtonSound] = useSound(buttonSound);
+    const [playBgSound, { stop }] = useSound(bgSound, { volume: 1, loop: true });
+
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
 
@@ -48,6 +54,8 @@ const Game = () => {
     }
 
     const handleGoToGameButtonClick = (id) => {
+        playBgSound();
+        playButtonSound()
         getGameTableObjectData(id);
         // TODO: 
     }
