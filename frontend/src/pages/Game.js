@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useTheme } from "@mui/material";
+import { CircularProgress, useTheme } from "@mui/material";
 import { tokens } from "../theme";
 import { Box } from "@mui/material";
 import BlackJack from "../components/BlackJack.tsx";
@@ -84,6 +84,22 @@ const Game = () => {
                 backgroundPosition: 'center',
             }}
         >
+             {loading && (
+                    <Box 
+                    sx={{
+                        position: 'fixed',
+                        top: '60%',
+                        left: '50%',
+                        width: '100px',
+                        height: '100px',
+                        transform: 'translate(-50%, -50%)',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                    }}>
+                        <CircularProgress color='secondary' />
+                    </Box>
+                )}
             {
                 gameTableConfirmed ?
                     <Box>
@@ -117,6 +133,7 @@ const Game = () => {
                         gameTableObjectId={gameTableObjectId}
                         setGameTableObjectId={setGameTableObjectId}
                         handleGoToGameButtonClick={handleGoToGameButtonClick}
+                        setLoading={setLoading}
                     />
             }
         </Box>
