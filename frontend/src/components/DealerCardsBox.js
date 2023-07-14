@@ -24,9 +24,7 @@ const DealerCardsBox = ({
         }}
         >
             {dealerHandData.cards.map((c, i) => (
-                i === 0 ? (
-                    null
-                ) : i === 1 ? (
+                 i === 0 ? (
                     <Card key={i} index={i} open={true} />
                 ) : (
                     <Card key={i} index={i} />
