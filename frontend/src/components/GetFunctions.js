@@ -56,6 +56,7 @@ export async function fetchGameTableObject(
     setDealerHandData,
     setPlayerHandData,
     setConfirmed,
+    setLoading,
     ) {
 
     const response = await getObject(gametable_object_id);
@@ -99,6 +100,7 @@ export async function fetchGameTableObject(
         }
         setIsPlaying(is_playing);
         setConfirmed(true);
+        setLoading(false);
     } catch(err) {
         console.log("error for getting game table information");
         setConfirmed(false);

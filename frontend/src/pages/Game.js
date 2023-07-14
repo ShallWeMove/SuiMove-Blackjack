@@ -26,6 +26,8 @@ const Game = () => {
     const [playerHandData, setPlayerHandData] = useState({});
     const [allGameTables, setAllGameTables] = useState([]);
 
+    const [loading, setLoading] = useState(false);
+
     useEffect(() => {
         console.log("confirmed: ", gameTableConfirmed);
         console.log("Gametable Object Id: ", gameTableObjectId);
@@ -63,7 +65,8 @@ const Game = () => {
             setCardDeckData,
             setDealerHandData,
             setPlayerHandData,
-            setGameTableConfirmed
+            setGameTableConfirmed,
+            setLoading,
         )
     }
 
@@ -96,6 +99,8 @@ const Game = () => {
                                     gameTableObjectId={gameTableObjectId}
                                     isPlaying={isPlaying}
                                     setIsPlaying={setIsPlaying}
+                                    loading={loading}
+                                    setLoading={setLoading}
                                 />
                                 :
                                 <BettingAmount

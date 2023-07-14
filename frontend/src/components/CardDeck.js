@@ -5,6 +5,7 @@ import CandidateCard from './CandidateCard';
 
 const CardDeck = ({
     cardDeckData, 
+    handleHit,
 }) => {
 
     return (
@@ -22,10 +23,10 @@ const CardDeck = ({
             paddingRight: '15px',
         }}
         >
+            
             {cardDeckData.cards.map((c, i) => (
-                <CandidateCard key={i} index={i} />
+                <CandidateCard key={i} index={i} handleHit={handleHit} />
             ))}
-
         </Box> 
     )
 }
