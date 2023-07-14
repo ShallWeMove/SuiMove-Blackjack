@@ -47,9 +47,9 @@ const Navbar = () => {
                 >
                     <DiamondOutlinedIcon />
                 </IconButton> */}
-                <Link to="/">
+                <a href="/">
                     <img src={card} alt="card" style={{ height: "3.68284rem", width: "3.68284rem" }} />
-                </Link>
+                </a>
                 <Typography variant="h3" component="div" sx={{ flexGrow: 1, color: "#0054E7" }}>
                     
                 </Typography>

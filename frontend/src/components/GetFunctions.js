@@ -24,18 +24,41 @@ export async function getObject(object_id) {
     return response;
 }
 
-export default async function fetchGameTableObject(
+// game table id 전부 가져오기
+export async function getAllGames() {
+    const response = await axios.post(config.TESTNET_ENDPOINT, {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "method": "sui_multiGetObjects",
+        "params": [
+         config.GAME_TABLES,
+          {
+            "showType": true,
+            "showOwner": true,
+            "showPreviousTransaction": true,
+            "showDisplay": false,
+            "showContent": true,
+            "showBcs": false,
+            "showStorageRebate": true
+          }
+        ]
+      
+    });
+    console.log("All Game Response: ", response);
+    return response;
+}
+
+export async function fetchGameTableObject(
     gametable_object_id, 
     setGameTableData, 
     setIsPlaying, 
     setCardDeckData, 
     setDealerHandData,
     setPlayerHandData,
-    setConfirmed
+    setConfirmed,
     ) {
 
-    const response = await getObject(gametable_object_id)
-    console.log("game table",response);
+    const response = await getObject(gametable_object_id);
 
     try {
         setGameTableData(response.data.result.data.content.fields);
@@ -63,5 +86,17 @@ export default async function fetchGameTableObject(
     } catch(err) {
         console.log("error for getting game table information");
         setConfirmed(false);
+    }
+}
+
+export async function fetchAllGameTables(
+    setAllGameTables
+) {
+    const res = await getAllGames();
+    
+    try {
+        setAllGameTables(res.data.result);
+    }   catch(err) {
+        console.log("error for getting all game tables");
     }
 }
