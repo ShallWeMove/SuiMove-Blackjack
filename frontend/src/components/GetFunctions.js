@@ -104,6 +104,7 @@ export async function fetchGameTableObject(
     } catch(err) {
         console.log("error for getting game table information");
         setConfirmed(false);
+        setLoading(false);
     }
 }
 

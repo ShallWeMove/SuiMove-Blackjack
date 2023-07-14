@@ -176,32 +176,6 @@ const BlackJack = ({
         >
             <h2>Blackjack Game Table : {gameTableObjectId}</h2>
             <h2>Playing : {isPlaying == 0 ? "Not Ready" : isPlaying == 1? "Ready" : "Playing"}</h2>
-
-            {loading && (
-                <Box 
-                sx={{
-                    position: 'fixed',
-                    top: '60%',
-                    left: '50%',
-                    width: '100px',
-                    height: '100px',
-                    transform: 'translate(-50%, -50%)',
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                }}>
-                    <CircularProgress color='secondary' />
-                </Box>
-            )}
-
-            {/* {isPlaying>0 ? 
-            <GameTableInfo
-                gameTableData={gameTableData}
-                cardDeckData={cardDeckData}
-                dealerHandData={dealerHandData}
-                playerHandData={playerHandData}
-            /> 
-            : <Typography>Not Ready</Typography>} */}
             
 
             {/* 디버깅용 */}
