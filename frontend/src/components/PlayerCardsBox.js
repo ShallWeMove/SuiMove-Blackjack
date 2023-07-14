@@ -1,13 +1,12 @@
 import React from 'react';
 import { Box } from "@mui/material";
 import Card from './Card';
+import config from "../config.json";
 
 
 const PlayerCardsBox = ({
     playerHandData, 
 }) => {
-
-    const types = ["heart", "spade", "diamond", "clover"];
 
     return (
         <Box
@@ -26,7 +25,7 @@ const PlayerCardsBox = ({
         }}
         >
             {playerHandData.cards.map((c, i) => (
-                    <Card key={i} index={i} open={true} type={types[i%4]} num={i+2} />
+                    <Card key={i} index={i} open={true} type={config.CARD_TYPES[Math.floor(c.card_number / 13)]} num={config.CARD_NUMS[c.card_number % 13]} />
             ))}
         </Box> 
     )
