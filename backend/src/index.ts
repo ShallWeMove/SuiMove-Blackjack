@@ -26,7 +26,7 @@ wss.on('connection', (ws: WebSocket) => {
         } 
 
         else if (flag == 'Go Card') {
-            goCard(dealer_signer, package_id, game_table_id, ws)
+            goCard(dealer_signer, package_id, game_table_id, player_address, ws)
         }
 
         else if (flag == 'Stop Game') {
