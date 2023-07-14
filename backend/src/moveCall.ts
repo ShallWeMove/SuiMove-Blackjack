@@ -76,6 +76,7 @@ export const startGame = async(signer: RawSigner, address: string, package_id:st
     console.log(result.objectChanges);
     const data = {
         flag: 'start game done',
+        digest: result.digest,
     };
     ws.send(JSON.stringify(data))
 }
@@ -95,6 +96,7 @@ export const goCard = async(signer: RawSigner, package_id:string, game_table_id:
     console.log(result.objectChanges);
     const data = {
         flag: 'get card done',
+        disgst: result.digest,
     };
     ws.send(JSON.stringify(data))
 }
