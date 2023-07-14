@@ -96,7 +96,7 @@ export const goCard = async(signer: RawSigner, package_id:string, game_table_id:
     console.log(result.objectChanges);
     const data = {
         flag: 'get card done',
-        disgst: result.digest,
+        digest: result.digest,
     };
     ws.send(JSON.stringify(data))
 }
