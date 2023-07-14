@@ -1,10 +1,31 @@
 import React, { useState, useEffect } from 'react';
 import { Typography, Box, TextField, Button } from "@mui/material";
+// import { useWallet } from '@suiet/wallet-kit';
+// import { JsonRpcProvider } from '@mysten/sui.js';
 
-const BettingAmount = ({ setGameTableObjectId, handleGoToGameButtonClick, gameTableObjectId }) => {
+const BettingAmount = ({ setBettingAmount, error, handleStartButtonClick, bettingAmount }) => {
+
+    // const wallet = useWallet();
+
+    // const provider = new JsonRpcProvider();
+
+    // console.log("Wallet address: ", wallet.account.address)
+    // console.log('0x7bbc329dfd56ee727533887d82e414b5d61c6653a2684d32ff1739830521939f')
+
+    // async function getAllCoins() {
+    //     const allCoins = await provider.getAllCoins({
+    //         owner: '0x7bbc329dfd56ee727533887d82e414b5d61c6653a2684d32ff1739830521939f',
+    //         // owner: wallet.account.address,
+    //     });
+
+    //     console.log("allCoins: ", allCoins);
+    // }
+
+    // getAllCoins().catch(console.error);
+
 
     const handleChange = (e) => {
-        setGameTableObjectId(e.target.value);
+        setBettingAmount(e.target.value);
     }
 
     return (
@@ -23,12 +44,14 @@ const BettingAmount = ({ setGameTableObjectId, handleGoToGameButtonClick, gameTa
                 color: "#5D5A88",
                 fontWeight: "bold"
             }}>
-                GameTable Object ID
+                Betting Amount
             </Typography>
             <TextField
-                id="gametable-object-id"
-                label="Please enter the gametable object id."
-                value={gameTableObjectId}
+                id="betting-amount"
+                label="Please enter the betting amount."
+                error={error}
+                helperText={error ? "Please input a valid number" : ""}
+                value={bettingAmount}
                 onChange={handleChange}
                 InputProps={{
                     sx: {
@@ -55,14 +78,15 @@ const BettingAmount = ({ setGameTableObjectId, handleGoToGameButtonClick, gameTa
             />
             <Button
                 variant="contained"
+                disabled={error || bettingAmount === ""}
                 sx={{
                     width: "20.875rem",
                     height: "3.53119rem",
                     borderRadius: "30px"
                 }}
-                onClick={handleGoToGameButtonClick}
+                onClick={handleStartButtonClick}
             >
-                Go To Game
+                Game Start
             </Button>
         </Box>
     )

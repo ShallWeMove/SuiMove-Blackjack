@@ -5,7 +5,7 @@ import { Box } from "@mui/material";
 import BlackJack from "../components/BlackJack.tsx";
 import BettingAmount from "../components/BettingAmount";
 import bg_landing from "../images/bg_landing.jpg";
-import {fetchGameTableObject, fetchAllGameTables } from "../components/GetFunctions"
+import { fetchGameTableObject, fetchAllGameTables } from "../components/GetFunctions"
 import { useWallet } from '@suiet/wallet-kit';
 import GameTableList from '../components/GameTableList';
 
@@ -14,7 +14,10 @@ const Game = () => {
     const colors = tokens(theme.palette.mode);
 
     const [gameTableObjectId, setGameTableObjectId] = useState("");
-    const [confirmed, setConfirmed] = useState(false);
+    const [gameTableConfirmed, setGameTableConfirmed] = useState(false);
+    const [bettingAmount, setBettingAmount] = useState("");
+    const [error, setError] = useState(false);
+    const [bettingConfirmed, setBettingConfirmed] = useState(false);
 
     const [isPlaying, setIsPlaying] = useState(0);
     const [gameTableData, setGameTableData] = useState({});
@@ -24,14 +27,24 @@ const Game = () => {
     const [allGameTables, setAllGameTables] = useState([]);
 
     useEffect(() => {
-        console.log("confirmed: ", confirmed);
+        console.log("confirmed: ", gameTableConfirmed);
         console.log("Gametable Object Id: ", gameTableObjectId);
-    }, [confirmed, gameTableObjectId]);
+    }, [gameTableConfirmed, gameTableObjectId]);
 
     useEffect(() => {
         fetchAllGameTables(setAllGameTables);
     }, []);
-    
+
+    useEffect(() => {
+        if (bettingAmount !== "") {
+            setError(isNaN(bettingAmount) || bettingAmount % 1 !== 0 || bettingAmount <= 0);
+        }
+    }, [bettingAmount]);
+
+    const handleStartButtonClick = () => {
+        setBettingConfirmed(true);
+    }
+
     const handleGoToGameButtonClick = (id) => {
         getGameTableObjectData(id);
         // TODO: 
@@ -39,19 +52,19 @@ const Game = () => {
 
     const resetGame = () => {
         setGameTableObjectId("");
-        setConfirmed(false);
+        setGameTableConfirmed(false);
     }
 
     async function getGameTableObjectData(gametable_object_id) {
         fetchGameTableObject(
             gametable_object_id,
-            setGameTableData, 
-            setIsPlaying, 
-            setCardDeckData, 
+            setGameTableData,
+            setIsPlaying,
+            setCardDeckData,
             setDealerHandData,
             setPlayerHandData,
-            setConfirmed
-            )
+            setGameTableConfirmed
+        )
     }
 
     return (
@@ -69,31 +82,36 @@ const Game = () => {
             }}
         >
             {
-                confirmed ?
+                gameTableConfirmed ?
                     <Box>
-                        <BlackJack 
-                        resetGame={resetGame} 
-                        gameTableData={gameTableData}
-                        cardDeckData={cardDeckData}
-                        dealerHandData={dealerHandData}
-                        playerHandData={playerHandData}
-                        getGameTableObjectData={getGameTableObjectData}
-                        gameTableObjectId={gameTableObjectId}
-                        isPlaying={isPlaying}
-                        setIsPlaying={setIsPlaying}
-                        />
+                        {
+                            bettingConfirmed ?
+                                <BlackJack
+                                    resetGame={resetGame}
+                                    gameTableData={gameTableData}
+                                    cardDeckData={cardDeckData}
+                                    dealerHandData={dealerHandData}
+                                    playerHandData={playerHandData}
+                                    getGameTableObjectData={getGameTableObjectData}
+                                    gameTableObjectId={gameTableObjectId}
+                                    isPlaying={isPlaying}
+                                    setIsPlaying={setIsPlaying}
+                                />
+                                :
+                                <BettingAmount
+                                    setBettingAmount={setBettingAmount}
+                                    error={error}
+                                    handleStartButtonClick={handleStartButtonClick}
+                                    bettingAmount={bettingAmount}
+                                />
+                        }
                     </Box>
                     :
-                    // <BettingAmount
-                    //     setGameTableObjectId={setGameTableObjectId}
-                    //     handleGoToGameButtonClick={handleGoToGameButtonClick}
-                    //     gameTableObjectId={gameTableObjectId}
-                    // />
                     <GameTableList
                         allGameTables={allGameTables}
                         gameTableObjectId={gameTableObjectId}
                         setGameTableObjectId={setGameTableObjectId}
-                        handleGoToGameButtonClick={handleGoToGameButtonClick}                        
+                        handleGoToGameButtonClick={handleGoToGameButtonClick}
                     />
             }
         </Box>
