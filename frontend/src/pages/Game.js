@@ -75,6 +75,7 @@ const Game = () => {
             setPlayerHandData,
             setGameTableConfirmed,
             setLoading,
+            setBettingAmount,
         )
     }
 
@@ -112,7 +113,7 @@ const Game = () => {
                 gameTableConfirmed ?
                     <Box>
                         {
-                            bettingConfirmed ?
+                            bettingConfirmed || isPlaying >= 1 ?
                                 <BlackJack
                                     resetGame={resetGame}
                                     gameTableData={gameTableData}

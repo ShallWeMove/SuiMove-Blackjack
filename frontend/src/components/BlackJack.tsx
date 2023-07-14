@@ -193,10 +193,9 @@ const BlackJack = ({
             }}
         >
             <h2>Blackjack Game Table : {gameTableObjectId}</h2>
-            <h2>Playing : {isPlaying == 0 ? "Not Ready" : isPlaying == 1? "Ready" : "Playing"}</h2>
-            
-
-            {/* 디버깅용 */}
+            <h2>Player : {playerHandData.account}</h2>
+            <h2>Game Status : {isPlaying == 0 ? "Not Ready" : isPlaying == 1? "Ready" : "Playing"}</h2>
+            {/* <h3>Bet Amount : {bettingAmount/1000000000} SUI</h3> */}
 
             <Box sx={{
                 marginBottom: "20px",

@@ -79,6 +79,7 @@ export async function fetchGameTableObject(
     setPlayerHandData,
     setConfirmed,
     setLoading,
+    setBettingAmount,
     ) {
 
     const response = await getObject(gametable_object_id);
