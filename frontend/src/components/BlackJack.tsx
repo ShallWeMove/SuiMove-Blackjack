@@ -122,11 +122,14 @@ const BlackJack = ({
     }
 
     const [playBgMusic] = useSound('/bg_sound.mp3');
+    const [playButtonSound] = useSound('/button_sound.mp3');
+
 
 
     const handleGameReady = async () => {
         setLoading(true);
 
+        playButtonSound();
         playBgMusic();
         await gameReady();
         await getGameTableObjectData(gameTableObjectId);
@@ -136,6 +139,7 @@ const BlackJack = ({
     const handleGameStart = () => {
         setLoading(true);
 
+        playButtonSound();
         socket.send(JSON.stringify({ 
             flag: 'Start Game', 
             packageObjectId: config.PACKAGE_OBJECT_ID,
@@ -147,6 +151,7 @@ const BlackJack = ({
     const handleHit = async () => {
         setLoading(true);
 
+        playButtonSound();
         socket.send(JSON.stringify({ 
             flag: 'Go Card',
             packageObjectId: config.PACKAGE_OBJECT_ID,
@@ -158,6 +163,7 @@ const BlackJack = ({
     const handleStand = () => {
         setLoading(true);
 
+        playButtonSound();
         socket.send(JSON.stringify({ 
             flag: 'Stop Game',
             packageObjectId: config.PACKAGE_OBJECT_ID,
