@@ -166,6 +166,12 @@ const BlackJack = ({
         }));
     }
 
+    const handleEndGame = () => {
+        setLoading(true);
+
+        setLoading(false);
+    }
+
     console.log("Player Hands: ", playerHandData.cards)
 
     return (
@@ -278,6 +284,7 @@ const BlackJack = ({
                 <Button variant="contained" color='secondary' sx={{ width: '120px', fontWeight: '800' }}onClick={handleGameStart}>Game Start</Button>
                 <Button variant="contained" color='secondary' sx={{ width: '120px', fontWeight: '800' }}onClick={handleHit}>Hit</Button>
                 <Button variant="contained" color='secondary' sx={{ width: '120px', fontWeight: '800' }}onClick={handleStand}>Stand</Button>
+                <Button variant="contained" color='secondary' sx={{ width: '120px', fontWeight: '800' }}onClick={handleEndGame}>End Game</Button>
             </Box>
         </Box>
     );
