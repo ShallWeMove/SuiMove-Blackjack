@@ -5,8 +5,9 @@ import { Box } from "@mui/material";
 import BlackJack from "../components/BlackJack.tsx";
 import BettingAmount from "../components/BettingAmount";
 import bg_landing from "../images/bg_landing.jpg";
-import fetchGameTableObject from "../components/GetFunctions"
+import {fetchGameTableObject, fetchAllGameTables } from "../components/GetFunctions"
 import { useWallet } from '@suiet/wallet-kit';
+import GameTableList from '../components/GameTableList';
 
 const Game = () => {
     const theme = useTheme();
@@ -20,14 +21,19 @@ const Game = () => {
     const [cardDeckData, setCardDeckData] = useState({});
     const [dealerHandData, setDealerHandData] = useState({});
     const [playerHandData, setPlayerHandData] = useState({});
+    const [allGameTables, setAllGameTables] = useState([]);
 
     useEffect(() => {
         console.log("confirmed: ", confirmed);
         console.log("Gametable Object Id: ", gameTableObjectId);
     }, [confirmed, gameTableObjectId]);
+
+    useEffect(() => {
+        fetchAllGameTables(setAllGameTables);
+    }, []);
     
-    const handleGoToGameButtonClick = () => {
-        getGameTableObjectData(gameTableObjectId);
+    const handleGoToGameButtonClick = (id) => {
+        getGameTableObjectData(id);
         // TODO: 
     }
 
@@ -44,7 +50,7 @@ const Game = () => {
             setCardDeckData, 
             setDealerHandData,
             setPlayerHandData,
-            setConfirmed,
+            setConfirmed
             )
     }
 
@@ -78,10 +84,16 @@ const Game = () => {
                         />
                     </Box>
                     :
-                    <BettingAmount
-                        setGameTableObjectId={setGameTableObjectId}
-                        handleGoToGameButtonClick={handleGoToGameButtonClick}
+                    // <BettingAmount
+                    //     setGameTableObjectId={setGameTableObjectId}
+                    //     handleGoToGameButtonClick={handleGoToGameButtonClick}
+                    //     gameTableObjectId={gameTableObjectId}
+                    // />
+                    <GameTableList
+                        allGameTables={allGameTables}
                         gameTableObjectId={gameTableObjectId}
+                        setGameTableObjectId={setGameTableObjectId}
+                        handleGoToGameButtonClick={handleGoToGameButtonClick}                        
                     />
             }
         </Box>
