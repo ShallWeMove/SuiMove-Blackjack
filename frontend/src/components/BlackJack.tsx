@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Button, Input, Typography } from '@mui/material';
+import { Box, Button, CircularProgress, Input, Typography } from '@mui/material';
 import BackgroundImage from "../images/background.jpg";
 import config from "../config.json";
 import { useWallet } from '@suiet/wallet-kit';
@@ -30,6 +30,8 @@ const BlackJack = ({
     getGameTableObjectData, 
     gameTableObjectId, 
     isPlaying,
+    loading,
+    setLoading,
 }) => {
     const [playerCards, setPlayerCards] = useState<Card[]>([]);
     const [dealerCards, setDealerCards] = useState<Card[]>([]);
@@ -53,15 +55,15 @@ const BlackJack = ({
     useEffect(() => {
         let total = 0;
         for(let i = 0; i < playerHandData.cards.length; i++) {
-            const num = parseInt(playerHandData.cards[i].card_number);
-            if(num < 10000) total += num;
+            const num = parseInt(playerHandData.cards[i].card_number) % 13;
+            if(num < 10000) total += config.REAL_NUMS[num];
         }
         setPlayerTotal(total);
 
         total = 0;
         for(let i = 0; i < dealerHandData.cards.length; i++) {
-            const num = parseInt(dealerHandData.cards[i].card_number);
-            if(num < 10000) total += num;
+            const num = parseInt(dealerHandData.cards[i].card_number) % 13;
+            if(num < 10000) total += config.REAL_NUMS[num];
         }
         setDealerTotal(total);
     }, [playerHandData, dealerHandData]);
@@ -90,6 +92,7 @@ const BlackJack = ({
                 default:
                     break;
             }
+
         };
 
     }, []);
@@ -117,12 +120,16 @@ const BlackJack = ({
     }
 
     const handleGameReady = async () => {
+        setLoading(true);
+
         await gameReady();
         await getGameTableObjectData(gameTableObjectId);
         console.log('game ready done!!!!!')
     }
 
     const handleGameStart = () => {
+        setLoading(true);
+
         socket.send(JSON.stringify({ 
             flag: 'Start Game', 
             packageObjectId: config.PACKAGE_OBJECT_ID,
@@ -132,6 +139,8 @@ const BlackJack = ({
     }
 
     const handleHit = async () => {
+        setLoading(true);
+
         socket.send(JSON.stringify({ 
             flag: 'Go Card',
             packageObjectId: config.PACKAGE_OBJECT_ID,
@@ -141,6 +150,8 @@ const BlackJack = ({
     }
 
     const handleStand = () => {
+        setLoading(true);
+
         socket.send(JSON.stringify({ 
             flag: 'Stop Game',
             packageObjectId: config.PACKAGE_OBJECT_ID,
@@ -165,6 +176,23 @@ const BlackJack = ({
         >
             <h2>Blackjack Game Table : {gameTableObjectId}</h2>
             <h2>Playing : {isPlaying == 0 ? "Not Ready" : isPlaying == 1? "Ready" : "Playing"}</h2>
+
+            {loading && (
+                <Box 
+                sx={{
+                    position: 'fixed',
+                    top: '60%',
+                    left: '50%',
+                    width: '100px',
+                    height: '100px',
+                    transform: 'translate(-50%, -50%)',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                }}>
+                    <CircularProgress color='secondary' />
+                </Box>
+            )}
 
             {/* {isPlaying>0 ? 
             <GameTableInfo
@@ -199,9 +227,9 @@ const BlackJack = ({
                                 {isPlaying == 2 &&
                                 dealerHandData.cards.map((card, i)=> {
                                     if(card.card_number < 10000) {
-                                        return (<Typography key={i} sx={{marginRight: "10px"}} >{card.card_number}</Typography>)
+                                        return <Typography key={i} sx={{marginRight: "10px"}}>{config.CARD_NUMS[card.card_number % 13]}</Typography>     
                                     }   else {
-                                        return (<Typography key={i} sx={{marginRight: "10px"}} >Closed</Typography>)
+                                        return (<Typography key={i} sx={{marginRight: "10px"}} >hidden</Typography>)
                                     }        
                                 })}
                             </ul>
@@ -230,9 +258,9 @@ const BlackJack = ({
                             {isPlaying == 2 && 
                             playerHandData.cards.map((card, i) => {
                                 if(card.card_number < 10000) {
-                                    return <Typography key={i} sx={{marginRight: "10px"}}>{card.card_number}</Typography>
+                                    return <Typography key={i} sx={{marginRight: "10px"}}>{config.CARD_NUMS[card.card_number % 13]}</Typography>     
                                 }   else {
-                                    return <Typography key={i} sx={{marginRight: "10px"}}>Closed</Typography>
+                                    return <Typography key={i} sx={{marginRight: "10px"}}>hidden</Typography>
                                 }
                             })}
                         </ul>
@@ -245,7 +273,7 @@ const BlackJack = ({
 
             {/* Card Deck */}
             {isPlaying >= 1 
-            ? <CardDeck cardDeckData={cardDeckData}/> : <Box/>}
+            ? <CardDeck cardDeckData={cardDeckData} handleHit={handleHit} /> : <Box/>}
 
             {/* Dealer Cards Box */}
             {isPlaying == 2 

@@ -2,11 +2,12 @@ import { Box } from "@mui/material";
 import card from "../images/cards/card.png";
 import { useState } from "react";
 
-const CandidateCard = ({ index=0, type="heart", num="2" }) => {
+const CandidateCard = ({ index=0, type="heart", num="2", handleHit }) => {
     const [open, setOpen] = useState(false);
     const [hide, setHide] = useState(false);
 
     const handleOpen = () => {
+        handleHit();
         setOpen(true);
 
         setTimeout(() => {
@@ -24,7 +25,7 @@ const CandidateCard = ({ index=0, type="heart", num="2" }) => {
             transform: `${open ? `translateX(-12vw) translateY(20vh) rotateY(180deg)` : `translateX(${-8*index}px) translateY(${3*index}px)`}`,
             transformStyle: 'preserve-3d',
             transformOrigin: 'center',
-            transition: 'all 1s',
+            transition: 'all .3s',
             "&:hover": {
                 transform: `${open ? `translateX(-12vw) translateY(20vh) rotateY(180deg) scale(1.1)` : `translateX(${-8*index}px) translateY(${3*index}px) scale(1.1)`}`,
             }
@@ -43,7 +44,7 @@ const CandidateCard = ({ index=0, type="heart", num="2" }) => {
                         backgroundPosition: 'center',
                         cursor: 'pointer',
                         backfaceVisibility: 'hidden',
-                        transition: 'all 1s',
+                        transition: 'all .3s',
                     }}
                 />
 
@@ -56,14 +57,15 @@ const CandidateCard = ({ index=0, type="heart", num="2" }) => {
                     position: 'absolute',
                     left: '0',
                     top: '0',
-                    background: `url('/img/cards/${type}/${num}.png')`,
+                    // background: `url('/img/cards/${type}/${num}.png')`,
+                    backgroundImage: `url(${card})`,
                     backgroundSize: 'contain',
                     backgroundRepeat: 'no-repeat',
                     backgroundPosition: 'center',
                     transform: `rotateY(180deg)`,
                     cursor: 'pointer',
                     backfaceVisibility: 'hidden',
-                    transition: 'all 1s',
+                    transition: 'all .3s',
                 }}
                 />
 
