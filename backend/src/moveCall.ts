@@ -81,14 +81,14 @@ export const startGame = async(signer: RawSigner, address: string, package_id:st
     ws.send(JSON.stringify(data))
 }
 
-export const goCard = async(signer: RawSigner, package_id:string, game_table_id:string, ws: WebSocket) => {
+export const goCard = async(signer: RawSigner, package_id:string, game_table_id:string, player_address: string, ws: WebSocket) => {
     const tx = new TransactionBlock()
     tx.setGasBudget(30000000);
     const module = "blackjack"
-    const function_name = "go_card"
+    const function_name = "pass_card_to_player"
     tx.moveCall({
         target: `${package_id}::${module}::${function_name}`,
-        arguments: [tx.object(game_table_id), tx.pure(1)],
+        arguments: [tx.object(game_table_id), tx.pure(player_address)],
     });
     const result = await signer.signAndExecuteTransactionBlock({
         transactionBlock: tx,
