@@ -18,10 +18,11 @@ wss.on('connection', (ws: WebSocket) => {
         const package_id = data.packageObjectId;
         const game_table_id = data.gameTableObjectId;
         const player_address = data.playerAddress;
+        const betting_amount = data.bettingAmount;
         console.log("data: ",data)
         console.log("flag: ", flag)    
         if (flag == 'Start Game') {
-            startGame(dealer_signer, player_address, package_id, game_table_id, ws);
+            startGame(dealer_signer, player_address, betting_amount, package_id, game_table_id, ws);
         } 
 
         else if (flag == 'Go Card') {

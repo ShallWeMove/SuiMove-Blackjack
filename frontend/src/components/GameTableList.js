@@ -2,20 +2,21 @@ import { Box, Grid, Typography } from "@mui/material"
 import config from "../config.json";
 import card from "../images/cards/card.png";
 import { useEffect, useState } from "react";
+import { useWallet } from "@suiet/wallet-kit";
 
 
 const GameTableList = ({
     allGameTables,
     setGameTableObjectId,
-    handleGoToGameButtonClick,
+    handlGameTableButtonClick,
     setLoading,
 }) => {
-
-    const [opens, setOpens] = useState([]);
-    const game_status = ["Not Ready", "Ready", "Playing"]
+    const wallet = useWallet();
+    const [gameTableOpens, setGameTableOpens] = useState([]);
+    const game_status = ["Available Game", "Ready", "Playing"]
 
     useEffect(() => {
-        setOpens(allGameTables.map((t) => false));
+        setGameTableOpens(allGameTables.map((table) => false));
     }, [allGameTables]);
 
     return allGameTables && (
@@ -34,17 +35,20 @@ const GameTableList = ({
                 }}
             >Game Table List</Typography>
             <Grid container rowSpacing={3} columnSpacing={1}>
-            {allGameTables.map((t, i) => (
+            {allGameTables.map((table, i) => (
                      <Grid key={i} item xs={4}>
                         
                         <Box 
                         onClick={() => {
-                            // if (t.data.content.fields.is_playing < 1)  {
+                            if ((table.data.content.fields.is_playing < 1) || (table.data.content.fields.player_address === wallet.address)) {
+                                console.log("you can play the game")
                                 setLoading(true);
-                                setGameTableObjectId(t.data.objectId);
-                                handleGoToGameButtonClick(t.data.objectId);
-                                setOpens(opens.map((o, j) => i === j ? true : o));
-                            // }
+                                setGameTableObjectId(table.data.objectId);
+                                handlGameTableButtonClick(table.data.objectId);
+                                setGameTableOpens(gameTableOpens.map((open, j) => i === j ? true : open));
+                            } else {
+                                console.log("you can't play the game")
+                            }
                         }}
                         sx={{
                             width: '160px',
@@ -54,11 +58,11 @@ const GameTableList = ({
                             transformStyle: 'preserve-3d',
                             transformOrigin: 'center',
                             transition: 'transform .5s',
-                            transform: `${opens[i] ? `rotateY(180deg) scale(1.1)` : `rotateY(0deg)`}`,
+                            transform: `${gameTableOpens[i] ? `rotateY(180deg) scale(1.1)` : `rotateY(0deg)`}`,
                             "&:hover": {
                                 // transform: `rotateY(180deg) scale(1.1)`,
                                 // transform: `${t.data.content.fields.is_playing >= 1 ? '' : 'scale(1.1)'}`,
-                                transform: `${opens[i] ? `rotateY(180deg) scale(1.1)` : `rotateY(0deg) scale(1.1)`}`,
+                                transform: `${gameTableOpens[i] ? `rotateY(180deg) scale(1.1)` : `rotateY(0deg) scale(1.1)`}`,
                             }
                         }}>
                                 <Typography
@@ -70,7 +74,7 @@ const GameTableList = ({
                                         fontSize: '20px',
                                         fontWeight: '700',
                                         opacity: '0.8',
-                                    }}>{game_status[parseInt(t.data.content.fields.is_playing)]}</Typography>
+                                    }}>{game_status[parseInt(table.data.content.fields.is_playing)]}</Typography>
                             <Box
                                 sx={{
                                     zIndex: '10',

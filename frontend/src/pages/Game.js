@@ -35,7 +35,7 @@ const Game = () => {
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-        console.log("confirmed: ", gameTableConfirmed);
+        console.log("gameTableConfirmed: ", gameTableConfirmed);
         console.log("Gametable Object Id: ", gameTableObjectId);
     }, [gameTableConfirmed, gameTableObjectId]);
 
@@ -49,22 +49,6 @@ const Game = () => {
         }
     }, [bettingAmount]);
 
-    const handleStartButtonClick = () => {
-        setBettingConfirmed(true);
-    }
-
-    const handleGoToGameButtonClick = (id) => {
-        playBgSound();
-        playButtonSound()
-        getGameTableObjectData(id);
-        // TODO: 
-    }
-
-    const resetGame = () => {
-        setGameTableObjectId("");
-        setGameTableConfirmed(false);
-    }
-
     async function getGameTableObjectData(gametable_object_id) {
         fetchGameTableObject(
             gametable_object_id,
@@ -76,6 +60,22 @@ const Game = () => {
             setGameTableConfirmed,
             setLoading,
         )
+    }
+
+    const handlGameTableButtonClick = (objectId) => {
+        playButtonSound();
+        playBgSound();
+        getGameTableObjectData(objectId);
+        // TODO: 
+    }
+
+    const handleStartButtonClick = () => {
+        setBettingConfirmed(true);
+    }
+
+    const resetGame = () => {
+        setGameTableObjectId("");
+        setGameTableConfirmed(false);
     }
 
     return (
@@ -123,7 +123,7 @@ const Game = () => {
                                     gameTableObjectId={gameTableObjectId}
                                     isPlaying={isPlaying}
                                     setIsPlaying={setIsPlaying}
-                                    loading={loading}
+                                    bettingAmount={bettingAmount}
                                     setLoading={setLoading}
                                 />
                                 :
@@ -140,7 +140,7 @@ const Game = () => {
                         allGameTables={allGameTables}
                         gameTableObjectId={gameTableObjectId}
                         setGameTableObjectId={setGameTableObjectId}
-                        handleGoToGameButtonClick={handleGoToGameButtonClick}
+                        handlGameTableButtonClick={handlGameTableButtonClick}
                         setLoading={setLoading}
                     />
             }

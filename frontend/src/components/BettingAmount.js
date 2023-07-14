@@ -5,25 +5,6 @@ import { Typography, Box, TextField, Button } from "@mui/material";
 
 const BettingAmount = ({ setBettingAmount, error, handleStartButtonClick, bettingAmount }) => {
 
-    // const wallet = useWallet();
-
-    // const provider = new JsonRpcProvider();
-
-    // console.log("Wallet address: ", wallet.account.address)
-    // console.log('0x7bbc329dfd56ee727533887d82e414b5d61c6653a2684d32ff1739830521939f')
-
-    // async function getAllCoins() {
-    //     const allCoins = await provider.getAllCoins({
-    //         owner: '0x7bbc329dfd56ee727533887d82e414b5d61c6653a2684d32ff1739830521939f',
-    //         // owner: wallet.account.address,
-    //     });
-
-    //     console.log("allCoins: ", allCoins);
-    // }
-
-    // getAllCoins().catch(console.error);
-
-
     const handleChange = (e) => {
         setBettingAmount(e.target.value);
     }
@@ -48,7 +29,7 @@ const BettingAmount = ({ setBettingAmount, error, handleStartButtonClick, bettin
             </Typography>
             <TextField
                 id="betting-amount"
-                label="Please enter the betting amount."
+                label="Please enter the betting amount in MIST. (1 SUI = 1000000000 MIST)"
                 error={error}
                 helperText={error ? "Please input a valid number" : ""}
                 value={bettingAmount}

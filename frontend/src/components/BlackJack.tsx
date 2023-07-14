@@ -32,7 +32,7 @@ const BlackJack = ({
     getGameTableObjectData, 
     gameTableObjectId, 
     isPlaying,
-    loading,
+    bettingAmount,
     setLoading,
 }) => {
     const [playerCards, setPlayerCards] = useState<Card[]>([]);
@@ -45,6 +45,8 @@ const BlackJack = ({
 
     const wallet = useWallet();
 
+    const [playButtonSound] = useSound('/button_sound.mp3');
+
     useEffect(() => {
         if (wallet.status === 'connected') {
             console.log('blackjack wallet status: ', wallet.status)
@@ -52,23 +54,9 @@ const BlackJack = ({
         } else {
             console.log('blackjack wallet status', wallet.status)
         }
+        console.log("betting amount : ", bettingAmount)
+
     }, [wallet.connected])
-
-    useEffect(() => {
-        let total = 0;
-        for(let i = 0; i < playerHandData.cards.length; i++) {
-            const num = parseInt(playerHandData.cards[i].card_number) % 13;
-            if(num < 10000) total += config.REAL_NUMS[num];
-        }
-        setPlayerTotal(total);
-
-        total = 0;
-        for(let i = 0; i < dealerHandData.cards.length; i++) {
-            const num = parseInt(dealerHandData.cards[i].card_number) % 13;
-            if(num < 10000) total += config.REAL_NUMS[num];
-        }
-        setDealerTotal(total);
-    }, [playerHandData, dealerHandData]);
 
     // Handle incoming WebSocket messages
     useEffect(() => {
@@ -94,15 +82,32 @@ const BlackJack = ({
                 default:
                     break;
             }
-
         };
-
     }, []);
+
+    useEffect(() => {
+        let total = 0;
+        if (isPlaying >= 1) {
+            for(let i = 0; i < playerHandData.cards.length; i++) {
+                const num = parseInt(playerHandData.cards[i].card_number) % 13;
+                if(num < 10000) total += config.REAL_NUMS[num];
+            }
+            setPlayerTotal(total);
+    
+            total = 0;
+            for(let i = 0; i < dealerHandData.cards.length; i++) {
+                const num = parseInt(dealerHandData.cards[i].card_number) % 13;
+                if(num < 10000) total += config.REAL_NUMS[num];
+            }
+            setDealerTotal(total);
+        }
+        
+    }, [playerHandData, dealerHandData, isPlaying]);
 
     // now this function works!
     const gameReady = async() => {
         const tx = new TransactionBlock();
-        const [coin] = tx.splitCoins(tx.gas, [tx.pure(10000)]);
+        const [coin] = tx.splitCoins(tx.gas, [tx.pure(parseInt(bettingAmount))]);
         tx.setGasBudget(30000000);
         const package_id = config.PACKAGE_OBJECT_ID;
         const module = "blackjack"
@@ -118,40 +123,43 @@ const BlackJack = ({
             chain: 'sui:testnet'
         }
 
-        console.log(await wallet.signAndExecuteTransactionBlock(stx))
+        try {
+            console.log(await wallet.signAndExecuteTransactionBlock(stx))
+        } catch (err) {
+            console.log(err)
+        }
     }
 
-    const [playBgMusic] = useSound('/bg_sound.mp3');
-    const [playButtonSound] = useSound('/button_sound.mp3');
-
-
-
+    // --------------------------------------------------------------------
+    // Socket send flag
     const handleGameReady = async () => {
-        setLoading(true);
+        if (isPlaying < 1) {
+            playButtonSound();
 
-        playButtonSound();
-        playBgMusic();
-        await gameReady();
-        await getGameTableObjectData(gameTableObjectId);
-        console.log('game ready done!!!!!')
+            setLoading(true);
+            await gameReady();
+            await getGameTableObjectData(gameTableObjectId);
+            console.log('game ready done!!!!!')
+        }
     }
 
     const handleGameStart = () => {
-        setLoading(true);
-
         playButtonSound();
+
+        setLoading(true);
         socket.send(JSON.stringify({ 
             flag: 'Start Game', 
             packageObjectId: config.PACKAGE_OBJECT_ID,
             gameTableObjectId: gameTableObjectId,
-            playerAddress: wallet.address 
+            playerAddress: wallet.address,
+            bettingAmount: bettingAmount
         }));
     }
 
     const handleHit = async () => {
-        setLoading(true);
-
         playButtonSound();
+
+        setLoading(true);
         socket.send(JSON.stringify({ 
             flag: 'Go Card',
             packageObjectId: config.PACKAGE_OBJECT_ID,
@@ -172,7 +180,14 @@ const BlackJack = ({
         }));
     }
 
-    console.log("Player Hands: ", playerHandData.cards)
+    const handleEndGame = () => {
+        setLoading(true);
+
+        setLoading(false);
+    }
+
+    // --------------------------------------------------------------------
+    console.log("Player Hands: ", playerHandData)
 
     return (
         <Box
@@ -187,10 +202,9 @@ const BlackJack = ({
             }}
         >
             <h2>Blackjack Game Table : {gameTableObjectId}</h2>
-            <h2>Playing : {isPlaying == 0 ? "Not Ready" : isPlaying == 1? "Ready" : "Playing"}</h2>
-            
-
-            {/* 디버깅용 */}
+            <h2>Player : {playerHandData.account}</h2>
+            <h2>Game Status : {isPlaying == 0 ? "Not Ready" : isPlaying == 1? "Ready" : "Playing"}</h2>
+            <h3>Bet Amount : {bettingAmount/1000000000} SUI</h3>
 
             <Box sx={{
                 marginBottom: "20px",
@@ -257,7 +271,7 @@ const BlackJack = ({
             </Box>
 
 
-            {/* Card Deck */}
+            {/* Card Deck : handleHit 빼는 것 어떻습니까? by TW*/}
             {isPlaying >= 1 
             ? <CardDeck cardDeckData={cardDeckData} handleHit={handleHit} /> : <Box/>}
 
@@ -280,10 +294,12 @@ const BlackJack = ({
                 bottom: '50px',
                 left: '20vw',
             }}>
-                <Button variant="contained" color='secondary' sx={{ width: '120px', fontWeight: '800' }} onClick={handleGameReady}>Game Ready</Button>
-                <Button variant="contained" color='secondary' sx={{ width: '120px', fontWeight: '800' }}onClick={handleGameStart}>Game Start</Button>
+                {isPlaying < 1 ? <Button variant="contained" color='secondary' sx={{ width: '120px', fontWeight: '800' }} onClick={handleGameReady}>Game Ready</Button> : <Box/>}
+                {isPlaying < 2 ? <Button variant="contained" color='secondary' sx={{ width: '120px', fontWeight: '800' }}onClick={handleGameStart}>Game Start</Button> : <Box/>}
+                
                 <Button variant="contained" color='secondary' sx={{ width: '120px', fontWeight: '800' }}onClick={handleHit}>Hit</Button>
                 <Button variant="contained" color='secondary' sx={{ width: '120px', fontWeight: '800' }}onClick={handleStand}>Stand</Button>
+                <Button variant="contained" color='secondary' sx={{ width: '120px', fontWeight: '800' }}onClick={handleEndGame}>End Game</Button>
             </Box>
         </Box>
     );
