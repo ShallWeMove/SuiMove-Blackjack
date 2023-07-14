@@ -72,14 +72,30 @@ export async function fetchGameTableObject(
 
             // setCardDeckObjectId(card_deck);
             const card_deck_response = await getObject(card_deck_id);
-            console.log("card deck", card_deck_response)
             setCardDeckData(card_deck_response.data.result.data.content.fields);
+
+            // set Dealer Hand
             const dealer_hand_response = await getObject(dealer_hand_id);
-            console.log("dealer hand", dealer_hand_response)
-            setDealerHandData(dealer_hand_response.data.result.data.content.fields);
+            let dealer_hand = dealer_hand_response.data.result.data.content.fields;
+            let dealer_cards = [];
+            for (let i = 1; i < dealer_hand.cards.length; i++) {
+                const card = await getObject(dealer_hand.cards[i]);
+                dealer_cards.push(card.data.result.data.content.fields);
+            }
+            dealer_hand.cards = dealer_cards;
+            setDealerHandData(dealer_hand);
+            console.log("Dealer Hand: ", dealer_hand);
+
+            // set Player Hand
             const player_hand_response = await getObject(player_hand_id);
-            console.log("player hand", player_hand_response)
-            setPlayerHandData(player_hand_response.data.result.data.content.fields);
+            let player_hand = player_hand_response.data.result.data.content.fields;
+            let player_cards = [];
+            for (let i = 1; i < player_hand.cards.length; i++) {
+                const card = await getObject(player_hand.cards[i]);
+                player_cards.push(card.data.result.data.content.fields);
+            }
+            player_hand.cards = player_cards;
+            setPlayerHandData(player_hand);
         }
         setIsPlaying(is_playing);
         setConfirmed(true);

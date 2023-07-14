@@ -36,6 +36,9 @@ const BlackJack = ({
     const [gameOver, setGameOver] = useState(false);
     const [message, setMessage] = useState('');
 
+    const [playerTotal, setPlayerTotal] = useState(0);
+    const [dealerTotal, setDealerTotal] = useState(0);
+
     const wallet = useWallet();
 
     useEffect(() => {
@@ -46,6 +49,22 @@ const BlackJack = ({
             console.log('blackjack wallet status', wallet.status)
         }
     }, [wallet.connected])
+
+    useEffect(() => {
+        let total = 0;
+        for(let i = 0; i < playerHandData.cards.length; i++) {
+            const num = parseInt(playerHandData.cards[i].card_number);
+            if(num < 10000) total += num;
+        }
+        setPlayerTotal(total);
+
+        total = 0;
+        for(let i = 0; i < dealerHandData.cards.length; i++) {
+            const num = parseInt(dealerHandData.cards[i].card_number);
+            if(num < 10000) total += num;
+        }
+        setDealerTotal(total);
+    }, [playerHandData, dealerHandData]);
 
     // Handle incoming WebSocket messages
     useEffect(() => {
@@ -158,16 +177,70 @@ const BlackJack = ({
             
 
             {/* 디버깅용 */}
-            <h3>Player's cards:</h3>
-            <ul>
-                {isPlaying == 2 ? 
-                playerHandData.cards.map((card, i)=>(<Typography key={i}>{card}</Typography>)) : <Box/>}
-            </ul>
-            <h3>Dealer's cards:</h3>
-            <ul>
-                {isPlaying == 2 ? 
-                dealerHandData.cards.map((card, i)=>(<Typography key={i}>{card}</Typography>)) : <Box/>}
-            </ul>
+
+            <Box sx={{
+                marginBottom: "20px",
+            }}>
+                    <Box
+                    sx={{
+                        border: "1px solid white",
+                        display: "inline-block",
+                        paddingX: "10px",
+                        borderRadius: "20px",
+                    }}>
+                        <Box sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                        }}>
+                            <h3>Dealer's cards:</h3>
+                            <ul style={{
+                                display: 'flex',
+                            }}>
+                                {isPlaying == 2 &&
+                                dealerHandData.cards.map((card, i)=> {
+                                    if(card.card_number < 10000) {
+                                        return (<Typography key={i} sx={{marginRight: "10px"}} >{card.card_number}</Typography>)
+                                    }   else {
+                                        return (<Typography key={i} sx={{marginRight: "10px"}} >Closed</Typography>)
+                                    }        
+                                })}
+                            </ul>
+                        </Box>
+                    
+                        <h3>Total: {dealerTotal}</h3>
+                    </Box>
+            </Box>
+
+            <Box>
+                <Box 
+                sx={{
+                    border: "1px solid white",
+                    display: "inline-block",
+                    paddingX: "10px",
+                    borderRadius: "20px",
+                }}>
+                    <Box sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                    }}>
+                        <h3>Player's cards:</h3>
+                        <ul style={{
+                            display: 'flex',
+                        }}>
+                            {isPlaying == 2 && 
+                            playerHandData.cards.map((card, i) => {
+                                if(card.card_number < 10000) {
+                                    return <Typography key={i} sx={{marginRight: "10px"}}>{card.card_number}</Typography>
+                                }   else {
+                                    return <Typography key={i} sx={{marginRight: "10px"}}>Closed</Typography>
+                                }
+                            })}
+                        </ul>
+                    </Box>
+
+                    <h3>Total: {playerTotal}</h3>
+                </Box>
+            </Box>
 
 
             {/* Card Deck */}

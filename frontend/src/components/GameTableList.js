@@ -37,13 +37,13 @@ const GameTableList = ({
                         
                         <Box 
                         onClick={() => {
-                            if (t.data.content.fields.is_playing < 1)  {
+                            // if (t.data.content.fields.is_playing < 1)  {
                                 setTimeout(() => {
                                     setGameTableObjectId(t.data.objectId);
                                     handleGoToGameButtonClick(t.data.objectId);
                                 }, 1500);
                                 setOpens(opens.map((o, j) => i === j ? true : o));
-                            }
+                            // }
                         }}
                         sx={{
                             width: '160px',
