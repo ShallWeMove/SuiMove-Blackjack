@@ -183,7 +183,15 @@ const BlackJack = ({
     const handleEndGame = () => {
         setLoading(true);
 
-        setLoading(false);
+        playButtonSound();
+        socket.send(JSON.stringify({ 
+            flag: 'Fill Cards',
+            packageObjectId: config.PACKAGE_OBJECT_ID,
+            gameTableObjectId: gameTableObjectId,
+            playerAddress: wallet.address 
+        }));
+
+        // setLoading(false);
     }
 
     // --------------------------------------------------------------------
