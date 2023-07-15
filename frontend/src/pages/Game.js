@@ -21,7 +21,7 @@ const Game = () => {
 
     const [gameTableObjectId, setGameTableObjectId] = useState("");
     const [gameTableConfirmed, setGameTableConfirmed] = useState(false);
-    const [bettingAmount, setBettingAmount] = useState("");
+    const [bettingAmount, setBettingAmount] = useState("10000");
     const [error, setError] = useState(false);
     const [bettingConfirmed, setBettingConfirmed] = useState(false);
 

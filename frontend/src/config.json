@@ -1,16 +1,11 @@
 {
   "TESTNET_ENDPOINT": "https://sui-testnet.nodeinfra.com",
-  "PACKAGE_OBJECT_ID": "0x4b1a5c3ff1b530e1f390b3d70d772ba127bec9482ad1cb13e37c3d93a6c3dacf",
-  "GAME_INFO_OBJECT_ID" : "0x770485b29c25e2e100227cc0519c0f7e4cf7d96abe95e89e297c436e1401be5d",
+  "PACKAGE_OBJECT_ID": "0xfd695a715cf2d9aaff5785c390b71bbb50bab4bd9c98cee5a866f449ca7e52ff",
+  "GAME_INFO_OBJECT_ID" : "0xf0f31f0f78441acedd628d1966343b8ce32a668490dc2faadd2e4e36b77e7efb",
   "GAME_TABLES": [
-    "0x9aa0ecc1d949818f78b19e060f225d0677b02fc0dd97d43b7b35c56936bc12a4",
-    "0x39ec86c6f562d9e3eda9fe29ccc6e7bcd322788de37ddd0f0998758b2935c83d",
-    "0xd4da4630af03ef67b136808c8be447059a0dc993d420ed484423642bc67d69d1",
-    "0xf4b7ae1aff38e13cc299c3a09f74665c6aab37bdf6226f1fc22a52bde9e7164e",
-    "0x18b4854e819611b2d947199e0badd87b82d0e2d49a4e96795ab00744db8ce9bd",
-    "0x09aab992e53631e44f9d2476bf302adeb11f2b880d2594e38d4d32e77789d94f"
+    "0x1e9e2da72cc75ad5e2df0193a93c648bd58210ba726f13db6890e1f9384155d8"
   ],
-  "CARD_NUMS": ["queen", "ace", "2", "3", "4", "5", "6", "7", "8", "9", "10", "jack", "king"],
-  "REAL_NUMS": [10, 10, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10],
+  "CARD_NUMS": ["king", "ace", "2", "3", "4", "5", "6", "7", "8", "9", "10", "jack", "queen"],
+  "REAL_NUMS": [10, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10],
   "CARD_TYPES": ["heart", "spade", "diamond", "clover"]
 }

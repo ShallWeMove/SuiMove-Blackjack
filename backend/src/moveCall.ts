@@ -59,7 +59,7 @@ const moveCall = async (target: `${string}::${string}::${string}`, signer: RawSi
 };
 
 
-export const startGame = async(signer: RawSigner, address: string, package_id:string, game_table_id: string,  ws: WebSocket) => {
+export const startGame = async(signer: RawSigner, player_address: string, betting_amount: string, package_id:string, game_table_id: string,  ws: WebSocket) => {
     const tx = new TransactionBlock()
     const [coin] = tx.splitCoins(tx.gas, [tx.pure(10000)]);
     tx.setGasBudget(30000000);
@@ -68,7 +68,7 @@ export const startGame = async(signer: RawSigner, address: string, package_id:st
 
     tx.moveCall({
         target: `${package_id}::${module}::${function_name}`,
-        arguments: [tx.object(game_table_id), coin, tx.pure(address)],
+        arguments: [tx.object(game_table_id), coin, tx.pure(player_address)],
     });
     const result = await signer.signAndExecuteTransactionBlock({
         transactionBlock: tx,
@@ -76,6 +76,41 @@ export const startGame = async(signer: RawSigner, address: string, package_id:st
     console.log(result.objectChanges);
     const data = {
         flag: 'start game done',
+        digest: result.digest,
+    };
+    ws.send(JSON.stringify(data))
+}
+
+export const fillCardDeck = async(signer: RawSigner, package_id:string, game_table_id: string,  ws: WebSocket) => {
+    const tx = new TransactionBlock()
+    // const [coin] = tx.splitCoins(tx.gas, [tx.pure(parseInt(betting_amount))]);
+    tx.setGasBudget(3000000000);
+    const module = "blackjack"
+    const function_name = "fill_10_cards_to_card_deck"
+
+    let shuffle_cards = [38, 24, 13, 39, 46, 40, 29, 20, 3, 2]; 
+
+    tx.moveCall({
+        target: `${package_id}::${module}::${function_name}`,
+        arguments: [tx.object(game_table_id), 
+            tx.pure(shuffle_cards[0]),
+            tx.pure(shuffle_cards[1]),
+            tx.pure(shuffle_cards[2]),
+            tx.pure(shuffle_cards[3]),
+            tx.pure(shuffle_cards[4]),
+            tx.pure(shuffle_cards[5]),
+            tx.pure(shuffle_cards[6]),
+            tx.pure(shuffle_cards[7]),
+            tx.pure(shuffle_cards[8]),
+            tx.pure(shuffle_cards[9])
+        ],
+    });
+    const result = await signer.signAndExecuteTransactionBlock({
+        transactionBlock: tx,
+    });
+    console.log(result.objectChanges);
+    const data = {
+        flag: 'fill card done',
         digest: result.digest,
     };
     ws.send(JSON.stringify(data))
