@@ -1,6 +1,6 @@
 import WebSocket from 'ws';
 import dotenv from "dotenv";
-import { getProvider, getSigner, startGame, endGame, goCard, fillCardDeck } from './moveCall';
+import { getProvider, getSigner, startGame, endGame, goCard, fillCardDeck, settleUpGame } from './moveCall';
 
 dotenv.config();
 
@@ -29,12 +29,12 @@ wss.on('connection', (ws: WebSocket) => {
             goCard(dealer_signer, package_id, game_table_id, player_address, ws)
         }
 
-        else if (flag == 'End Game') {
+        else if (flag == 'End Game (Stand)') {
             endGame(dealer_signer, package_id, game_table_id, ws)
         }
 
         else if (flag == 'Settle Up Game') {
-            // settleUpGame(dealer_signer, package_id, game_table_id, ws)
+            settleUpGame(dealer_signer, package_id, game_table_id, ws)
         }
 
         else if (flag == 'Fill Cards') {
