@@ -10,9 +10,9 @@ const GameTableList = ({
     handleGoToGameButtonClick,
     setLoading,
 }) => {
-
-    const [opens, setOpens] = useState([]);
-    const game_status = ["Not Ready", "Ready", "Playing"]
+    const wallet = useWallet();
+    const [gameTableOpens, setGameTableOpens] = useState([]);
+    const game_status = ["Available Game", "Ready", "Playing", "Game End"]
 
     useEffect(() => {
         setOpens(allGameTables.map((t) => false));
