@@ -34,7 +34,7 @@ wss.on('connection', (ws: WebSocket) => {
         }
 
         else if (flag == 'Settle Up Game') {
-            // endGame(dealer_signer, package_id, game_table_id, ws)
+            // settleUpGame(dealer_signer, package_id, game_table_id, ws)
         }
 
         else if (flag == 'Fill Cards') {

@@ -227,7 +227,12 @@ const BlackJack = ({
             setLoading(true);
 
             playButtonSound();
-            setLoading(false);
+            socket.send(JSON.stringify({ 
+                flag: 'Settle Up Game',
+                packageObjectId: config.PACKAGE_OBJECT_ID,
+                gameTableObjectId: gameTableObjectId,
+                playerAddress: wallet.address 
+            }));
         }
     }
 
@@ -362,7 +367,7 @@ const BlackJack = ({
                 {isPlaying == 2 ? <Button variant="contained" color='secondary' sx={{ width: '120px', fontWeight: '800' }}onClick={handleHit}>Hit</Button> : <Box/>}
                 {isPlaying == 2 ? <Button variant="contained" color='secondary' sx={{ width: '120px', fontWeight: '800' }}onClick={handleStand}>Stand</Button> : <Box/>}
                 
-                {isPlaying == 3 ?  <Button variant="contained" color='secondary' sx={{ width: '120px', fontWeight: '800' }}onClick={handleSettleUpGame}>End Game</Button> : <Box/>}
+                {isPlaying == 3 ?  <Button variant="contained" color='secondary' sx={{ width: '120px', fontWeight: '800' }}onClick={handleSettleUpGame}>Settle Up Game</Button> : <Box/>}
                
 
                 {wallet.address === config.DEALER_ADDRESS ? <Button variant="contained" color='secondary' sx={{ width: '120px', fontWeight: '800' }}onClick={handleFillCard}>Fill Card</Button> : <Box/>}
