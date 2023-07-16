@@ -16,7 +16,7 @@ export default function App() {
       <ColorModeContext.Provider value={colorMode}>
         <CssBaseline />
         <Box sx={{ flexGrow: 1 }}>
-          <WalletProvider>
+          <WalletProvider chains={[{id:"sui:testnet", name: "Sui Testnet", rpcUrl: "https://sui-testnet.nodeinfra.com" }]}>
             <Navbar />
             <Routes>
               <Route path="/" element={<Landing />} />

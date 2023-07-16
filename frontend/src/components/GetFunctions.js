@@ -95,14 +95,10 @@ export async function fetchGameTableObject(
             const dealer_hand_id = await response.data.result.data.content.fields.dealer_hand;
             const player_hand_id = await response.data.result.data.content.fields.player_hand;
 
-            // setCardDeckObjectId(card_deck);
-            const card_deck_response = await getObject(card_deck_id);
-            const dealer_hand_response = await getObject(dealer_hand_id);
-            const player_hand_response = await getObject(player_hand_id);
-            
-            let card_deck = card_deck_response.data.result.data.content.fields
-            let dealer_hand = dealer_hand_response.data.result.data.content.fields;
-            let player_hand = player_hand_response.data.result.data.content.fields;
+            const all_response = await getMultiObjects([card_deck_id, dealer_hand_id, player_hand_id])
+            let card_deck = all_response.data.result[0].data.content.fields; 
+            let dealer_hand = all_response.data.result[1].data.content.fields;
+            let player_hand = all_response.data.result[2].data.content.fields;
             
             // push card information to dealer, player hand from card object ids of dealer, player hand
             pushCardsDataFrom(dealer_hand)
@@ -112,6 +108,8 @@ export async function fetchGameTableObject(
             setCardDeckData(card_deck);
             setDealerHandData(dealer_hand);
             setPlayerHandData(player_hand);
+        } else if (is_playing < READY) {
+            setPlayerHandData({}); 
         }
         setIsPlaying(is_playing);
         setConfirmed(true);

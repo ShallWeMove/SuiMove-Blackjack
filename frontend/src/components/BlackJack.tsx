@@ -91,6 +91,18 @@ const BlackJack = ({
                     console.log("game stop done!!!!!");
                     break;
 
+                case 'fill card done':
+                    // handle Stop done
+                    getGameTableObjectData(gameTableObjectId);
+                    console.log("fill card done!!!!!");
+                    break;
+
+                case 'cancel ready game done':
+                    // handle Stop done
+                    getGameTableObjectData(gameTableObjectId);
+                    console.log("cancel ready game done!!!!!");
+                    break;
+
                 default:
                     break;
             }
@@ -100,7 +112,7 @@ const BlackJack = ({
     }, []);
 
     // now this function works!
-    const gameReady = async() => {
+    const readyGame = async() => {
         const tx = new TransactionBlock();
         const [coin] = tx.splitCoins(tx.gas, [tx.pure(10000)]);
         tx.setGasBudget(30000000);
@@ -112,7 +124,31 @@ const BlackJack = ({
             arguments: [tx.object(config.GAME_INFO_OBJECT_ID), tx.object(gameTableObjectId) , coin],
         });
 
-        const stx: Omit<SuiSignAndExecuteTransactionBlockInput,'sui:testnet'> = {
+        const stx: Omit<SuiSignAndExecuteTransactionBlockInput,"sui:testnet"> = {
+            transactionBlock: tx,
+            account: wallet.account!,
+            chain: 'sui:testnet'
+        }
+
+        try {
+            console.log(await wallet.signAndExecuteTransactionBlock(stx))
+        } catch (err) {
+            console.log(err)
+        }
+    }
+
+    const cancelReadyGame = async() => {
+        const tx = new TransactionBlock();
+        tx.setGasBudget(30000000);
+        const package_id = config.PACKAGE_OBJECT_ID;
+        const module = "blackjack"
+        const function_name = "cancel_ready_game"
+        tx.moveCall({
+            target: `${package_id}::${module}::${function_name}`,
+            arguments: [tx.object(config.GAME_INFO_OBJECT_ID), tx.object(gameTableObjectId)],
+        });
+
+        const stx: Omit<SuiSignAndExecuteTransactionBlockInput,"sui:testnet"> = {
             transactionBlock: tx,
             account: wallet.account!,
             chain: 'sui:testnet'
@@ -124,16 +160,19 @@ const BlackJack = ({
     const [playBgMusic] = useSound('/bg_sound.mp3');
     const [playButtonSound] = useSound('/button_sound.mp3');
 
-
-
-    const handleGameReady = async () => {
-        setLoading(true);
-
+            setLoading(true);
+            await readyGame();
+            await getGameTableObjectData(gameTableObjectId);
+            console.log('game ready done!!!!!')
+        }
+    }
+    const handleCancelGameReady = async () => {
         playButtonSound();
-        playBgMusic();
-        await gameReady();
+
+        setLoading(true);
+        await cancelReadyGame();
         await getGameTableObjectData(gameTableObjectId);
-        console.log('game ready done!!!!!')
+        console.log('cancel game ready done!!!!!')
     }
 
     const handleGameStart = () => {
@@ -176,6 +215,13 @@ const BlackJack = ({
         setLoading(true);
 
         playButtonSound();
+        setLoading(false);
+    }
+
+    const handleFillCard = () => {
+        setLoading(true);
+
+        playButtonSound();
         socket.send(JSON.stringify({ 
             flag: 'Fill Cards',
             packageObjectId: config.PACKAGE_OBJECT_ID,
@@ -183,10 +229,11 @@ const BlackJack = ({
             playerAddress: wallet.address 
         }));
 
-        // setLoading(false);
+        setLoading(false);
     }
 
-    console.log("Player Hands: ", playerHandData.cards)
+    // --------------------------------------------------------------------
+    console.log("Player Hands: ", playerHandData.account);
 
     return (
         <Box
@@ -293,11 +340,16 @@ const BlackJack = ({
                 bottom: '50px',
                 left: '20vw',
             }}>
-                <Button variant="contained" color='secondary' sx={{ width: '120px', fontWeight: '800' }} onClick={handleGameReady}>Game Ready</Button>
-                <Button variant="contained" color='secondary' sx={{ width: '120px', fontWeight: '800' }}onClick={handleGameStart}>Game Start</Button>
+                {isPlaying < 1 ? <Button variant="contained" color='secondary' sx={{ width: '120px', fontWeight: '800' }} onClick={handleGameReady}>Game Ready</Button> 
+                : isPlaying == 1 ? <Button variant="contained" color='secondary' sx={{ width: '120px', fontWeight: '800' }} onClick={handleCancelGameReady}>Cancel Ready</Button> : <Box/>}
+                {isPlaying < 2 ? <Button variant="contained" color='secondary' sx={{ width: '120px', fontWeight: '800' }}onClick={handleGameStart}>Game Start</Button> : <Box/>}
+                
                 <Button variant="contained" color='secondary' sx={{ width: '120px', fontWeight: '800' }}onClick={handleHit}>Hit</Button>
                 <Button variant="contained" color='secondary' sx={{ width: '120px', fontWeight: '800' }}onClick={handleStand}>Stand</Button>
                 <Button variant="contained" color='secondary' sx={{ width: '120px', fontWeight: '800' }}onClick={handleEndGame}>End Game</Button>
+
+                {wallet.address === config.DEALER_ADDRESS ? <Button variant="contained" color='secondary' sx={{ width: '120px', fontWeight: '800' }}onClick={handleFillCard}>Fill Card</Button> : <Box/>}
+                
             </Box>
         </Box>
     );

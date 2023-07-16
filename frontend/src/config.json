@@ -1,11 +1,12 @@
 {
   "TESTNET_ENDPOINT": "https://sui-testnet.nodeinfra.com",
-  "PACKAGE_OBJECT_ID": "0xfd695a715cf2d9aaff5785c390b71bbb50bab4bd9c98cee5a866f449ca7e52ff",
-  "GAME_INFO_OBJECT_ID" : "0xf0f31f0f78441acedd628d1966343b8ce32a668490dc2faadd2e4e36b77e7efb",
+  "PACKAGE_OBJECT_ID": "0x275075bd2a12097c551cc4e80e642640e5f1908ba6bb963ac7280660bded3df6",
+  "GAME_INFO_OBJECT_ID" : "0xa21b4711348a32ab8f926d40dfe6b7fc450711c0f7bace6764a67880d5c631bd",
   "GAME_TABLES": [
-    "0x1e9e2da72cc75ad5e2df0193a93c648bd58210ba726f13db6890e1f9384155d8"
+    "0x78f50cd54df93469537b69386e934f5df588d0174112a2a40fd82cb085c73ebe"
   ],
   "CARD_NUMS": ["king", "ace", "2", "3", "4", "5", "6", "7", "8", "9", "10", "jack", "queen"],
   "REAL_NUMS": [10, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10],
-  "CARD_TYPES": ["heart", "spade", "diamond", "clover"]
+  "CARD_TYPES": ["heart", "spade", "diamond", "clover"],
+  "DEALER_ADDRESS": "0xdd235ff1e61e1d6f204eb567d1b4b5eca752dc2ce05d8bb23ccb82654f76c8ce"
 }

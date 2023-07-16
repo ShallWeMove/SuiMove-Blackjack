@@ -58,7 +58,6 @@ const moveCall = async (target: `${string}::${string}::${string}`, signer: RawSi
     // return "Asf" 
 };
 
-
 export const startGame = async(signer: RawSigner, player_address: string, betting_amount: string, package_id:string, game_table_id: string,  ws: WebSocket) => {
     const tx = new TransactionBlock()
     const [coin] = tx.splitCoins(tx.gas, [tx.pure(10000)]);
@@ -83,26 +82,25 @@ export const startGame = async(signer: RawSigner, player_address: string, bettin
 
 export const fillCardDeck = async(signer: RawSigner, package_id:string, game_table_id: string,  ws: WebSocket) => {
     const tx = new TransactionBlock()
-    // const [coin] = tx.splitCoins(tx.gas, [tx.pure(parseInt(betting_amount))]);
-    tx.setGasBudget(3000000000);
+    tx.setGasBudget(500000000);
     const module = "blackjack"
     const function_name = "fill_10_cards_to_card_deck"
 
-    let shuffle_cards = [38, 24, 13, 39, 46, 40, 29, 20, 3, 2]; 
-
+    let shuffle_cards = ["38", "24", "13", "39", "46", "40", "29", "20", "3", "2"]; 
     tx.moveCall({
         target: `${package_id}::${module}::${function_name}`,
-        arguments: [tx.object(game_table_id), 
-            tx.pure(shuffle_cards[0]),
-            tx.pure(shuffle_cards[1]),
-            tx.pure(shuffle_cards[2]),
-            tx.pure(shuffle_cards[3]),
-            tx.pure(shuffle_cards[4]),
-            tx.pure(shuffle_cards[5]),
-            tx.pure(shuffle_cards[6]),
-            tx.pure(shuffle_cards[7]),
-            tx.pure(shuffle_cards[8]),
-            tx.pure(shuffle_cards[9])
+        arguments: [
+            tx.object(game_table_id), 
+            tx.pure(parseInt(shuffle_cards[0])),
+            tx.pure(parseInt(shuffle_cards[1])),
+            tx.pure(parseInt(shuffle_cards[2])),
+            tx.pure(parseInt(shuffle_cards[3])),
+            tx.pure(parseInt(shuffle_cards[4])),
+            tx.pure(parseInt(shuffle_cards[5])),
+            tx.pure(parseInt(shuffle_cards[6])),
+            tx.pure(parseInt(shuffle_cards[7])),
+            tx.pure(parseInt(shuffle_cards[8])),
+            tx.pure(parseInt(shuffle_cards[9])),
         ],
     });
     const result = await signer.signAndExecuteTransactionBlock({

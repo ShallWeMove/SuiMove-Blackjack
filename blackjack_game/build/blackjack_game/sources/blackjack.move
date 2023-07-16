@@ -1,19 +1,19 @@
 module blackjack_game::blackjack {
   use sui::object::{Self,ID, UID};
-  use std::option::{Self, Option, none};
-  use std::string::{Self, String};
+  use std::option::{Self, Option};
   use sui::coin::{Self, Coin};
-  use sui::pay;
-  use sui::balance::Balance;
   use sui::sui::SUI;
   use sui::tx_context::{Self, TxContext};
   use sui::transfer;
   use std::vector;
   use sui::dynamic_object_field;
+  use std::string::{Self, String};
+  use sui::pay;
+  use sui::balance::Balance;
   use std::bcs;
   use sui::clock::{Self, Clock};
 
-  // game identity
+  // game object which can create game table
   struct GameInfo has key {
     id: UID,
     admin: address
@@ -24,13 +24,9 @@ module blackjack_game::blackjack {
   const GAME_IS_PLAYING : u64 = 2;
   const GAME_END : u64 = 3;
 
-  const TOTAL_CARD_NUMBER_IN_CARD_DECK : u64 = 26;
-
   const PLYAER_WIN : u64 = 1;
   const DEALER_WIN : u64 = 2;
   const DRAW : u64 = 3;
-
-  
 
   // GameTable is essential object to play blackjack
   // it wrap objects like below
@@ -72,12 +68,14 @@ module blackjack_game::blackjack {
     id: UID,
     cards: vector<Option<ID>>,
     entire_number_of_cards: u64,
+    current_number_of_cards: u64,
     current_sequence_number: u64,
+    how_many_fill_card: u64,
     game_id: ID,
   }
 
-  // When card is open, card number is number. 
-  // In other hand, when card is flipped over, card number is some cryptogram
+  // When card is open, card number is between 1 and 52. 
+  // In other hand, when card is flipped over, card number is some cryptogram number.
   struct Card has key, store {
     id: UID,
     card_number: u64,
@@ -86,20 +84,13 @@ module blackjack_game::blackjack {
     card_deck_id: ID,
   }
 
-  struct Card1 has key, store {
-    id: UID,
-    card_number: u64,
-    sequence_number: u64,
-    is_open: bool,
-    timestamp: u64,
-    card_deck_id: ID,
-  }
   // TODO : sui -> casino chips
   // place to store betting money
   struct MoneyBox has key, store {
     id: UID,
     // stake: vector<Option<Coin<SUI>>>, 
-    stake: vector<Option<ID>>,
+    player_bet: Option<ID>,
+    dealer_bet: Option<ID>,
     game_id: ID,
   }   
   
@@ -196,7 +187,9 @@ module blackjack_game::blackjack {
       id : id,
       cards : vector[option::none()] ,
       entire_number_of_cards : 0,
+      current_number_of_cards: 0,
       current_sequence_number: 0,
+      how_many_fill_card: 0,
       game_id : game_id,
      }
   }
@@ -204,7 +197,8 @@ module blackjack_game::blackjack {
   fun create_money_box(game: &GameInfo, ctx: &mut TxContext) : MoneyBox {
     MoneyBox {
       id : object::new(ctx),
-      stake : vector[option::none()],
+      player_bet : option::none(),
+      dealer_bet: option::none(),
       game_id : object::id(game),
     }
   }
@@ -214,31 +208,6 @@ module blackjack_game::blackjack {
     assert!(game_table.dealer_address == sender, 403);
 
   }
-
-  // TODO : vector<vector<u8>>? vector<u8> ? select one
-  // dealer action from BE
-  // when fill card deck cards must be encrypted
-  // fun fill_card_deck(game_table: &mut GameTable, ctx: &mut TxContext) {
-  //   check_is_dealer(game_table, ctx);
-
-  //   let card_deck = dynamic_object_field::borrow_mut<vector<u8>, CardDeck> (&mut game_table.id, b"card_deck");
-  //   // assert!(card_deck.is_filled == false, 403);
-  //   let shuffle_card : vector<u64> = vector<u64>[];
-
-  //   let i : u64 = 0;
-  //   while (i < card_deck.number_of_cards) {
-  //     let card_number = vector::pop_back<u64>(&mut shuffle_card);
-  //     let sequence_number = TOTAL_CARD_NUMBER_IN_CARD_DECK - i;
-  //     let encrypted_number = encrypt_card_number(card_number);
-  //     let card = create_card(encrypted_number, sequence_number, object::uid_to_inner(&card_deck.id), ctx);
-  //     let card_id = object::uid_to_inner(&card.id);
-  //     dynamic_object_field::add(&mut card_deck.id, sequence_number, card);
-  //     vector::push_back<Option<ID>>(&mut card_deck.cards, option::some(card_id));
-  //     i = i + 1;
-  //   };
-
-  //   // card_deck.is_filled = true;
-  // }
 
   public entry fun fill_10_cards_to_card_deck(
     game_table: &mut GameTable, 
@@ -275,10 +244,11 @@ module blackjack_game::blackjack {
       i = i + 1;
     };
 
-    card_deck.entire_number_of_cards = card_deck.entire_number_of_cards + number_of_cards;
     vector::reverse<Option<ID>>(&mut card_deck.cards);
+    card_deck.entire_number_of_cards = card_deck.entire_number_of_cards + number_of_cards;
+    card_deck.current_number_of_cards = card_deck.current_number_of_cards + number_of_cards;
+    card_deck.how_many_fill_card = card_deck.how_many_fill_card + 1;
   }
-
 
   fun create_card(card_number: u64, sequence_number: u64, card_deck_id: ID, ctx: &mut TxContext) : Card {
     Card {
@@ -301,21 +271,21 @@ module blackjack_game::blackjack {
 
   // player action from FE
   // transfer player hand to game table and bet some money
+  // TODO : if player already had player's own hand, use the hand for player hand (recycle hand)
   public entry fun ready_game(game: &GameInfo, game_table: &mut GameTable, money: Coin<SUI>, ctx: &mut TxContext) {
     // check game id
     check_game_id(game, game_table.game_id);
-    // check_game_id(game, player_hand.game_id);
-    let player_hand = create_hand(game, ctx);
 
     // pass player hand to the game table
-    pass_hand(game_table, player_hand, ctx);
-
+    let player_hand = create_hand(game, ctx);
+    pass_hand_to_gametable(game_table, player_hand, ctx);
+    // bet money
     bet_player_money(game_table, money, ctx);
 
     game_table.is_playing = GAME_READY_STATE;
   }
 
-  fun pass_hand(game_table: &mut GameTable, player_hand: Hand, ctx: &mut TxContext) {
+  fun pass_hand_to_gametable(game_table: &mut GameTable, player_hand: Hand, ctx: &mut TxContext) {
     let sender = tx_context::sender(ctx);
     let player_hand_id = object::uid_to_inner(&player_hand.id);
     dynamic_object_field::add(&mut game_table.id, b"player_hand", player_hand);
@@ -326,7 +296,7 @@ module blackjack_game::blackjack {
   fun bet_player_money(game_table: &mut GameTable, money: Coin<SUI>, ctx: &mut TxContext) {
     let money_box = dynamic_object_field::borrow_mut<vector<u8>,MoneyBox>(&mut game_table.id, b"money_box");
     let money_id = object::id(&money);
-    vector::push_back<Option<ID>>(&mut money_box.stake, option::some(money_id));
+    money_box.player_bet = option::some(money_id);
     dynamic_object_field::add(&mut money_box.id, b"player_money", money);
   }
   
@@ -338,8 +308,29 @@ module blackjack_game::blackjack {
     object::id(game)
   }
 
-  // public entry fun cancel_ready_game() {}
+  // dealer action from BE 
+  public entry fun cancel_ready_game(game: &GameInfo, game_table: &mut GameTable, ctx: &mut TxContext) {
+    // check game id
+    check_game_id(game, game_table.game_id);
+    // check whether player address in the game table is equal to executor
+    let sender = tx_context::sender(ctx);
+    assert!(game_table.player_address == option::some(sender), 403);
+    // check if game is ready stats
+    // only can cancel ready game in game ready state
+    assert!(game_table.is_playing == GAME_READY_STATE, 403);
 
+    let player_hand = dynamic_object_field::remove<vector<u8>, Hand> (&mut game_table.id, b"player_hand");
+    transfer::transfer(player_hand, sender);
+    game_table.player_hand = option::none();
+    game_table.player_address = option::none();
+
+    let money_box = dynamic_object_field::borrow_mut<vector<u8>, MoneyBox> (&mut game_table.id, b"money_box");
+    let bet_money = dynamic_object_field::remove<vector<u8>, Coin<SUI>> (&mut money_box.id, b"player_money");
+    transfer::public_transfer(bet_money, sender);
+    money_box.player_bet = option::none();
+
+    game_table.is_playing = GAME_NOT_READY;
+  }
 
   // dealer action from BE 
   public entry fun start_game(game_table: &mut GameTable, money: Coin<SUI>, player_address: address,  ctx: &mut TxContext) {
@@ -354,40 +345,24 @@ module blackjack_game::blackjack {
     // from now game in progress
     game_table.is_playing = GAME_IS_PLAYING;
 
+    // check if card deck is filled at least once
+    let card_deck = dynamic_object_field::borrow<vector<u8>, CardDeck> (&mut game_table.id, b"card_deck");
+    assert!(card_deck.how_many_fill_card > 0, 403);
+
     pass_card_to_player(game_table, player_address, ctx);
     pass_card_to_dealer(game_table, true, ctx);
     pass_card_to_player(game_table, player_address, ctx);
     pass_card_to_dealer(game_table, false, ctx);
 
-
-
-    // let card_deck = dynamic_object_field::remove<vector<u8>, CardDeck> (&mut game_table.id, b"card_deck");
-    let player_hand = dynamic_object_field::remove<vector<u8>, Hand> (&mut game_table.id, b"player_hand");
-    // let dealer_hand = dynamic_object_field::remove<vector<u8>, Hand> (&mut game_table.id, b"dealer_hand");
-
-    // // pass_card_to(dealer, sequence_number=3)
-    // let sequence_number = TOTAL_CARD_NUMBER_IN_CARD_DECK - (card_deck.entire_number_of_cards - 1);
-    // let hand_sequence_number = dealer_hand.number_of_cards;
-    // let dealer_card_2 : Card = dynamic_object_field::remove(&mut card_deck.id, sequence_number);
-    // vector::pop_back<Option<ID>> (&mut card_deck.cards);
-    // // let decrypted_card_number = decrypt_card_number(dealer_card_2.card_number);
-    // // dealer_card_2.card_number = decrypted_card_number;
-    // vector::push_back<Option<ID>>(&mut dealer_hand.cards, option::some(object::id(&dealer_card_2)));
-    // dynamic_object_field::add(&mut dealer_hand.id, hand_sequence_number, dealer_card_2);
-    // dealer_hand.number_of_cards = dealer_hand.number_of_cards + 1;
-    // card_deck.entire_number_of_cards = card_deck.entire_number_of_cards - 1;
-
+    let player_hand = dynamic_object_field::borrow_mut<vector<u8>, Hand> (&mut game_table.id, b"player_hand");
     player_hand.is_my_turn = true;
-
-    // dynamic_object_field::add(&mut game_table.id, b"card_deck", card_deck);
-    dynamic_object_field::add(&mut game_table.id, b"player_hand", player_hand);
-    // dynamic_object_field::add(&mut game_table.id, b"dealer_hand", dealer_hand);    
   }
 
   fun bet_dealer_money(game_table: &mut GameTable, money: Coin<SUI>, ctx: &mut TxContext) {
     let money_box = dynamic_object_field::borrow_mut<vector<u8>,MoneyBox>(&mut game_table.id, b"money_box");
     let money_id = object::id(&money);
-    vector::push_back<Option<ID>>(&mut money_box.stake, option::some(money_id));
+
+    money_box.dealer_bet = option::some(money_id);
     dynamic_object_field::add(&mut money_box.id, b"dealer_money", money);
   }
 
@@ -404,32 +379,35 @@ module blackjack_game::blackjack {
     assert!(game_table.dealer_address == tx_context::sender(ctx), 403);
 
     let card_deck = dynamic_object_field::remove<vector<u8>, CardDeck> (&mut game_table.id, b"card_deck");
-    let player_hand = dynamic_object_field::remove<vector<u8>, Hand> (&mut game_table.id, b"player_hand");
-
     let sequence_number = card_deck.current_sequence_number;
+
+    let player_hand = dynamic_object_field::remove<vector<u8>, Hand> (&mut game_table.id, b"player_hand");
     let hand_sequence_number = player_hand.number_of_cards;
-    
+
     let player_card : Card = dynamic_object_field::remove(&mut card_deck.id, sequence_number);
     if (vector::pop_back<Option<ID>> (&mut card_deck.cards) == option::none()) {
       vector::pop_back<Option<ID>> (&mut card_deck.cards); 
     };
-    player_card.is_open = true;
+    card_deck.current_number_of_cards = card_deck.current_number_of_cards - 1;
+
     let decrypted_card_number = decrypt_card_number(player_card.card_number, player_card.sequence_number);
     player_card.card_number = decrypted_card_number;
-    vector::push_back<Option<ID>>(&mut player_hand.cards, option::some(object::id(&player_card)));
-    dynamic_object_field::add(&mut player_hand.id, hand_sequence_number, player_card);
-    
-    player_hand.number_of_cards = player_hand.number_of_cards + 1;
-    card_deck.current_sequence_number = card_deck.current_sequence_number + 1;
+    player_card.is_open = true;
+
     let card_real_value : u64 = decrypted_card_number % 13;
     if (card_real_value > 10 || card_real_value == 0) {
       card_real_value = 10;
     };
     player_hand.total_card_numbers = player_hand.total_card_numbers + card_real_value;
 
+    vector::push_back<Option<ID>>(&mut player_hand.cards, option::some(object::id(&player_card)));
+    dynamic_object_field::add(&mut player_hand.id, hand_sequence_number, player_card);
+    player_hand.number_of_cards = player_hand.number_of_cards + 1;
+
+    card_deck.current_sequence_number = card_deck.current_sequence_number + 1;
+
     dynamic_object_field::add(&mut game_table.id, b"player_hand", player_hand);
     dynamic_object_field::add(&mut game_table.id, b"card_deck", card_deck);
-
   }
 
   fun pass_card_to_dealer(game_table: &mut GameTable, want_to_open: bool, ctx: &mut TxContext){
@@ -437,20 +415,22 @@ module blackjack_game::blackjack {
     // check whether dealer address in the game table is equal to executor
     assert!(game_table.dealer_address == tx_context::sender(ctx), 403);
     let card_deck = dynamic_object_field::remove<vector<u8>, CardDeck> (&mut game_table.id, b"card_deck"); 
-    let dealer_hand = dynamic_object_field::remove<vector<u8>, Hand> (&mut game_table.id, b"dealer_hand");
-
     let sequence_number = card_deck.current_sequence_number;
+
+    let dealer_hand = dynamic_object_field::remove<vector<u8>, Hand> (&mut game_table.id, b"dealer_hand");
     let hand_sequence_number = dealer_hand.number_of_cards;
     
     let dealer_card : Card = dynamic_object_field::remove(&mut card_deck.id, sequence_number);
     if (vector::pop_back<Option<ID>> (&mut card_deck.cards) == option::none()) {
       vector::pop_back<Option<ID>> (&mut card_deck.cards); 
     };
+    card_deck.current_number_of_cards = card_deck.current_number_of_cards - 1;
 
     if (want_to_open) {
-      dealer_card.is_open = true;
       let decrypted_card_number = decrypt_card_number(dealer_card.card_number, dealer_card.sequence_number);
       dealer_card.card_number = decrypted_card_number;
+      dealer_card.is_open = true;
+
       let card_real_value : u64 = decrypted_card_number % 13;
       if (card_real_value > 10 || card_real_value == 0) {
         card_real_value = 10;
@@ -460,10 +440,10 @@ module blackjack_game::blackjack {
     
     vector::push_back<Option<ID>>(&mut dealer_hand.cards, option::some(object::id(&dealer_card)));
     dynamic_object_field::add(&mut dealer_hand.id, hand_sequence_number, dealer_card);
-    
     dealer_hand.number_of_cards = dealer_hand.number_of_cards + 1;
+    
     card_deck.current_sequence_number = card_deck.current_sequence_number + 1;
-  
+
     dynamic_object_field::add(&mut game_table.id, b"dealer_hand", dealer_hand);
     dynamic_object_field::add(&mut game_table.id, b"card_deck", card_deck);
   }
