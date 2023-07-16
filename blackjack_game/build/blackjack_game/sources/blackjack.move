@@ -525,28 +525,83 @@ module blackjack_game::blackjack {
   }
 
   public entry fun settle_up_game(game_table: &mut GameTable, ctx: &mut TxContext) {
-    assert!(game_table.is_playing == GAME_IS_PLAYING, 403);
+    assert!(game_table.is_playing == GAME_END, 403);
     // check whether dealer address in the game table is equal to executor
     check_is_dealer(game_table, ctx);
 
+    let dealer_hand = dynamic_object_field::remove<vector<u8>, Hand> (&mut game_table.id, b"dealer_hand");
+    let player_hand = dynamic_object_field::remove<vector<u8>, Hand> (&mut game_table.id, b"player_hand"); 
+    let used_card_deck = dynamic_object_field::remove<vector<u8>, CardDeck> (&mut game_table.id, b"used_card_deck"); 
+    let money_box = dynamic_object_field::remove<vector<u8>,MoneyBox>(&mut game_table.id, b"money_box");
+
+    // transfer all cards of deale hand to used card deck
+    let i = 0;
+    vector::reverse<Option<ID>>(&mut dealer_hand.cards); 
+    let dealer_number_of_cards = dealer_hand.number_of_cards;
+    while (i < dealer_number_of_cards) {
+      let dealer_card = dynamic_object_field::remove<u64, Card> (&mut dealer_hand.id, i);
+      let dealer_card_id = object::id(&dealer_card);
+      if (vector::pop_back<Option<ID>> (&mut dealer_hand.cards) == option::none()) {
+      vector::pop_back<Option<ID>> (&mut dealer_hand.cards); 
+      };
+      dealer_hand.number_of_cards = dealer_hand.number_of_cards - 1;
+
+      let number_of_cards = used_card_deck.entire_number_of_cards;
+      dynamic_object_field::add<u64, Card> (&mut used_card_deck.id, number_of_cards, dealer_card);
+      vector::push_back<Option<ID>> (&mut used_card_deck.cards, option::some(dealer_card_id));
+      used_card_deck.entire_number_of_cards = used_card_deck.entire_number_of_cards + 1;
+      i = i + 1;
+    };
+
+    // transfer all cards of player hand to used card deck
+    let i = 0;
+    vector::reverse<Option<ID>>(&mut player_hand.cards); 
+    let player_number_of_cards = player_hand.number_of_cards;
+    while (i < player_number_of_cards) {
+      let player_card = dynamic_object_field::remove<u64, Card> (&mut player_hand.id, i);
+      let player_card_id = object::id(&player_card);
+      if (vector::pop_back<Option<ID>> (&mut player_hand.cards) == option::none()) {
+      vector::pop_back<Option<ID>> (&mut player_hand.cards); 
+      };
+      player_hand.number_of_cards = player_hand.number_of_cards - 1;
+
+      let number_of_cards = used_card_deck.entire_number_of_cards;
+      dynamic_object_field::add<u64, Card> (&mut used_card_deck.id, number_of_cards, player_card);
+      vector::push_back<Option<ID>> (&mut used_card_deck.cards, option::some(player_card_id));
+      used_card_deck.entire_number_of_cards = used_card_deck.entire_number_of_cards + 1;
+      i = i + 1;
+    };
+    player_hand.total_card_numbers = 0;
+
+    let player_money = dynamic_object_field::remove<vector<u8>, Coin<SUI>> (&mut money_box.id, b"player_money");
+    money_box.player_bet = option::none();
+    let dealer_money = dynamic_object_field::remove<vector<u8>, Coin<SUI>> (&mut money_box.id, b"dealer_money");
+    money_box.dealer_bet = option::none();
+    let player_address = option::extract(&mut game_table.player_address);
+    let dealer_address = game_table.dealer_address;
+    if (game_table.winner == PLYAER_WIN) {
+      transfer::public_transfer(player_money, player_address);
+      transfer::public_transfer(dealer_money, player_address);
+    } else if (game_table.winner == DEALER_WIN) {
+      transfer::public_transfer(player_money, dealer_address);
+      transfer::public_transfer(dealer_money, dealer_address);
+    } else {
+      // DRAW
+      transfer::public_transfer(player_money, player_address);
+      transfer::public_transfer(dealer_money, dealer_address);
+    };
+    dealer_hand.total_card_numbers = 0;
+
+    transfer::transfer(player_hand, player_address);
+    game_table.player_address = option::none();
+    game_table.player_hand = option::none();
+
+    dynamic_object_field::add(&mut game_table.id, b"dealer_hand", dealer_hand);
+    dynamic_object_field::add(&mut game_table.id, b"used_card_deck", used_card_deck);
+    dynamic_object_field::add(&mut game_table.id, b"money_box", money_box);
+
+    game_table.winner = 0;
+    game_table.is_playing = GAME_NOT_READY;
   }
 
-
-// ------------------------------------------------------------------------------------------------------------
-
-  fun check_is_over_16() {
-    // check that total of card number is over 16
-  }
-
-  fun check_is_over_21() {
-    // check that total of card number is over 21
-  }
-
-  fun check_is_blackjack() {
-    // check that total of card number is equal to 21
-  }
-
-  // check whether this is necessary
-  // fun merge_sui_objects_in_moneybox() {}
-  
 }

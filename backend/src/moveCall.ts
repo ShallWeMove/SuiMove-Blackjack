@@ -149,7 +149,7 @@ export const endGame = async(signer: RawSigner, package_id:string, game_table_id
     });
     console.log(result.objectChanges);
     const data = {
-        flag: 'end game done',
+        flag: 'end game (stand) done',
     };
     ws.send(JSON.stringify(data))
 }

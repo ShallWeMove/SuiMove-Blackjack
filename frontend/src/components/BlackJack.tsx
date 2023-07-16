@@ -71,27 +71,28 @@ const BlackJack = ({
                     getGameTableObjectData(gameTableObjectId);
                     console.log("game start done!!!!!");
                     break;
+
                 case 'get card done':
                     getGameTableObjectData(gameTableObjectId);
                     console.log("get card done!!!!!");
                     break;
 
-                case 'end game done':
+                case 'end game (stand) done':
                     // handle Stop done
                     getGameTableObjectData(gameTableObjectId);
                     console.log("game end done!!!!!");
+                    break;
+
+                case 'settle up game done':
+                    // handle Stop done
+                    getGameTableObjectData(gameTableObjectId);
+                    console.log("settle up game done!!!!!");
                     break;
 
                 case 'fill card done':
                     // handle Stop done
                     getGameTableObjectData(gameTableObjectId);
                     console.log("fill card done!!!!!");
-                    break;
-
-                case 'cancel ready game done':
-                    // handle Stop done
-                    getGameTableObjectData(gameTableObjectId);
-                    console.log("cancel ready game done!!!!!");
                     break;
 
                 default:
@@ -231,7 +232,7 @@ const BlackJack = ({
 
             playButtonSound();
             socket.send(JSON.stringify({ 
-                flag: 'End Game',
+                flag: 'End Game (Stand)',
                 packageObjectId: config.PACKAGE_OBJECT_ID,
                 gameTableObjectId: gameTableObjectId,
                 playerAddress: wallet.address 
