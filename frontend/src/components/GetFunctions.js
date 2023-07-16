@@ -66,12 +66,12 @@ export async function fetchGameTableObject(
     gametable_object_id, 
     setGameTableData, 
     setIsPlaying, 
+    setWinner,
     setCardDeckData, 
     setDealerHandData,
     setPlayerHandData,
     setGameTableConfirmed,
     setLoading,
-    setBettingAmount,
     ) {
 
     const gametable_response = await getObject(gametable_object_id);
@@ -79,6 +79,7 @@ export async function fetchGameTableObject(
     try {
         setGameTableData(gametable_response.data.result.data.content.fields);
         const is_playing = gametable_response.data.result.data.content.fields.is_playing;
+        const winner = gametable_response.data.result.data.content.fields.winner;
         
         const READY=1;
         if (is_playing >= READY) {
@@ -104,6 +105,7 @@ export async function fetchGameTableObject(
             setPlayerHandData({}); 
         }
         setIsPlaying(is_playing);
+        setWinner(winner);
         setGameTableConfirmed(true);
         setLoading(false);
     } catch(err) {

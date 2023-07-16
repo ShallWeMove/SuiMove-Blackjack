@@ -3,28 +3,7 @@ import { Typography, Box, TextField, Button } from "@mui/material";
 import { useWallet } from '@suiet/wallet-kit';
 import { JsonRpcProvider, Connection } from '@mysten/sui.js';
 
-const BettingAmount = ({ setBettingAmount, error, handleStartButtonClick, bettingAmount, balance, setBalance }) => {
-
-    const wallet = useWallet();
-
-    // Construct your connection:
-    const connection = new Connection({
-        fullnode: "https://sui-testnet.nodeinfra.com",
-    });
-    // connect to a custom RPC server
-    const provider = new JsonRpcProvider(connection);
-
-    async function getAllCoins() {
-        const allCoins = await provider.getAllCoins({
-            owner: wallet.account.address,
-        });
-
-        console.log("sdk: ", allCoins);
-        setBalance(allCoins.data[0].balance)
-    }
-
-    getAllCoins().catch(console.error);
-
+const BettingAmount = ({ setBettingAmount, error, setError, handleStartButtonClick, bettingAmount, balance, setBalance }) => {
 
     const handleChange = (e) => {
         setBettingAmount(e.target.value);
