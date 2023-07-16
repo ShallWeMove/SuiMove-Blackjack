@@ -113,12 +113,8 @@ export async function fetchGameTableObject(
             setPlayerHandData({}); 
         }
         setIsPlaying(is_playing);
-<<<<<<< HEAD
-        setConfirmed(true);
-=======
         setWinner(winner);
         setGameTableConfirmed(true);
->>>>>>> 371ef9e (refactor get balance from BetAmount.js to Game.js)
         setLoading(false);
     } catch(err) {
         console.log("error for getting game table information");

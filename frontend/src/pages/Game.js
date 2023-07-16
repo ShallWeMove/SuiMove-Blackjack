@@ -170,7 +170,8 @@ const Game = () => {
                                     gameTableObjectId={gameTableObjectId}
                                     isPlaying={isPlaying}
                                     setIsPlaying={setIsPlaying}
-                                    loading={loading}
+                                    bettingAmount={bettingAmount}
+                                    winner={winner}
                                     setLoading={setLoading}
                                 />
                                 :
