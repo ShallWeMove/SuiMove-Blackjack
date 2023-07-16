@@ -88,7 +88,6 @@ export async function fetchGameTableObject(
             const player_hand_id = gametable_response.data.result.data.content.fields.player_hand;
 
             const all_response = await getMultiObjects([card_deck_id, dealer_hand_id, player_hand_id])
-
             let card_deck = all_response.data.result[0].data.content.fields; 
             let dealer_hand = all_response.data.result[1].data.content.fields;
             let player_hand = all_response.data.result[2].data.content.fields;
@@ -101,6 +100,8 @@ export async function fetchGameTableObject(
             setCardDeckData(card_deck);
             setDealerHandData(dealer_hand);
             setPlayerHandData(player_hand);
+        } else if (is_playing < READY) {
+            setPlayerHandData({}); 
         }
         setIsPlaying(is_playing);
         setGameTableConfirmed(true);
