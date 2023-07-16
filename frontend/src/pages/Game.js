@@ -24,6 +24,7 @@ const Game = () => {
     const [bettingAmount, setBettingAmount] = useState("10000");
     const [error, setError] = useState(false);
     const [bettingConfirmed, setBettingConfirmed] = useState(false);
+    const [balance, setBalance] = useState(0);
 
     const [isPlaying, setIsPlaying] = useState(0);
     const [gameTableData, setGameTableData] = useState({});
@@ -45,9 +46,15 @@ const Game = () => {
 
     useEffect(() => {
         if (bettingAmount !== "") {
-            setError(isNaN(bettingAmount) || bettingAmount % 1 !== 0 || bettingAmount <= 0);
+            if (isNaN(bettingAmount) || bettingAmount <= 0) {
+                setError("Please input a valid number");
+            } else if (bettingAmount > balance / 1000000000) {
+                setError("Insufficient wallet balance");
+            } else {
+                setError(false);
+            }
         }
-    }, [bettingAmount]);
+    }, [bettingAmount, balance]);
 
     const handleStartButtonClick = () => {
         setBettingConfirmed(true);
@@ -133,6 +140,8 @@ const Game = () => {
                                     error={error}
                                     handleStartButtonClick={handleStartButtonClick}
                                     bettingAmount={bettingAmount}
+                                    balance={balance}
+                                    setBalance={setBalance}
                                 />
                         }
                     </Box>
@@ -150,4 +159,3 @@ const Game = () => {
 }
 
 export default Game;
-

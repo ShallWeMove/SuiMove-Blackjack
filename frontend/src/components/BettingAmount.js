@@ -1,27 +1,29 @@
 import React, { useState, useEffect } from 'react';
 import { Typography, Box, TextField, Button } from "@mui/material";
-// import { useWallet } from '@suiet/wallet-kit';
-// import { JsonRpcProvider } from '@mysten/sui.js';
+import { useWallet } from '@suiet/wallet-kit';
+import { JsonRpcProvider, Connection } from '@mysten/sui.js';
 
-const BettingAmount = ({ setBettingAmount, error, handleStartButtonClick, bettingAmount }) => {
+const BettingAmount = ({ setBettingAmount, error, handleStartButtonClick, bettingAmount, balance, setBalance }) => {
 
-    // const wallet = useWallet();
+    const wallet = useWallet();
 
-    // const provider = new JsonRpcProvider();
+    // Construct your connection:
+    const connection = new Connection({
+        fullnode: "https://sui-testnet.nodeinfra.com",
+    });
+    // connect to a custom RPC server
+    const provider = new JsonRpcProvider(connection);
 
-    // console.log("Wallet address: ", wallet.account.address)
-    // console.log('0x7bbc329dfd56ee727533887d82e414b5d61c6653a2684d32ff1739830521939f')
+    async function getAllCoins() {
+        const allCoins = await provider.getAllCoins({
+            owner: wallet.account.address,
+        });
 
-    // async function getAllCoins() {
-    //     const allCoins = await provider.getAllCoins({
-    //         owner: '0x7bbc329dfd56ee727533887d82e414b5d61c6653a2684d32ff1739830521939f',
-    //         // owner: wallet.account.address,
-    //     });
+        console.log("sdk: ", allCoins);
+        setBalance(allCoins.data[0].balance)
+    }
 
-    //     console.log("allCoins: ", allCoins);
-    // }
-
-    // getAllCoins().catch(console.error);
+    getAllCoins().catch(console.error);
 
 
     const handleChange = (e) => {
@@ -50,7 +52,7 @@ const BettingAmount = ({ setBettingAmount, error, handleStartButtonClick, bettin
                 id="betting-amount"
                 label="Please enter the betting amount."
                 error={error}
-                helperText={error ? "Please input a valid number" : ""}
+                helperText={error || ""}
                 value={bettingAmount}
                 onChange={handleChange}
                 InputProps={{
