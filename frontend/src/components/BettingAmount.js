@@ -1,9 +1,30 @@
 import React, { useState, useEffect } from 'react';
 import { Typography, Box, TextField, Button } from "@mui/material";
-// import { useWallet } from '@suiet/wallet-kit';
-// import { JsonRpcProvider } from '@mysten/sui.js';
+import { useWallet } from '@suiet/wallet-kit';
+import { JsonRpcProvider, Connection } from '@mysten/sui.js';
 
-const BettingAmount = ({ setBettingAmount, error, handleStartButtonClick, bettingAmount }) => {
+const BettingAmount = ({ setBettingAmount, error, handleStartButtonClick, bettingAmount, balance, setBalance }) => {
+
+    const wallet = useWallet();
+
+    // Construct your connection:
+    const connection = new Connection({
+        fullnode: "https://sui-testnet.nodeinfra.com",
+    });
+    // connect to a custom RPC server
+    const provider = new JsonRpcProvider(connection);
+
+    async function getAllCoins() {
+        const allCoins = await provider.getAllCoins({
+            owner: wallet.account.address,
+        });
+
+        console.log("sdk: ", allCoins);
+        setBalance(allCoins.data[0].balance)
+    }
+
+    getAllCoins().catch(console.error);
+
 
     const handleChange = (e) => {
         setBettingAmount(e.target.value);
@@ -29,9 +50,9 @@ const BettingAmount = ({ setBettingAmount, error, handleStartButtonClick, bettin
             </Typography>
             <TextField
                 id="betting-amount"
-                label="Please enter the betting amount in MIST. (1 SUI = 1000000000 MIST)"
+                label="Please enter the betting amount."
                 error={error}
-                helperText={error ? "Please input a valid number" : ""}
+                helperText={error || ""}
                 value={bettingAmount}
                 onChange={handleChange}
                 InputProps={{
