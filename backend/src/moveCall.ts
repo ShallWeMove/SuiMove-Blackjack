@@ -153,3 +153,23 @@ export const endGame = async(signer: RawSigner, package_id:string, game_table_id
     };
     ws.send(JSON.stringify(data))
 }
+
+export const settleUpGame = async(signer: RawSigner, package_id:string, game_table_id:string, ws: WebSocket) => {
+    const tx = new TransactionBlock()
+    tx.setGasBudget(30000000);
+    const module = "blackjack"
+    const function_name = "settle_up_game"
+    tx.moveCall({
+        target: `${package_id}::${module}::${function_name}`,
+        // arguments: [tx.object(game_table_id), tx.pure(1)],
+        arguments: [tx.object(game_table_id)],
+    });
+    const result = await signer.signAndExecuteTransactionBlock({
+        transactionBlock: tx,
+    });
+    console.log(result.objectChanges);
+    const data = {
+        flag: 'settle up game done',
+    };
+    ws.send(JSON.stringify(data))
+}
