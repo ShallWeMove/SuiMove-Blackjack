@@ -2,6 +2,7 @@ import React from 'react';
 import {Box, Typography} from "@mui/material";
 import card from "../images/cards/card.png";
 import Card from './Card';
+import config from "../config.json";
 
 
 const DealerCardsBox = ({
@@ -24,12 +25,10 @@ const DealerCardsBox = ({
         }}
         >
             {dealerHandData.cards.map((c, i) => (
-                i === 0 ? (
-                    null
-                ) : i === 1 ? (
-                    <Card key={i} index={i} open={true} />
+                 i === 0 ? (
+                    <Card key={i} index={i} open={true} type={config.CARD_TYPES[Math.floor(c.card_number / 13)]} num={config.CARD_NUMS[c.card_number % 13]} />
                 ) : (
-                    <Card key={i} index={i} />
+                    <Card key={i} index={i} type={config.CARD_TYPES[Math.floor(c.card_number / 13)]} num={config.CARD_NUMS[c.card_number % 13]} />
                 )
         ))}
         </Box> 

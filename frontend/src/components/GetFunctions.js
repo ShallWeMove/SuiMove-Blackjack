@@ -24,28 +24,42 @@ export async function getObject(object_id) {
     return response;
 }
 
-// game table id 전부 가져오기
-export async function getAllGames() {
+export async function getMultiObjects(object_id_array) {
     const response = await axios.post(config.TESTNET_ENDPOINT, {
         "jsonrpc": "2.0",
         "id": 1,
         "method": "sui_multiGetObjects",
         "params": [
-         config.GAME_TABLES,
-          {
-            "showType": true,
-            "showOwner": true,
-            "showPreviousTransaction": true,
-            "showDisplay": false,
-            "showContent": true,
-            "showBcs": false,
-            "showStorageRebate": true
-          }
+            object_id_array,
+            {
+                "showType": true,
+                "showOwner": true,
+                "showPreviousTransaction": false,
+                "showDisplay": false,
+                "showContent": true,
+                "showBcs": false,
+                "showStorageRebate": false
+            },
         ]
-      
     });
-    console.log("All Game Response: ", response);
+    // console.log("get multi objects: ",response);
     return response;
+}
+
+export async function pushCardsDataFrom(data) {
+    let card_id_array = [];
+    for (let i = 1; i < data.cards.length; i++) {
+        if (data.cards[i] != null) {
+            card_id_array.push(data.cards[i])
+        }
+    }
+    const response = await getMultiObjects(card_id_array);
+    let card_data_array = [];
+    for (let i = 0; i < response.data.result.length; i++) {
+        card_data_array.push(response.data.result[i].data.content.fields)
+    }
+
+    data.cards = card_data_array;
 }
 
 export async function fetchGameTableObject(
@@ -55,44 +69,62 @@ export async function fetchGameTableObject(
     setCardDeckData, 
     setDealerHandData,
     setPlayerHandData,
-    setConfirmed,
+    setGameTableConfirmed,
+    setLoading,
+    setBettingAmount,
     ) {
 
-    const response = await getObject(gametable_object_id);
+    const gametable_response = await getObject(gametable_object_id);
 
     try {
-        setGameTableData(response.data.result.data.content.fields);
-        const is_playing = response.data.result.data.content.fields.is_playing;
+        setGameTableData(gametable_response.data.result.data.content.fields);
+        const is_playing = gametable_response.data.result.data.content.fields.is_playing;
         
         const READY=1;
         if (is_playing >= READY) {
-            const card_deck_id = await response.data.result.data.content.fields.card_deck;
-            const dealer_hand_id = await response.data.result.data.content.fields.dealer_hand;
-            const player_hand_id = await response.data.result.data.content.fields.player_hand;
+            // console.log("This Game Table is ready or start ", is_playing);
+            const card_deck_id = gametable_response.data.result.data.content.fields.card_deck;
+            const dealer_hand_id = gametable_response.data.result.data.content.fields.dealer_hand;
+            const player_hand_id = gametable_response.data.result.data.content.fields.player_hand;
 
-            // setCardDeckObjectId(card_deck);
-            const card_deck_response = await getObject(card_deck_id);
-            console.log("card deck", card_deck_response)
-            setCardDeckData(card_deck_response.data.result.data.content.fields);
-            const dealer_hand_response = await getObject(dealer_hand_id);
-            console.log("dealer hand", dealer_hand_response)
-            setDealerHandData(dealer_hand_response.data.result.data.content.fields);
-            const player_hand_response = await getObject(player_hand_id);
-            console.log("player hand", player_hand_response)
-            setPlayerHandData(player_hand_response.data.result.data.content.fields);
+            const all_response = await getMultiObjects([card_deck_id, dealer_hand_id, player_hand_id])
+            let card_deck = all_response.data.result[0].data.content.fields; 
+            let dealer_hand = all_response.data.result[1].data.content.fields;
+            let player_hand = all_response.data.result[2].data.content.fields;
+            
+            // push card information to dealer, player hand from card object ids of dealer, player hand
+            await pushCardsDataFrom(dealer_hand)
+            await pushCardsDataFrom(player_hand)
+            
+            // set Card Deck, Dealer Hand, Player Hand
+            setCardDeckData(card_deck);
+            setDealerHandData(dealer_hand);
+            setPlayerHandData(player_hand);
+        } else if (is_playing < READY) {
+            setPlayerHandData({}); 
         }
         setIsPlaying(is_playing);
-        setConfirmed(true);
+        setGameTableConfirmed(true);
+        setLoading(false);
     } catch(err) {
         console.log("error for getting game table information");
-        setConfirmed(false);
+        setGameTableConfirmed(false);
+        setLoading(false);
     }
+}
+
+// game table id 전부 가져오기
+export async function getAllGames() {
+    const response = await getMultiObjects(config.GAME_TABLES);
+    console.log("All Game Response: ", response);
+    return response;
 }
 
 export async function fetchAllGameTables(
     setAllGameTables
 ) {
     const res = await getAllGames();
+    console.log("fetchAllGameTables")
     
     try {
         setAllGameTables(res.data.result);

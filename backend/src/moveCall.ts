@@ -58,17 +58,16 @@ const moveCall = async (target: `${string}::${string}::${string}`, signer: RawSi
     // return "Asf" 
 };
 
-
-export const startGame = async(signer: RawSigner, address: string, package_id:string, game_table_id: string,  ws: WebSocket) => {
+export const startGame = async(signer: RawSigner, player_address: string, betting_amount: string, package_id:string, game_table_id: string,  ws: WebSocket) => {
     const tx = new TransactionBlock()
-    const [coin] = tx.splitCoins(tx.gas, [tx.pure(10000)]);
+    const [coin] = tx.splitCoins(tx.gas, [tx.pure(parseInt(betting_amount))]);
     tx.setGasBudget(30000000);
     const module = "blackjack"
     const function_name = "start_game"
 
     tx.moveCall({
         target: `${package_id}::${module}::${function_name}`,
-        arguments: [tx.object(game_table_id), coin, tx.pure(address)],
+        arguments: [tx.object(game_table_id), coin, tx.pure(player_address)],
     });
     const result = await signer.signAndExecuteTransactionBlock({
         transactionBlock: tx,
@@ -81,14 +80,48 @@ export const startGame = async(signer: RawSigner, address: string, package_id:st
     ws.send(JSON.stringify(data))
 }
 
-export const goCard = async(signer: RawSigner, package_id:string, game_table_id:string, ws: WebSocket) => {
+export const fillCardDeck = async(signer: RawSigner, package_id:string, game_table_id: string,  ws: WebSocket) => {
+    const tx = new TransactionBlock()
+    tx.setGasBudget(500000000);
+    const module = "blackjack"
+    const function_name = "fill_10_cards_to_card_deck"
+
+    let shuffle_cards = ["38", "24", "13", "39", "46", "40", "29", "20", "3", "2"]; 
+    tx.moveCall({
+        target: `${package_id}::${module}::${function_name}`,
+        arguments: [
+            tx.object(game_table_id), 
+            tx.pure(parseInt(shuffle_cards[0])),
+            tx.pure(parseInt(shuffle_cards[1])),
+            tx.pure(parseInt(shuffle_cards[2])),
+            tx.pure(parseInt(shuffle_cards[3])),
+            tx.pure(parseInt(shuffle_cards[4])),
+            tx.pure(parseInt(shuffle_cards[5])),
+            tx.pure(parseInt(shuffle_cards[6])),
+            tx.pure(parseInt(shuffle_cards[7])),
+            tx.pure(parseInt(shuffle_cards[8])),
+            tx.pure(parseInt(shuffle_cards[9])),
+        ],
+    });
+    const result = await signer.signAndExecuteTransactionBlock({
+        transactionBlock: tx,
+    });
+    console.log(result.objectChanges);
+    const data = {
+        flag: 'fill card done',
+        digest: result.digest,
+    };
+    ws.send(JSON.stringify(data))
+}
+
+export const goCard = async(signer: RawSigner, package_id:string, game_table_id:string, player_address: string, ws: WebSocket) => {
     const tx = new TransactionBlock()
     tx.setGasBudget(30000000);
     const module = "blackjack"
-    const function_name = "go_card"
+    const function_name = "pass_card_to_player"
     tx.moveCall({
         target: `${package_id}::${module}::${function_name}`,
-        arguments: [tx.object(game_table_id), tx.pure(1)],
+        arguments: [tx.object(game_table_id), tx.pure(player_address)],
     });
     const result = await signer.signAndExecuteTransactionBlock({
         transactionBlock: tx,
@@ -96,7 +129,7 @@ export const goCard = async(signer: RawSigner, package_id:string, game_table_id:
     console.log(result.objectChanges);
     const data = {
         flag: 'get card done',
-        disgst: result.digest,
+        digest: result.digest,
     };
     ws.send(JSON.stringify(data))
 }

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useTheme } from "@mui/material";
+import { CircularProgress, useTheme } from "@mui/material";
 import { tokens } from "../theme";
 import { Box } from "@mui/material";
 import BlackJack from "../components/BlackJack.tsx";
@@ -8,14 +8,20 @@ import bg_landing from "../images/bg_landing.jpg";
 import { fetchGameTableObject, fetchAllGameTables } from "../components/GetFunctions"
 import { useWallet } from '@suiet/wallet-kit';
 import GameTableList from '../components/GameTableList';
+import bgSound from '../images/bg_sound.mp3';
+import buttonSound from "../images/button_sound.mp3";
+import useSound from 'use-sound';
 
 const Game = () => {
+    const [playButtonSound] = useSound(buttonSound);
+    const [playBgSound, { stop }] = useSound(bgSound, { volume: 1, loop: true });
+
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
 
     const [gameTableObjectId, setGameTableObjectId] = useState("");
     const [gameTableConfirmed, setGameTableConfirmed] = useState(false);
-    const [bettingAmount, setBettingAmount] = useState("");
+    const [bettingAmount, setBettingAmount] = useState("10000");
     const [error, setError] = useState(false);
     const [bettingConfirmed, setBettingConfirmed] = useState(false);
     const [balance, setBalance] = useState(0);
@@ -27,8 +33,10 @@ const Game = () => {
     const [playerHandData, setPlayerHandData] = useState({});
     const [allGameTables, setAllGameTables] = useState([]);
 
+    const [loading, setLoading] = useState(false);
+
     useEffect(() => {
-        console.log("confirmed: ", gameTableConfirmed);
+        console.log("gameTableConfirmed: ", gameTableConfirmed);
         console.log("Gametable Object Id: ", gameTableObjectId);
     }, [gameTableConfirmed, gameTableObjectId]);
 
@@ -48,20 +56,6 @@ const Game = () => {
         }
     }, [bettingAmount, balance]);
 
-    const handleStartButtonClick = () => {
-        setBettingConfirmed(true);
-    }
-
-    const handleGoToGameButtonClick = (id) => {
-        getGameTableObjectData(id);
-        // TODO: 
-    }
-
-    const resetGame = () => {
-        setGameTableObjectId("");
-        setGameTableConfirmed(false);
-    }
-
     async function getGameTableObjectData(gametable_object_id) {
         fetchGameTableObject(
             gametable_object_id,
@@ -70,8 +64,26 @@ const Game = () => {
             setCardDeckData,
             setDealerHandData,
             setPlayerHandData,
-            setGameTableConfirmed
+            setGameTableConfirmed,
+            setLoading,
+            setBettingAmount,
         )
+    }
+
+    const handlGameTableButtonClick = (objectId) => {
+        playButtonSound();
+        playBgSound();
+        getGameTableObjectData(objectId);
+        // TODO: 
+    }
+
+    const handleStartButtonClick = () => {
+        setBettingConfirmed(true);
+    }
+
+    const resetGame = () => {
+        setGameTableObjectId("");
+        setGameTableConfirmed(false);
     }
 
     return (
@@ -88,11 +100,27 @@ const Game = () => {
                 backgroundPosition: 'center',
             }}
         >
+             {loading && (
+                    <Box 
+                    sx={{
+                        position: 'fixed',
+                        top: '60%',
+                        left: '50%',
+                        width: '100px',
+                        height: '100px',
+                        transform: 'translate(-50%, -50%)',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                    }}>
+                        <CircularProgress color='secondary' />
+                    </Box>
+                )}
             {
                 gameTableConfirmed ?
                     <Box>
                         {
-                            bettingConfirmed ?
+                            bettingConfirmed || isPlaying >= 1 ?
                                 <BlackJack
                                     resetGame={resetGame}
                                     gameTableData={gameTableData}
@@ -103,6 +131,8 @@ const Game = () => {
                                     gameTableObjectId={gameTableObjectId}
                                     isPlaying={isPlaying}
                                     setIsPlaying={setIsPlaying}
+                                    bettingAmount={bettingAmount}
+                                    setLoading={setLoading}
                                 />
                                 :
                                 <BettingAmount
@@ -120,7 +150,8 @@ const Game = () => {
                         allGameTables={allGameTables}
                         gameTableObjectId={gameTableObjectId}
                         setGameTableObjectId={setGameTableObjectId}
-                        handleGoToGameButtonClick={handleGoToGameButtonClick}
+                        handlGameTableButtonClick={handlGameTableButtonClick}
+                        setLoading={setLoading}
                     />
             }
         </Box>

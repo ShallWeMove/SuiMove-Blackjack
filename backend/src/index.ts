@@ -1,6 +1,6 @@
 import WebSocket from 'ws';
 import dotenv from "dotenv";
-import { getProvider, getSigner, startGame, endGame, goCard } from './moveCall';
+import { getProvider, getSigner, startGame, endGame, goCard, fillCardDeck } from './moveCall';
 
 dotenv.config();
 
@@ -18,19 +18,25 @@ wss.on('connection', (ws: WebSocket) => {
         const package_id = data.packageObjectId;
         const game_table_id = data.gameTableObjectId;
         const player_address = data.playerAddress;
+        const betting_amount = data.bettingAmount;
         console.log("data: ",data)
         console.log("flag: ", flag)    
         if (flag == 'Start Game') {
-            startGame(dealer_signer, player_address, package_id, game_table_id, ws);
+            startGame(dealer_signer, player_address, betting_amount, package_id, game_table_id, ws);
         } 
 
         else if (flag == 'Go Card') {
-            goCard(dealer_signer, package_id, game_table_id, ws)
+            goCard(dealer_signer, package_id, game_table_id, player_address, ws)
         }
 
         else if (flag == 'Stop Game') {
             endGame(dealer_signer, package_id, game_table_id, ws)
         }
+
+        else if (flag == 'Fill Cards') {
+            fillCardDeck(dealer_signer, package_id, game_table_id, ws);
+        }
+
     });
 
     ws.on('close', () => {

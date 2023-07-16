@@ -1,11 +1,12 @@
 {
   "TESTNET_ENDPOINT": "https://sui-testnet.nodeinfra.com",
-  "PACKAGE_OBJECT_ID": "0xc7e14d7894e8a75a0fcf947850b7af8477f7cbf494d690dc584b7ef172cea502",
-  "GAME_INFO_OBJECT_ID" : "0x6816632588a547fbca2e6df158b7ef804767007c06458aa0191611b4cac076cb",
+  "PACKAGE_OBJECT_ID": "0x275075bd2a12097c551cc4e80e642640e5f1908ba6bb963ac7280660bded3df6",
+  "GAME_INFO_OBJECT_ID" : "0xa21b4711348a32ab8f926d40dfe6b7fc450711c0f7bace6764a67880d5c631bd",
   "GAME_TABLES": [
-    "0xd94d6f4558713d698d6b6bc8db96faa140d617c57cebda33a531bdd5949bc5ae",
-    "0x39d7b292069acf5fb68c9fa327067deffdfbb020ac137369e2f32c568f1e2d3d",
-    "0xa8fe1cda65d58cf096771833b3e0e5ad347a921082478275b4f826b5291a935e",
-    "0x11fb0d8499f3ceedf7ce5d156588abe62f4858822855af3ec03e81d6b7037e5b"
-  ]
+    "0x78f50cd54df93469537b69386e934f5df588d0174112a2a40fd82cb085c73ebe"
+  ],
+  "CARD_NUMS": ["king", "ace", "2", "3", "4", "5", "6", "7", "8", "9", "10", "jack", "queen"],
+  "REAL_NUMS": [10, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10],
+  "CARD_TYPES": ["heart", "spade", "diamond", "clover"],
+  "DEALER_ADDRESS": "0xdd235ff1e61e1d6f204eb567d1b4b5eca752dc2ce05d8bb23ccb82654f76c8ce"
 }
