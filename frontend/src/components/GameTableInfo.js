@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Typography, Box, TextField, Button } from "@mui/material";
+import React from 'react';
+import { Typography, Box} from "@mui/material";
 
 const GameTableInfo = ({
     gameTableData, 

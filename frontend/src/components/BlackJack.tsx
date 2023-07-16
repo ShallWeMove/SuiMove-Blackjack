@@ -12,14 +12,6 @@ import PlayerCardsBox from './PlayerCardsBox';
 import SideBar from './SideBar';
 import useSound from 'use-sound';
 
-
-type Card = {
-    id: string,
-    card_number: number,
-    sequence_number: number,
-    is_open: boolean,
-};
-
 // Create a WebSocket connection
 const socket = new WebSocket('ws://localhost:8080');
 
@@ -35,16 +27,14 @@ const BlackJack = ({
     loading,
     setLoading,
 }) => {
-    const [playerCards, setPlayerCards] = useState<Card[]>([]);
-    const [dealerCards, setDealerCards] = useState<Card[]>([]);
-    const [gameOver, setGameOver] = useState(false);
-    const [message, setMessage] = useState('');
-
     const [playerTotal, setPlayerTotal] = useState(0);
     const [dealerTotal, setDealerTotal] = useState(0);
 
     const wallet = useWallet();
 
+    const [playButtonSound] = useSound('/button_sound.mp3');
+
+    // ----------------------------------------------------------------------------------
     useEffect(() => {
         if (wallet.status === 'connected') {
             console.log('blackjack wallet status: ', wallet.status)
@@ -111,6 +101,7 @@ const BlackJack = ({
 
     }, []);
 
+    // ----------------------------------------------------------------------------------
     // now this function works!
     const readyGame = async() => {
         const tx = new TransactionBlock();
@@ -157,8 +148,11 @@ const BlackJack = ({
         console.log(await wallet.signAndExecuteTransactionBlock(stx))
     }
 
-    const [playBgMusic] = useSound('/bg_sound.mp3');
-    const [playButtonSound] = useSound('/button_sound.mp3');
+    // ----------------------------------------------------------------------------------
+    // Socket send flag
+    const handleGameReady = async () => {
+        if (isPlaying < 1) {
+            playButtonSound();
 
             setLoading(true);
             await readyGame();

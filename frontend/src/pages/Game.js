@@ -6,11 +6,13 @@ import BlackJack from "../components/BlackJack.tsx";
 import BettingAmount from "../components/BettingAmount";
 import bg_landing from "../images/bg_landing.jpg";
 import { fetchGameTableObject, fetchAllGameTables } from "../components/GetFunctions"
-import { useWallet } from '@suiet/wallet-kit';
 import GameTableList from '../components/GameTableList';
 import bgSound from '../images/bg_sound.mp3';
 import buttonSound from "../images/button_sound.mp3";
 import useSound from 'use-sound';
+
+import { useWallet } from '@suiet/wallet-kit';
+import { JsonRpcProvider, Connection } from '@mysten/sui.js';
 
 const Game = () => {
     const [playButtonSound] = useSound(buttonSound);
@@ -21,12 +23,13 @@ const Game = () => {
 
     const [gameTableObjectId, setGameTableObjectId] = useState("");
     const [gameTableConfirmed, setGameTableConfirmed] = useState(false);
-    const [bettingAmount, setBettingAmount] = useState("10000");
-    const [error, setError] = useState(false);
-    const [bettingConfirmed, setBettingConfirmed] = useState(false);
+    const [bettingAmount, setBettingAmount] = useState("0.0001");
     const [balance, setBalance] = useState(0);
+    const [bettingConfirmed, setBettingConfirmed] = useState(false);
+    const [error, setError] = useState(false);
 
     const [isPlaying, setIsPlaying] = useState(0);
+    const [winner, setWinner] = useState(0);
     const [gameTableData, setGameTableData] = useState({});
     const [cardDeckData, setCardDeckData] = useState({});
     const [dealerHandData, setDealerHandData] = useState({});
@@ -34,6 +37,7 @@ const Game = () => {
     const [allGameTables, setAllGameTables] = useState([]);
 
     const [loading, setLoading] = useState(false);
+    const wallet = useWallet();
 
     useEffect(() => {
         console.log("confirmed: ", gameTableConfirmed);
@@ -42,6 +46,24 @@ const Game = () => {
 
     useEffect(() => {
         fetchAllGameTables(setAllGameTables);
+
+        // Construct your connection:
+        const connection = new Connection({
+            fullnode: "https://sui-testnet.nodeinfra.com",
+        });
+        // connect to a custom RPC server
+        const provider = new JsonRpcProvider(connection);
+
+        async function getAllCoins() {
+            const allCoins = await provider.getAllCoins({
+                owner: wallet.account.address,
+            });
+
+            // console.log("sdk: ", allCoins);
+            setBalance(allCoins.data[0].balance)
+        }
+
+        getAllCoins().catch(console.error);
     }, []);
 
     useEffect(() => {
@@ -77,13 +99,30 @@ const Game = () => {
             gametable_object_id,
             setGameTableData,
             setIsPlaying,
+            setWinner,
             setCardDeckData,
             setDealerHandData,
             setPlayerHandData,
             setGameTableConfirmed,
             setLoading,
-            setBettingAmount,
         )
+    }
+
+    const handlGameTableButtonClick = (objectId) => {
+        playButtonSound();
+        playBgSound();
+        getGameTableObjectData(objectId);
+        // TODO: 
+    }
+
+    const handleStartButtonClick = () => {
+        
+        setBettingConfirmed(true);
+    }
+
+    const resetGame = () => {
+        setGameTableObjectId("");
+        setGameTableConfirmed(false);
     }
 
     return (
@@ -123,7 +162,7 @@ const Game = () => {
                             bettingConfirmed || isPlaying >= 1 ?
                                 <BlackJack
                                     resetGame={resetGame}
-                                    gameTableData={gameTableData}
+                                    // gameTableData={gameTableData}
                                     cardDeckData={cardDeckData}
                                     dealerHandData={dealerHandData}
                                     playerHandData={playerHandData}
@@ -138,6 +177,7 @@ const Game = () => {
                                 <BettingAmount
                                     setBettingAmount={setBettingAmount}
                                     error={error}
+                                    setError={setError}
                                     handleStartButtonClick={handleStartButtonClick}
                                     bettingAmount={bettingAmount}
                                     balance={balance}

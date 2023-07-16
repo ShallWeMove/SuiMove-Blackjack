@@ -1,7 +1,6 @@
 import { useWallet } from '@suiet/wallet-kit';
-import * as tweetnacl from 'tweetnacl';
-import { ConnectButton, ErrorCode } from "@suiet/wallet-kit";
-import { useEffect, useState } from 'react';
+import { ConnectButton} from "@suiet/wallet-kit";
+import { useEffect} from 'react';
 import "@suiet/wallet-kit/style.css";
 import "./suiet-wallet-kit-custom.css";
 import { useNavigate } from "react-router-dom";

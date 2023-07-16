@@ -74,19 +74,20 @@ export async function fetchGameTableObject(
     gametable_object_id, 
     setGameTableData, 
     setIsPlaying, 
+    setWinner,
     setCardDeckData, 
     setDealerHandData,
     setPlayerHandData,
     setConfirmed,
     setLoading,
-    setBettingAmount,
     ) {
 
     const response = await getObject(gametable_object_id);
 
     try {
-        setGameTableData(response.data.result.data.content.fields);
-        const is_playing = response.data.result.data.content.fields.is_playing;
+        setGameTableData(gametable_response.data.result.data.content.fields);
+        const is_playing = gametable_response.data.result.data.content.fields.is_playing;
+        const winner = gametable_response.data.result.data.content.fields.winner;
         
         const READY=1;
         if (is_playing >= READY) {
@@ -112,7 +113,12 @@ export async function fetchGameTableObject(
             setPlayerHandData({}); 
         }
         setIsPlaying(is_playing);
+<<<<<<< HEAD
         setConfirmed(true);
+=======
+        setWinner(winner);
+        setGameTableConfirmed(true);
+>>>>>>> 371ef9e (refactor get balance from BetAmount.js to Game.js)
         setLoading(false);
     } catch(err) {
         console.log("error for getting game table information");
