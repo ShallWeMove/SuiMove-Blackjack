@@ -155,6 +155,7 @@ const Game = () => {
                                     isPlaying={isPlaying}
                                     setIsPlaying={setIsPlaying}
                                     bettingAmount={bettingAmount}
+                                    winner={winner}
                                     setLoading={setLoading}
                                 />
                                 :

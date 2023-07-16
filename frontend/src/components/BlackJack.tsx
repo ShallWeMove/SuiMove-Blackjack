@@ -25,6 +25,7 @@ const BlackJack = ({
     gameTableObjectId, 
     isPlaying,
     bettingAmount,
+    winner,
     setLoading,
 }) => {
     const [playerTotal, setPlayerTotal] = useState(0);
@@ -158,7 +159,7 @@ const BlackJack = ({
     // ----------------------------------------------------------------------------------
     // Socket send flag
     const handleGameReady = async () => {
-        if (isPlaying < 1) {
+        if (isPlaying == 0) {
             playButtonSound();
 
             setLoading(true);
@@ -168,56 +169,66 @@ const BlackJack = ({
         }
     }
     const handleCancelGameReady = async () => {
-        playButtonSound();
+        if (isPlaying == 1) {
+            playButtonSound();
 
-        setLoading(true);
-        await cancelReadyGame();
-        await getGameTableObjectData(gameTableObjectId);
-        console.log('cancel game ready done!!!!!')
+            setLoading(true);
+            await cancelReadyGame();
+            await getGameTableObjectData(gameTableObjectId);
+            console.log('cancel game ready done!!!!!')
+        }
     }
 
     const handleGameStart = () => {
-        playButtonSound();
+        if (isPlaying == 1) {
+            playButtonSound();
 
-        setLoading(true);
-        socket.send(JSON.stringify({ 
-            flag: 'Start Game', 
-            packageObjectId: config.PACKAGE_OBJECT_ID,
-            gameTableObjectId: gameTableObjectId,
-            playerAddress: wallet.address,
-            bettingAmount: bettingAmount
-        }));
+            setLoading(true);
+            socket.send(JSON.stringify({ 
+                flag: 'Start Game', 
+                packageObjectId: config.PACKAGE_OBJECT_ID,
+                gameTableObjectId: gameTableObjectId,
+                playerAddress: wallet.address,
+                bettingAmount: bettingAmount
+            }));
+        }
     }
 
     const handleHit = async () => {
-        playButtonSound();
+        if (isPlaying == 2) {
+            playButtonSound();
 
-        setLoading(true);
-        socket.send(JSON.stringify({ 
-            flag: 'Go Card',
-            packageObjectId: config.PACKAGE_OBJECT_ID,
-            gameTableObjectId: gameTableObjectId,
-            playerAddress: wallet.address 
-    }));
+            setLoading(true);
+            socket.send(JSON.stringify({ 
+                flag: 'Go Card',
+                packageObjectId: config.PACKAGE_OBJECT_ID,
+                gameTableObjectId: gameTableObjectId,
+                playerAddress: wallet.address 
+            }));
+        }
     }
 
     const handleStand = () => {
-        setLoading(true);
+        if (isPlaying == 2) {
+            setLoading(true);
 
-        playButtonSound();
-        socket.send(JSON.stringify({ 
-            flag: 'End Game',
-            packageObjectId: config.PACKAGE_OBJECT_ID,
-            gameTableObjectId: gameTableObjectId,
-            playerAddress: wallet.address 
-        }));
+            playButtonSound();
+            socket.send(JSON.stringify({ 
+                flag: 'End Game',
+                packageObjectId: config.PACKAGE_OBJECT_ID,
+                gameTableObjectId: gameTableObjectId,
+                playerAddress: wallet.address 
+            }));
+        } 
     }
 
-    const handleEndGame = () => {
-        setLoading(true);
+    const handleSettleUpGame = () => {
+        if (isPlaying == 3) {
+            setLoading(true);
 
-        playButtonSound();
-        setLoading(false);
+            playButtonSound();
+            setLoading(false);
+        }
     }
 
     const handleFillCard = () => {
@@ -252,7 +263,8 @@ const BlackJack = ({
             <h2>Blackjack Game Table : {gameTableObjectId}</h2>
             <h2>Player : {playerHandData.account}</h2>
             <h2>Game Status : {isPlaying == 0 ? "Not Ready" : isPlaying == 1 ? "Ready" : isPlaying == 2 ? "Playing" : "End"}</h2>
-            {/* <h3>Bet Amount : {bettingAmount/1000000000} SUI</h3> */}
+            <h3>Bet Amount : {bettingAmount} SUI</h3>
+            {isPlaying == 3 && (winner == 1 ? <h2>Player Win! Congrats!</h2> : <h2>Dealer Win</h2>) }
 
             <Box sx={{
                 marginBottom: "20px",
@@ -342,13 +354,16 @@ const BlackJack = ({
                 bottom: '50px',
                 left: '20vw',
             }}>
-                {isPlaying < 1 ? <Button variant="contained" color='secondary' sx={{ width: '120px', fontWeight: '800' }} onClick={handleGameReady}>Game Ready</Button> 
-                : isPlaying == 1 ? <Button variant="contained" color='secondary' sx={{ width: '120px', fontWeight: '800' }} onClick={handleCancelGameReady}>Cancel Ready</Button> : <Box/>}
-                {isPlaying < 2 ? <Button variant="contained" color='secondary' sx={{ width: '120px', fontWeight: '800' }}onClick={handleGameStart}>Game Start</Button> : <Box/>}
+                {isPlaying == 0 ? <Button variant="contained" color='secondary' sx={{ width: '120px', fontWeight: '800' }} onClick={handleGameReady}>Game Ready</Button> : <Box/>}
+
+                {isPlaying == 1 ? <Button variant="contained" color='secondary' sx={{ width: '120px', fontWeight: '800' }} onClick={handleCancelGameReady}>Cancel Ready</Button> : <Box/>}
+                {isPlaying == 1 ? <Button variant="contained" color='secondary' sx={{ width: '120px', fontWeight: '800' }}onClick={handleGameStart}>Game Start</Button> : <Box/>}
                 
-                <Button variant="contained" color='secondary' sx={{ width: '120px', fontWeight: '800' }}onClick={handleHit}>Hit</Button>
-                <Button variant="contained" color='secondary' sx={{ width: '120px', fontWeight: '800' }}onClick={handleStand}>Stand</Button>
-                <Button variant="contained" color='secondary' sx={{ width: '120px', fontWeight: '800' }}onClick={handleEndGame}>End Game</Button>
+                {isPlaying == 2 ? <Button variant="contained" color='secondary' sx={{ width: '120px', fontWeight: '800' }}onClick={handleHit}>Hit</Button> : <Box/>}
+                {isPlaying == 2 ? <Button variant="contained" color='secondary' sx={{ width: '120px', fontWeight: '800' }}onClick={handleStand}>Stand</Button> : <Box/>}
+                
+                {isPlaying == 3 ?  <Button variant="contained" color='secondary' sx={{ width: '120px', fontWeight: '800' }}onClick={handleSettleUpGame}>End Game</Button> : <Box/>}
+               
 
                 {wallet.address === config.DEALER_ADDRESS ? <Button variant="contained" color='secondary' sx={{ width: '120px', fontWeight: '800' }}onClick={handleFillCard}>Fill Card</Button> : <Box/>}
                 
