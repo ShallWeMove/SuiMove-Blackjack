@@ -28,8 +28,12 @@ wss.on('connection', (ws: WebSocket) => {
             goCard(dealer_signer, package_id, game_table_id, player_address, ws)
         }
 
-        else if (flag == 'Stop Game') {
+        else if (flag == 'End Game') {
             endGame(dealer_signer, package_id, game_table_id, ws)
+        }
+
+        else if (flag == 'Settle Up Game') {
+            // endGame(dealer_signer, package_id, game_table_id, ws)
         }
 
         else if (flag == 'Fill Cards') {
