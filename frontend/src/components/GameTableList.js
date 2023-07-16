@@ -13,7 +13,7 @@ const GameTableList = ({
 }) => {
     const wallet = useWallet();
     const [gameTableOpens, setGameTableOpens] = useState([]);
-    const game_status = ["Available Game", "Ready", "Playing"]
+    const game_status = ["Available Game", "Ready", "Playing", "Game End"]
 
     useEffect(() => {
         setGameTableOpens(allGameTables.map((table) => false));
