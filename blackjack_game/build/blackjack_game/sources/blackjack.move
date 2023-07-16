@@ -59,7 +59,7 @@ module blackjack_game::blackjack {
     cards: vector<Option<ID>>,
     number_of_cards: u64,
     total_card_numbers: u64,
-    is_my_turn: bool,
+    // is_my_turn: bool,
     game_id: ID,
   }
 
@@ -112,12 +112,23 @@ module blackjack_game::blackjack {
   fun create_game(ctx: &mut TxContext) {
     let sender = tx_context::sender(ctx);
     let id = object::new(ctx);
-    transfer::freeze_object(
-      GameInfo {
+    let game = GameInfo {
       id,
       admin: sender,
-    }
+    };    
+    create_game_table(&game, ctx);
+
+    transfer::freeze_object(
+      game
     );
+  }
+
+  public entry fun create_game_tables(game: &GameInfo, number_of_gametable: u64, ctx: &mut TxContext) {
+    let i = 0;
+    while (i < number_of_gametable) {
+      create_game_table(game, ctx);
+      i = i + 1;
+    };
   }
 
   // can create game table for blackjack game with game info object
@@ -173,7 +184,7 @@ module blackjack_game::blackjack {
       cards: vector[option::none()],
       number_of_cards: 0,
       total_card_numbers: 0,
-      is_my_turn: false,
+      // is_my_turn: false,
       game_id: game_id,
     }
   }
@@ -339,23 +350,24 @@ module blackjack_game::blackjack {
     // check whether player address in the game table is equal to player address from parameter
     assert!(game_table.player_address == option::some(player_address), 403);
     // check whether dealer address in the game table is equal to executor
-    assert!(game_table.dealer_address == tx_context::sender(ctx), 403);
+    check_is_dealer(game_table, ctx);
+    // check if card deck is filled at least once
+    let card_deck = dynamic_object_field::borrow<vector<u8>, CardDeck> (&mut game_table.id, b"card_deck");
+    assert!(card_deck.how_many_fill_card > 0, 403);
+
     // pass dealer money to money box
     bet_dealer_money(game_table, money, ctx);
     // from now game in progress
     game_table.is_playing = GAME_IS_PLAYING;
 
-    // check if card deck is filled at least once
-    let card_deck = dynamic_object_field::borrow<vector<u8>, CardDeck> (&mut game_table.id, b"card_deck");
-    assert!(card_deck.how_many_fill_card > 0, 403);
-
+    // pass cards to player, dealer
     pass_card_to_player(game_table, player_address, ctx);
     pass_card_to_dealer(game_table, true, ctx);
     pass_card_to_player(game_table, player_address, ctx);
     pass_card_to_dealer(game_table, false, ctx);
 
-    let player_hand = dynamic_object_field::borrow_mut<vector<u8>, Hand> (&mut game_table.id, b"player_hand");
-    player_hand.is_my_turn = true;
+    // let player_hand = dynamic_object_field::borrow_mut<vector<u8>, Hand> (&mut game_table.id, b"player_hand");
+    // player_hand.is_my_turn = true;
   }
 
   fun bet_dealer_money(game_table: &mut GameTable, money: Coin<SUI>, ctx: &mut TxContext) {
@@ -376,7 +388,8 @@ module blackjack_game::blackjack {
     // check whether player address in the game table is equal to player address from parameter
     assert!(game_table.player_address == option::some(player_address), 403);
     // check whether dealer address in the game table is equal to executor
-    assert!(game_table.dealer_address == tx_context::sender(ctx), 403);
+    check_is_dealer(game_table, ctx);
+    // assert!(player_hand.is_my_turn == true, 403);
 
     let card_deck = dynamic_object_field::remove<vector<u8>, CardDeck> (&mut game_table.id, b"card_deck");
     let sequence_number = card_deck.current_sequence_number;
@@ -413,7 +426,7 @@ module blackjack_game::blackjack {
   fun pass_card_to_dealer(game_table: &mut GameTable, want_to_open: bool, ctx: &mut TxContext){
     assert!(game_table.is_playing == GAME_IS_PLAYING, 403);
     // check whether dealer address in the game table is equal to executor
-    assert!(game_table.dealer_address == tx_context::sender(ctx), 403);
+    check_is_dealer(game_table, ctx);
     let card_deck = dynamic_object_field::remove<vector<u8>, CardDeck> (&mut game_table.id, b"card_deck"); 
     let sequence_number = card_deck.current_sequence_number;
 
@@ -448,58 +461,78 @@ module blackjack_game::blackjack {
     dynamic_object_field::add(&mut game_table.id, b"card_deck", card_deck);
   }
 
-  public entry fun stop_card(game_table: &mut GameTable, ctx: &mut TxContext) {
-    // calculate player total card numbers
-    // decrypt dealer card 2
-    // loop : dealer get more card still total card numbers of dealer become more than 17, 
-    // check winner
-    // end game : transfer used cards to usedCardDeck, coin to winner account, 
-    // and transfer player hand to player account
+  public entry fun end_game(game_table: &mut GameTable, ctx: &mut TxContext) {
+    assert!(game_table.is_playing == GAME_IS_PLAYING, 403);
+    // check whether dealer address in the game table is equal to executor
+    check_is_dealer(game_table, ctx);
+    // calculate player total card numbers -> done
+
+    // open dealer's second card
+    let dealer_hand = dynamic_object_field::remove<vector<u8>, Hand> (&mut game_table.id, b"dealer_hand");
+    let dealer_card_sequence_number : u64 = 1;
+    let dealer_card : Card = dynamic_object_field::remove<u64, Card>(&mut dealer_hand.id, dealer_card_sequence_number);
+    let decrypted_card_number = decrypt_card_number(dealer_card.card_number, dealer_card.sequence_number);
+    dealer_card.card_number = decrypted_card_number;
+    dealer_card.is_open = true;
+    dynamic_object_field::add(&mut dealer_hand.id, dealer_card_sequence_number, dealer_card);
+
+    let card_real_value : u64 = decrypted_card_number % 13;
+    if (card_real_value > 10 || card_real_value == 0) {
+      card_real_value = 10;
+    };
+    dealer_hand.total_card_numbers = dealer_hand.total_card_numbers + card_real_value;
+
     
+    // loop : dealer get more card still total card numbers of dealer become more than 17, 
+    while (dealer_hand.total_card_numbers < 17) {
+      dynamic_object_field::add(&mut game_table.id, b"dealer_hand", dealer_hand);
+      pass_card_to_dealer(game_table, true, ctx);
+      dealer_hand = dynamic_object_field::remove<vector<u8>, Hand> (&mut game_table.id, b"dealer_hand");
+    };
+    dynamic_object_field::add(&mut game_table.id, b"dealer_hand", dealer_hand);
+    
+    // check winner
+    check_winner(game_table, ctx); 
+
+    game_table.is_playing = GAME_END;
   }
 
-  fun check_win_or_lose() {
+  fun check_winner(game_table: &mut GameTable, ctx: &mut TxContext) {
+    let dealer_hand = dynamic_object_field::remove<vector<u8>, Hand> (&mut game_table.id, b"dealer_hand");
+    let player_hand = dynamic_object_field::remove<vector<u8>, Hand> (&mut game_table.id, b"player_hand"); 
 
+    if (player_hand.total_card_numbers == 21 && dealer_hand.total_card_numbers == 21) {
+      // Draw
+      game_table.winner = DRAW;
+    } else if (player_hand.total_card_numbers <= 21 && dealer_hand.total_card_numbers > 21) {
+      // Player Win
+      game_table.winner = PLYAER_WIN;
+    } else if (player_hand.total_card_numbers > 21 && dealer_hand.total_card_numbers <= 21) {
+      // Dealer Win
+      game_table.winner = DEALER_WIN;
+    } else {
+      if (player_hand.total_card_numbers > dealer_hand.total_card_numbers) {
+        // Player Win
+        game_table.winner = PLYAER_WIN;
+      } else {
+        // Dealer Win
+        game_table.winner = DEALER_WIN;
+      };
+    };
+
+    dynamic_object_field::add(&mut game_table.id, b"dealer_hand", dealer_hand);
+    dynamic_object_field::add(&mut game_table.id, b"player_hand", player_hand);
   }
 
-  fun end_game() {
+  public entry fun settle_up_game(game_table: &mut GameTable, ctx: &mut TxContext) {
+    assert!(game_table.is_playing == GAME_IS_PLAYING, 403);
+    // check whether dealer address in the game table is equal to executor
+    check_is_dealer(game_table, ctx);
 
   }
-
-  public fun keep<T>(c: Coin<T>, ctx: &TxContext) {
-    transfer::public_transfer(c, tx_context::sender(ctx));
-  }
-
-  public entry fun split<T>( self: &mut Coin<T>, split_amount: u64, ctx: &mut TxContext ) {
-    keep(coin::split(self, split_amount, ctx), ctx);
-  }
-
-
-
-
-  
 
 
 // ------------------------------------------------------------------------------------------------------------
-
-  
-
-  fun change_sequence_number(sequence_number: u64, ctx: &mut TxContext) {
-
-  }
-
-  // fun encrypt_card_deck(card_deck: CardDeck, ctx: &mut TxContext) {
-
-  // }
-
-
-
-
-
-
-  
-
- 
 
   fun check_is_over_16() {
     // check that total of card number is over 16
@@ -515,79 +548,5 @@ module blackjack_game::blackjack {
 
   // check whether this is necessary
   // fun merge_sui_objects_in_moneybox() {}
-  
-
-  
-
-  // dealer action from BE
-
-  // public entry fun end_game() {
-  //   // remove player_hand
-  // }
-
-  public entry fun get_card() {
-     // transfer
-  }
-  
-
-  // player action from FE
- 
-  public entry fun bet() {
-    // transfer sui object to money box
-  }
-
-  
-  public entry fun stop() {
-     //next turn
-  }
-
-  fun next_turn() {
-    
-  }
-
-  // dealer action from BE
-  // can execute this function only when game is ready
-  // public entry fun shuffle_card_deck(game_table: &mut GameTable, sequence_number_array: vector<u8>, ctx: &mut TxContext) {
-  //   check_is_dealer(game_table, ctx);
-  //   let card_deck = dynamic_object_field::borrow_mut<vector<u8>, CardDeck> (&mut game_table.id, b"card_deck");
-  //   assert!(card_deck.is_filled == true, 403);
-  //   vector::reverse<u8>(&mut sequence_number_array);
-
-  //   let i : u64 = 0;
-  //   while (i < card_deck.total_cards_number) {
-  //     // TODO : pop_back -> from back to front
-  //     // consider this part
-  //     let sequence_number = (vector::pop_back(&mut sequence_number_array) as u64);
-  //     let card = dynamic_object_field::borrow_mut<u64, Card> (&mut card_deck.id, i);
-  //     card.sequence_number = sequence_number;
-
-  //     i = i + 1;
-  //   }
- 
-  // }
-
-  // dealer action from BE
-  // public entry fun change_card_number(game_table: &mut GameTable, card: &mut Card, card_number_want_to_change: vector<u8>, ctx: &mut TxContext) {
-  //   check_is_dealer(game_table, ctx);
-  //   card.card_number = card_number_want_to_change;
-  // }
-
-  // player action from FE
-  // public entry fun create_player_hand(game: &GameInfo, ctx: &mut TxContext) {
-  //   let sender = tx_context::sender(ctx);
-  //   let game_id = object::id(game);
-
-  //   transfer::transfer(
-  //     Hand {
-  //       id : object::new(ctx),
-  //       account: sender,
-  //       cards: vector[option::none()],
-  //       total_cards_number: 0,
-  //       is_my_turn: false,
-  //       game_id: game_id,
-  //     },
-  //     sender
-  //   );
-  // }
   
 }

@@ -73,10 +73,10 @@ const BlackJack = ({
                     console.log("get card done!!!!!");
                     break;
 
-                case 'stop game done':
+                case 'end game done':
                     // handle Stop done
                     getGameTableObjectData(gameTableObjectId);
-                    console.log("game stop done!!!!!");
+                    console.log("game end done!!!!!");
                     break;
 
                 case 'fill card done':
@@ -217,7 +217,7 @@ const BlackJack = ({
 
         playButtonSound();
         socket.send(JSON.stringify({ 
-            flag: 'Stop Game',
+            flag: 'End Game',
             packageObjectId: config.PACKAGE_OBJECT_ID,
             gameTableObjectId: gameTableObjectId,
             playerAddress: wallet.address 
@@ -246,7 +246,7 @@ const BlackJack = ({
     }
 
     // --------------------------------------------------------------------
-    console.log("Player Hands: ", playerHandData.account);
+    console.log("Player Hands: ", playerHandData);
 
     return (
         <Box
@@ -262,7 +262,7 @@ const BlackJack = ({
         >
             <h2>Blackjack Game Table : {gameTableObjectId}</h2>
             <h2>Player : {playerHandData.account}</h2>
-            <h2>Game Status : {isPlaying == 0 ? "Not Ready" : isPlaying == 1? "Ready" : "Playing"}</h2>
+            <h2>Game Status : {isPlaying == 0 ? "Not Ready" : isPlaying == 1 ? "Ready" : isPlaying == 2 ? "Playing" : "End"}</h2>
             {/* <h3>Bet Amount : {bettingAmount/1000000000} SUI</h3> */}
 
             <Box sx={{
