@@ -127,7 +127,8 @@ const BlackJack = ({
     // now this function works!
     const readyGame = async() => {
         const tx = new TransactionBlock();
-        const [coin] = tx.splitCoins(tx.gas, [tx.pure(parseInt(bettingAmount))]);
+        const bettingAmount_mist = Math.floor(parseFloat(bettingAmount) * 1000000000)
+        const [coin] = tx.splitCoins(tx.gas, [tx.pure(bettingAmount_mist)]);
         tx.setGasBudget(30000000);
         const package_id = config.PACKAGE_OBJECT_ID;
         const module = "blackjack"
