@@ -110,9 +110,30 @@ const BlackJack = ({
                     break;
             }
 
-        };
-
-    }, []);
+    useEffect(() => {
+        let total = 0;
+        if (isPlaying >= 1) {
+            for(let i = 0; i < playerHandData.cards.length; i++) {
+                let num = parseInt(playerHandData.cards[i].card_number);
+                if(num < 10000) {
+                    num %= 13
+                    total += config.REAL_NUMS[num];
+                }
+            }
+            setPlayerTotal(total);
+    
+            total = 0;
+            for(let i = 0; i < dealerHandData.cards.length; i++) {
+                let num = parseInt(dealerHandData.cards[i].card_number)
+                if(num < 10000) {
+                    num %= 13;
+                    total += config.REAL_NUMS[num];   
+                }
+            }
+            setDealerTotal(total);
+        }
+        
+    }, [playerHandData, dealerHandData, isPlaying]);
 
     // ----------------------------------------------------------------------------------
     // now this function works!
@@ -185,29 +206,6 @@ const BlackJack = ({
     }
 
     const handleGameStart = () => {
-<<<<<<< HEAD
-        setLoading(true);
-
-        playButtonSound();
-        socket.send(JSON.stringify({ 
-            flag: 'Start Game', 
-            packageObjectId: config.PACKAGE_OBJECT_ID,
-            gameTableObjectId: gameTableObjectId,
-            playerAddress: wallet.address 
-        }));
-    }
-
-    const handleHit = async () => {
-        setLoading(true);
-
-        playButtonSound();
-        socket.send(JSON.stringify({ 
-            flag: 'Go Card',
-            packageObjectId: config.PACKAGE_OBJECT_ID,
-            gameTableObjectId: gameTableObjectId,
-            playerAddress: wallet.address 
-    }));
-=======
         if (isPlaying == 1) {
             playButtonSound();
 
@@ -234,7 +232,6 @@ const BlackJack = ({
                 playerAddress: wallet.address 
             }));
         }
->>>>>>> b4a748a (add winner and refactor some buttons)
     }
 
     const handleStand = () => {
@@ -300,7 +297,11 @@ const BlackJack = ({
           bettingAmount={bettingAmount}
           />
 
-                {isPlaying == 3 && (winner == 1 ? <h2>Player Win! Congrats!</h2> : <h2>Dealer Win</h2>) }
+                {isPlaying == 3 && (winner == 1 ? (
+                        <h2>Player Win! Congrats!</h2> 
+                ) : (
+                <h2>Dealer Win</h2>
+                )) }
 
             <GameTableScore 
             isPlaying={isPlaying}
