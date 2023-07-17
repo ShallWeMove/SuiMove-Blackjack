@@ -89,6 +89,7 @@ const Game = () => {
             setPlayerHandData,
             setGameTableConfirmed,
             setLoading,
+            setBettingAmount,
         )
     }
 
