@@ -60,7 +60,8 @@ const moveCall = async (target: `${string}::${string}::${string}`, signer: RawSi
 
 export const startGame = async(signer: RawSigner, player_address: string, betting_amount: string, package_id:string, game_table_id: string,  ws: WebSocket) => {
     const tx = new TransactionBlock()
-    const [coin] = tx.splitCoins(tx.gas, [tx.pure(10000)]);
+    const bettingAmount_mist = Math.floor(parseFloat(betting_amount) * 1000000000)
+    const [coin] = tx.splitCoins(tx.gas, [tx.pure(bettingAmount_mist)]);
     tx.setGasBudget(30000000);
     const module = "blackjack"
     const function_name = "start_game"
