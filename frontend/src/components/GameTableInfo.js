@@ -1,27 +1,93 @@
 import React from 'react';
-import { Typography, Box} from "@mui/material";
+import { Box, Chip} from "@mui/material";
 
 const GameTableInfo = ({
-    gameTableData, 
-    cardDeckData, 
-    dealerHandData, 
+    gameTableObjectId,
     playerHandData, 
+    isPlaying,
+    bettingAmount,
 }) => {
 
     return (
-        <Box>
-            <Typography>dealer hand : {gameTableData.dealer_hand} total card : {dealerHandData.total_cards_number}</Typography>
-            <Typography>dealer cards</Typography>
-            {dealerHandData.cards.map((card)=>(<Typography>{card}</Typography>))}
+        <Box sx={{
+            margin: '20px 0 50px 0',
+           }}>
+            <Box
+                sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    margin: "0",
+                }}>
+                    <h4 style={{ margin: '8px 5px 8px 0'}}>Blackjack Game Table : </h4>
+                    <Chip 
+                    sx={{
+                        color: 'warning',
+                        fontWeight: '800',
+                    }}
+                    label={gameTableObjectId} 
+                    color='warning'
+                    variant='outlined'
+                    size='small'
+                    />
+                </Box>
 
-            <Typography>player hand : {gameTableData.player_hand} total card : {playerHandData.total_cards_number}</Typography>
-            <Typography>player cards</Typography>
-            {playerHandData.cards.map((card)=>(<Typography>{card}</Typography>))}
+                <Box
+                sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    margin: "0",
+                }}>
+                    <h4 style={{ margin: '8px 5px 8px 0'}}>Player : </h4>
+                    <Chip 
+                    sx={{
+                        color: 'warning',
+                        fontWeight: '800',
+                    }}
+                    label={playerHandData.account} 
+                    color='warning'
+                    variant='outlined' 
+                    size='small'
+                    />
+                </Box>
 
-            <Typography>card deck : {gameTableData.card_deck} total card : {cardDeckData.total_cards_number}</Typography>
-            <Typography>card deck cards</Typography>
-            {cardDeckData.cards.map((card)=>(<Typography>{card}</Typography>))}
-        </Box>
+                <div
+                style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    margin: "0px",
+                }}>
+                    <h4 style={{ margin: '8px 5px 8px 0'}}>
+                        Game Status :   
+                    </h4>
+                    <Chip 
+                    sx={{
+                        color: 'info',
+                        fontWeight: '800',
+                    }}
+                    label={isPlaying == 0 ? "Not Ready" : isPlaying == 1 ? "Ready" : isPlaying == 2 ? "Playing" : "End"} 
+                    color={isPlaying == 0 ? "error" : isPlaying == 1 ? "info" : isPlaying == 2 ? "secondary" : "primary"}
+                    size='small'
+                    />
+                </div>
+
+                <Box
+                sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    margin: "0",
+                }}>
+                    <h4 style={{ margin: '8px 5px 8px 0'}}>Bet Amount : </h4>
+                    <Chip 
+                    sx={{
+                        color: 'secondary',
+                        fontWeight: '800',
+                    }}
+                    label={`${bettingAmount} SUI`} 
+                    color='secondary'
+                    size='small'
+                    />
+                </Box>
+            </Box>
     )
 }
 
