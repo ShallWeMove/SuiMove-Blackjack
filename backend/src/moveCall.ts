@@ -71,11 +71,21 @@ export const startGame = async(signer: RawSigner, player_address: string, bettin
     });
     const result = await signer.signAndExecuteTransactionBlock({
         transactionBlock: tx,
+        options: {
+            showEffects: true,
+            showEvents: true,
+            showObjectChanges: true,
+            showInput: true,
+        }
     });
     console.log(result.objectChanges);
     const data = {
         flag: 'start game done',
         digest: result.digest,
+        effects: result.effects,
+        events: result.events,
+        objectChanges: result.objectChanges,
+        transaction: result.transaction,
     };
     ws.send(JSON.stringify(data))
 }
@@ -105,11 +115,21 @@ export const fillCardDeck = async(signer: RawSigner, package_id:string, game_tab
     });
     const result = await signer.signAndExecuteTransactionBlock({
         transactionBlock: tx,
+        options: {
+            showEffects: true,
+            showEvents: true,
+            showObjectChanges: true,
+            showInput: true,
+        }
     });
     console.log(result.objectChanges);
     const data = {
         flag: 'fill card done',
         digest: result.digest,
+        effects: result.effects,
+        events: result.events,
+        objectChanges: result.objectChanges,
+        transaction: result.transaction,
     };
     ws.send(JSON.stringify(data))
 }
@@ -125,11 +145,21 @@ export const goCard = async(signer: RawSigner, package_id:string, game_table_id:
     });
     const result = await signer.signAndExecuteTransactionBlock({
         transactionBlock: tx,
+        options: {
+            showEffects: true,
+            showEvents: true,
+            showObjectChanges: true,
+            showInput: true,
+        }
     });
     console.log(result.objectChanges);
     const data = {
         flag: 'get card done',
         digest: result.digest,
+        effects: result.effects,
+        events: result.events,
+        objectChanges: result.objectChanges,
+        transaction: result.transaction,
     };
     ws.send(JSON.stringify(data))
 }
@@ -146,10 +176,21 @@ export const endGame = async(signer: RawSigner, package_id:string, game_table_id
     });
     const result = await signer.signAndExecuteTransactionBlock({
         transactionBlock: tx,
+        options: {
+            showEffects: true,
+            showEvents: true,
+            showObjectChanges: true,
+            showInput: true,
+        }
     });
     console.log(result.objectChanges);
     const data = {
         flag: 'end game (stand) done',
+        digest: result.digest,
+        effects: result.effects,
+        events: result.events,
+        objectChanges: result.objectChanges,
+        transaction: result.transaction,
     };
     ws.send(JSON.stringify(data))
 }
@@ -166,10 +207,21 @@ export const settleUpGame = async(signer: RawSigner, package_id:string, game_tab
     });
     const result = await signer.signAndExecuteTransactionBlock({
         transactionBlock: tx,
+        options: {
+            showEffects: true,
+            showEvents: true,
+            showObjectChanges: true,
+            showInput: true,
+        }
     });
     console.log(result.objectChanges);
     const data = {
         flag: 'settle up game done',
+        digest: result.digest,
+        effects: result.effects,
+        events: result.events,
+        objectChanges: result.objectChanges,
+        transaction: result.transaction,
     };
     ws.send(JSON.stringify(data))
 }
