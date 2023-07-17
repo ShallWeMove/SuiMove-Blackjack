@@ -1,6 +1,6 @@
 import WebSocket from 'ws';
 import dotenv from "dotenv";
-import { getProvider, getSigner, startGame, endGame, goCard, fillCardDeck, settleUpGame } from './moveCall';
+import { getProvider, getSigner, startGame, endGame, goCard, fillCardDeck, settleUpGame} from './moveCall';
 
 dotenv.config();
 
