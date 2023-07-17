@@ -172,6 +172,7 @@ const Game = () => {
                                     setIsPlaying={setIsPlaying}
                                     bettingAmount={bettingAmount}
                                     winner={winner}
+                                    loading={loading}
                                     setLoading={setLoading}
                                 />
                                 :
