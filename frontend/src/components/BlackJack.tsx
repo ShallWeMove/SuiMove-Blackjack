@@ -73,7 +73,7 @@ const BlackJack = ({
             toast(
                 data.flag
                 + "  TxID:" + data.digest,
-                { autoClose: 10000 } );
+                { autoClose: 2000 } );
             console.log("this is the data: ", data);
 
 
