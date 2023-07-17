@@ -128,7 +128,7 @@ const GameTableList = ({
                 anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
             >
                 <Alert onClose={() => setOpenSnackbar(false)} severity="warning" sx={{ width: '100%' }}>
-                    You can't play the game.
+                    The table is taken by an other player!
                 </Alert>
             </Snackbar>
         </Box>
