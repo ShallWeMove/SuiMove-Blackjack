@@ -93,15 +93,21 @@ const BlackJack = ({
         let total = 0;
         if (isPlaying >= 1) {
             for(let i = 0; i < playerHandData.cards.length; i++) {
-                const num = parseInt(playerHandData.cards[i].card_number) % 13;
-                if(num < 10000) total += config.REAL_NUMS[num];
+                let num = parseInt(playerHandData.cards[i].card_number);
+                if(num < 10000) {
+                    num %= 13
+                    total += config.REAL_NUMS[num];
+                }
             }
             setPlayerTotal(total);
     
             total = 0;
             for(let i = 0; i < dealerHandData.cards.length; i++) {
-                const num = parseInt(dealerHandData.cards[i].card_number) % 13;
-                if(num < 10000) total += config.REAL_NUMS[num];
+                let num = parseInt(dealerHandData.cards[i].card_number)
+                if(num < 10000) {
+                    num %= 13;
+                    total += config.REAL_NUMS[num];   
+                }
             }
             setDealerTotal(total);
         }
@@ -274,7 +280,11 @@ const BlackJack = ({
           bettingAmount={bettingAmount}
           />
 
-                {isPlaying == 3 && (winner == 1 ? <h2>Player Win! Congrats!</h2> : <h2>Dealer Win</h2>) }
+                {isPlaying == 3 && (winner == 1 ? (
+                        <h2>Player Win! Congrats!</h2> 
+                ) : (
+                <h2>Dealer Win</h2>
+                )) }
 
             <GameTableScore 
             isPlaying={isPlaying}
