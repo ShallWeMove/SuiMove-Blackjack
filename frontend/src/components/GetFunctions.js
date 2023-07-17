@@ -80,6 +80,7 @@ export async function fetchGameTableObject(
     setPlayerHandData,
     setConfirmed,
     setLoading,
+    setBettingAmount,
     ) {
 
     const response = await getObject(gametable_object_id);
@@ -92,14 +93,18 @@ export async function fetchGameTableObject(
         const READY=1;
         if (is_playing >= READY) {
             // console.log("This Game Table is ready or start ", is_playing);
-            const card_deck_id = await response.data.result.data.content.fields.card_deck;
-            const dealer_hand_id = await response.data.result.data.content.fields.dealer_hand;
-            const player_hand_id = await response.data.result.data.content.fields.player_hand;
+            const card_deck_id = gametable_response.data.result.data.content.fields.card_deck;
+            const dealer_hand_id = gametable_response.data.result.data.content.fields.dealer_hand;
+            const player_hand_id = gametable_response.data.result.data.content.fields.player_hand;
+            const money_box_id = gametable_response.data.result.data.content.fields.money_box;
 
-            const all_response = await getMultiObjects([card_deck_id, dealer_hand_id, player_hand_id])
+            const all_response = await getMultiObjects([card_deck_id, dealer_hand_id, player_hand_id, money_box_id])
             let card_deck = all_response.data.result[0].data.content.fields; 
             let dealer_hand = all_response.data.result[1].data.content.fields;
             let player_hand = all_response.data.result[2].data.content.fields;
+            let player_bet_id = all_response.data.result[3].data.content.fields.player_bet;
+            let player_bet = await getObject(player_bet_id);
+            let player_bet_amount = player_bet.data.result.data.content.fields.balance;
             
             // push card information to dealer, player hand from card object ids of dealer, player hand
             pushCardsDataFrom(dealer_hand)
@@ -109,6 +114,7 @@ export async function fetchGameTableObject(
             setCardDeckData(card_deck);
             setDealerHandData(dealer_hand);
             setPlayerHandData(player_hand);
+            setBettingAmount(player_bet_amount/1000000000);
         } else if (is_playing < READY) {
             setPlayerHandData({}); 
         }
