@@ -91,13 +91,35 @@ export const startGame = async(signer: RawSigner, player_address: string, bettin
     ws.send(JSON.stringify(data))
 }
 
+export const getRandomNumbers = () : string[] => {
+    const numbers = Array.from({ length: 52 }, (_, index) => (index + 1).toString());
+    const selectedNumbers: string[] = [];
+    
+    while (selectedNumbers.length < 10) {
+        const randomIndex = Math.floor(Math.random() * numbers.length);
+        const selectedNumber = numbers.splice(randomIndex, 1)[0];
+        selectedNumbers.push(selectedNumber);
+    }
+    
+    const shuffledNumbers: string[] = [];
+    
+    while (selectedNumbers.length > 0) {
+        const randomIndex = Math.floor(Math.random() * selectedNumbers.length);
+        const removedNumber = selectedNumbers.splice(randomIndex, 1)[0];
+        shuffledNumbers.push(removedNumber);
+    }
+    
+    // console.log("shuffle numbers:", shuffledNumbers);
+    return shuffledNumbers;
+}
+
 export const fillCardDeck = async(signer: RawSigner, package_id:string, game_table_id: string,  ws: WebSocket) => {
     const tx = new TransactionBlock()
     tx.setGasBudget(500000000);
     const module = "blackjack"
     const function_name = "fill_10_cards_to_card_deck"
 
-    let shuffle_cards = ["38", "24", "13", "39", "3", "1", "4", "3", "10", "2"]; 
+    let shuffle_cards = getRandomNumbers(); 
     tx.moveCall({
         target: `${package_id}::${module}::${function_name}`,
         arguments: [
