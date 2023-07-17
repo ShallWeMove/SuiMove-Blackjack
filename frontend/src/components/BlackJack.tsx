@@ -9,6 +9,8 @@ import { SuiSignAndExecuteTransactionBlockInput } from "@mysten/wallet-standard"
 import CardDeck from './CardDeck';
 import DealerCardsBox from './DealerCardsBox';
 import PlayerCardsBox from './PlayerCardsBox';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import SideBar from './SideBar';
 import useSound from 'use-sound';
 
@@ -65,6 +67,13 @@ const BlackJack = ({
     useEffect(() => {
         socket.onmessage = (event) => {
             const data = JSON.parse(event.data);
+
+            toast(
+                data.flag
+                + "  TxID:" + data.digest,
+                { autoClose: 10000 } );
+            console.log("this is the data: ", data);
+
 
             switch (data.flag) {
                 case 'start game done':
@@ -365,7 +374,12 @@ const BlackJack = ({
             {/* Player Cards Box */}
             {isPlaying == 2 
             ?  <PlayerCardsBox playerHandData={playerHandData}/> : <Box/> }
-            {<SideBar/>}
+            
+            <ToastContainer 
+                position="bottom-right" 
+                newestOnTop
+                pauseOnFocusLoss={false}
+            />
 
             <Box
             sx={{
