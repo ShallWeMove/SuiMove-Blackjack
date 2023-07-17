@@ -313,11 +313,11 @@ const BlackJack = ({
             /> : <Box/>}
 
             {/* Dealer Cards Box */}
-            {isPlaying == 2 
+            {isPlaying >= 2 
             ?  <DealerCardsBox dealerHandData={dealerHandData}/> : <Box/> }
 
             {/* Player Cards Box */}
-            {isPlaying == 2 
+            {isPlaying >= 2 
             ?  <PlayerCardsBox playerHandData={playerHandData}/> : <Box/> }
             
             <ToastContainer 
