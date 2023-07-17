@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Button, CircularProgress, Input, Typography } from '@mui/material';
+import { Box, Button, Chip, CircularProgress, Input, Typography } from '@mui/material';
 import BackgroundImage from "../images/background.jpg";
 import config from "../config.json";
 import { useWallet } from '@suiet/wallet-kit';
@@ -11,6 +11,7 @@ import DealerCardsBox from './DealerCardsBox';
 import PlayerCardsBox from './PlayerCardsBox';
 import SideBar from './SideBar';
 import useSound from 'use-sound';
+import GameTableScore from './GameTableScore';
 
 // Create a WebSocket connection
 const socket = new WebSocket('ws://localhost:8080');
@@ -26,6 +27,7 @@ const BlackJack = ({
     isPlaying,
     bettingAmount,
     winner,
+    loading,
     setLoading,
 }) => {
     const [playerTotal, setPlayerTotal] = useState(0);
@@ -196,7 +198,7 @@ const BlackJack = ({
     }
 
     const handleHit = async () => {
-        if (isPlaying == 2) {
+        if (!loading && isPlaying == 2) {
             playButtonSound();
 
             setLoading(true);
@@ -252,7 +254,6 @@ const BlackJack = ({
     }
 
     // --------------------------------------------------------------------
-    console.log("Player Hands: ", playerHandData);
 
     return (
         <Box
@@ -266,80 +267,30 @@ const BlackJack = ({
                 paddingX: '50px',
             }}
         >
-            <h2>Blackjack Game Table : {gameTableObjectId}</h2>
-            <h2>Player : {playerHandData.account}</h2>
-            <h2>Game Status : {isPlaying == 0 ? "Not Ready" : isPlaying == 1 ? "Ready" : isPlaying == 2 ? "Playing" : "End"}</h2>
-            <h3>Bet Amount : {bettingAmount} SUI</h3>
-            {isPlaying == 3 && (winner == 1 ? <h2>Player Win! Congrats!</h2> : <h2>Dealer Win</h2>) }
+          <GameTableInfo
+          gameTableObjectId={gameTableObjectId}
+          playerHandData={playerHandData}
+          isPlaying={isPlaying}
+          bettingAmount={bettingAmount}
+          />
 
-            <Box sx={{
-                marginBottom: "20px",
-            }}>
-                    <Box
-                    sx={{
-                        border: "1px solid white",
-                        display: "inline-block",
-                        paddingX: "10px",
-                        borderRadius: "20px",
-                    }}>
-                        <Box sx={{
-                            display: 'flex',
-                            alignItems: 'center',
-                        }}>
-                            <h3>Dealer's cards:</h3>
-                            <ul style={{
-                                display: 'flex',
-                            }}>
-                                {isPlaying == 2 &&
-                                dealerHandData.cards.map((card, i)=> {
-                                    if(card.card_number < 10000) {
-                                        return <Typography key={i} sx={{marginRight: "10px"}}>{config.CARD_NUMS[card.card_number % 13]}</Typography>     
-                                    }   else {
-                                        return (<Typography key={i} sx={{marginRight: "10px"}} >hidden</Typography>)
-                                    }        
-                                })}
-                            </ul>
-                        </Box>
-                    
-                        <h3>Total: {dealerTotal}</h3>
-                    </Box>
-            </Box>
+                {isPlaying == 3 && (winner == 1 ? <h2>Player Win! Congrats!</h2> : <h2>Dealer Win</h2>) }
 
-            <Box>
-                <Box 
-                sx={{
-                    border: "1px solid white",
-                    display: "inline-block",
-                    paddingX: "10px",
-                    borderRadius: "20px",
-                }}>
-                    <Box sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                    }}>
-                        <h3>Player's cards:</h3>
-                        <ul style={{
-                            display: 'flex',
-                        }}>
-                            {isPlaying == 2 && 
-                            playerHandData.cards.map((card, i) => {
-                                if(card.card_number < 10000) {
-                                    return <Typography key={i} sx={{marginRight: "10px"}}>{config.CARD_NUMS[card.card_number % 13]}</Typography>     
-                                }   else {
-                                    return <Typography key={i} sx={{marginRight: "10px"}}>hidden</Typography>
-                                }
-                            })}
-                        </ul>
-                    </Box>
-
-                    <h3>Total: {playerTotal}</h3>
-                </Box>
-            </Box>
-
+            <GameTableScore 
+            isPlaying={isPlaying}
+            dealerHandData={dealerHandData}
+            dealerTotal={dealerTotal}
+            playerHandData={playerHandData}
+            playerTotal={playerTotal}
+            />
 
             {/* Card Deck : handleHit 빼는 것 어떻습니까? by TW*/}
             {isPlaying >= 1 
-            ? <CardDeck cardDeckData={cardDeckData} handleHit={handleHit} /> : <Box/>}
+            ? <CardDeck 
+            cardDeckData={cardDeckData} 
+            handleHit={handleHit}
+            loading={loading}
+            /> : <Box/>}
 
             {/* Dealer Cards Box */}
             {isPlaying == 2 
@@ -353,25 +304,26 @@ const BlackJack = ({
             <Box
             sx={{
                 display: 'flex',
-                justifyContent: 'space-between',
+                justifyContent: 'center',
                 alignItems: 'center',
+                gap: "20px",
                 width: '60vw',
                 position: 'fixed',
                 bottom: '50px',
                 left: '20vw',
             }}>
-                {isPlaying == 0 ? <Button variant="contained" color='secondary' sx={{ width: '120px', fontWeight: '800' }} onClick={handleGameReady}>Game Ready</Button> : <Box/>}
+                {isPlaying == 0 && <Button variant="contained" color='secondary' sx={{ width: '120px', fontWeight: '800' }} onClick={handleGameReady}>Game Ready</Button>}
 
-                {isPlaying == 1 ? <Button variant="contained" color='secondary' sx={{ width: '120px', fontWeight: '800' }} onClick={handleCancelGameReady}>Cancel Ready</Button> : <Box/>}
-                {isPlaying == 1 ? <Button variant="contained" color='secondary' sx={{ width: '120px', fontWeight: '800' }}onClick={handleGameStart}>Game Start</Button> : <Box/>}
+                {isPlaying == 1 && <Button variant="contained" color='secondary' sx={{ width: '120px', fontWeight: '800' }} onClick={handleCancelGameReady}>Cancel Ready</Button>}
+                {isPlaying == 1 && <Button variant="contained" color='secondary' sx={{ width: '120px', fontWeight: '800' }} onClick={handleGameStart}>Game Start</Button>}
                 
-                {isPlaying == 2 ? <Button variant="contained" color='secondary' sx={{ width: '120px', fontWeight: '800' }}onClick={handleHit}>Hit</Button> : <Box/>}
-                {isPlaying == 2 ? <Button variant="contained" color='secondary' sx={{ width: '120px', fontWeight: '800' }}onClick={handleStand}>Stand</Button> : <Box/>}
+                {isPlaying == 2 && <Button variant="contained" color='secondary' sx={{ width: '120px', fontWeight: '800' }} onClick={handleHit}>Hit</Button>}
+                {isPlaying == 2 && <Button variant="contained" color='secondary' sx={{ width: '120px', fontWeight: '800' }} onClick={handleStand}>Stand</Button>}
                 
-                {isPlaying == 3 ?  <Button variant="contained" color='secondary' sx={{ width: '120px', fontWeight: '800' }}onClick={handleSettleUpGame}>Settle Up Game</Button> : <Box/>}
+                {isPlaying == 3 &&  <Button variant="contained" color='secondary' sx={{ width: '120px', fontWeight: '800' }} onClick={handleSettleUpGame}>Settle Up Game</Button>}
                
 
-                {wallet.address === config.DEALER_ADDRESS ? <Button variant="contained" color='secondary' sx={{ width: '120px', fontWeight: '800' }}onClick={handleFillCard}>Fill Card</Button> : <Box/>}
+                {wallet.address === config.DEALER_ADDRESS ? <Button variant="contained" color='secondary' sx={{ width: '120px', fontWeight: '800' }} onClick={handleFillCard}>Fill Card</Button> : <Box/>}
                 
             </Box>
         </Box>

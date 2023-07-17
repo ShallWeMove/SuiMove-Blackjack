@@ -24,6 +24,7 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
+    "dev": "react-scripts start",
     "start": "HTTPS=true SSL_CRT_FILE=./fullchain1.pem SSL_KEY_FILE=./privkey1.pem react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",

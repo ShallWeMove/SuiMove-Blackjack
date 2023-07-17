@@ -2,17 +2,19 @@ import { Box } from "@mui/material";
 import card from "../images/cards/card.png";
 import { useState } from "react";
 
-const CandidateCard = ({ index=0, type="heart", num="2", handleHit }) => {
+const CandidateCard = ({ index=0, type="heart", num="2", handleHit, loading }) => {
     const [open, setOpen] = useState(false);
     const [hide, setHide] = useState(false);
 
     const handleOpen = () => {
-        handleHit();
-        setOpen(true);
+        if(!loading) {
+            handleHit();
+            setOpen(true);
 
-        setTimeout(() => {
-            setHide(true);
-        }, 1500);
+            setTimeout(() => {
+                setHide(true);
+            }, 1500);
+        }
     }
 
     return (
