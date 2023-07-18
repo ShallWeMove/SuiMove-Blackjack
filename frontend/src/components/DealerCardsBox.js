@@ -10,7 +10,7 @@ const DealerCardsBox = ({
     isPlaying,
 }) => {
 
-    console.log(dealerHandData.cards);
+    // console.log(dealerHandData.cards);
     return (
         <Box
         sx={{

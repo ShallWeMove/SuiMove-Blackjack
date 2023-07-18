@@ -71,7 +71,7 @@ export async function pushCardsDataFrom(data) {
 }
 
 export async function fetchGameTableObject(
-    gametable_object_id, 
+    gameTableObjectId, 
     setGameTableData, 
     setIsPlaying, 
     setWinner,
@@ -83,7 +83,7 @@ export async function fetchGameTableObject(
     setBettingAmount,
     ) {
 
-    const response = await getObject(gametable_object_id);
+    const gametable_response = await getObject(gameTableObjectId);
 
     try {
         setGameTableData(gametable_response.data.result.data.content.fields);
