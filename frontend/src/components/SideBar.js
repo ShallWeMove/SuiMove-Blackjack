@@ -6,7 +6,8 @@ export default function SideBar() {
   const [socket, setSocket] = useState(null);
 
   useEffect(() => {
-    const ws = new WebSocket('ws://localhost:8080');
+    // const ws = new WebSocket('ws://localhost:8080');
+    const ws = new WebSocket('wss://shallwemove.xyz:8080');
 
 
     ws.onmessage = (event) => {
