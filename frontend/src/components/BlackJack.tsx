@@ -67,7 +67,7 @@ const BlackJack = ({
 
     // Handle incoming WebSocket messages
     useEffect(() => {
-        socket.onmessage = (event) => {
+        socket.onmessage = async (event) => {
             const data = JSON.parse(event.data);
 
             toast(
@@ -79,30 +79,30 @@ const BlackJack = ({
 
             switch (data.flag) {
                 case 'start game done':
-                    getGameTableObjectData(gameTableObjectId);
+                    await getGameTableObjectData(gameTableObjectId);
                     console.log("game start done!!!!!");
                     break;
 
                 case 'get card done':
-                    getGameTableObjectData(gameTableObjectId);
+                    await getGameTableObjectData(gameTableObjectId);
                     console.log("get card done!!!!!");
                     break;
 
                 case 'end game (stand) done':
                     // handle Stop done
-                    getGameTableObjectData(gameTableObjectId);
+                    await getGameTableObjectData(gameTableObjectId);
                     console.log("game end done!!!!!");
                     break;
 
                 case 'settle up game done':
                     // handle Stop done
-                    getGameTableObjectData(gameTableObjectId);
+                    await getGameTableObjectData(gameTableObjectId);
                     console.log("settle up game done!!!!!");
                     break;
 
                 case 'fill card done':
                     // handle Stop done
-                    getGameTableObjectData(gameTableObjectId);
+                    await getGameTableObjectData(gameTableObjectId);
                     console.log("fill card done!!!!!");
                     break;
 
