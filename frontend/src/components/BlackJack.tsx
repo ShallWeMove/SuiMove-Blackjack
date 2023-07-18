@@ -157,7 +157,9 @@ const BlackJack = ({
         }
 
         try {
-            console.log(await wallet.signAndExecuteTransactionBlock(stx))
+            const result = await wallet.signAndExecuteTransactionBlock(stx);
+            console.log(result)
+            return result.confirmedLocalExecution
         } catch (err) {
             console.log(err)
         }
@@ -180,7 +182,13 @@ const BlackJack = ({
             chain: 'sui:testnet'
         }
 
-        console.log(await wallet.signAndExecuteTransactionBlock(stx))
+        try {
+            const result = await wallet.signAndExecuteTransactionBlock(stx);
+            console.log(result)
+            return result.confirmedLocalExecution
+        } catch (err) {
+            console.log(err)
+        }
     }
 
     // ----------------------------------------------------------------------------------
@@ -190,9 +198,14 @@ const BlackJack = ({
             playButtonSound();
 
             setLoading(true);
-            await readyGame();
+            const is_executed = await readyGame();
             await getGameTableObjectData(gameTableObjectId);
-            console.log('game ready done!!!!!')
+            if (is_executed) {
+                console.log('game ready done!!!!!')
+                toast("game ready done", { autoClose: 10000 });
+            } else {
+                toast("game ready is not executed", { autoClose: 10000 });
+            }
         }
     }
     const handleCancelGameReady = async () => {
@@ -200,9 +213,15 @@ const BlackJack = ({
             playButtonSound();
 
             setLoading(true);
-            await cancelReadyGame();
+            const is_executed = await cancelReadyGame();
             await getGameTableObjectData(gameTableObjectId);
-            console.log('cancel game ready done!!!!!')
+
+            if (is_executed) {
+                console.log('cancel game ready done!!!!!')
+                toast("cancel game ready done", { autoClose: 10000 });
+            } else {
+                toast("cancel game ready is not executed", { autoClose: 10000 });
+            }
         }
     }
 

@@ -47,8 +47,8 @@ const GameTableScore = ({
                                 </ul>
                             </Box>
                         
-                            <h3 style={{ margin: "0", color: dealerTotal > 21 ? "#f44336" : "#4CCEAC",}}>
-                                {dealerTotal > 21 ? `Total: ${dealerTotal} - LOSE! (over 21)` : `Total: ${dealerTotal}`}
+                            <h3 style={{ margin: "0", color: dealerTotal > 21 ? "#f44336" :"#4CCEAC",}}>
+                                {dealerTotal > 21 ? `Total: ${dealerTotal} - LOSE! (over 21)` : dealerTotal == 21? `Total: ${dealerTotal} - BlackJack!`: `Total: ${dealerTotal}`}
                             </h3>
                         </Box>
                 </Box>
@@ -85,7 +85,7 @@ const GameTableScore = ({
                         </Box>
 
                         <h3 style={{ margin: "0", color: playerTotal > 21 ? "#f44336" : "#4CCEAC",}}>
-                            {playerTotal > 21 ? `Total: ${playerTotal} - LOSE! (over 21)` : `Total: ${playerTotal}`}
+                            {playerTotal > 21 ? `Total: ${playerTotal} - LOSE! (over 21)` : playerTotal == 21 ? `Total: ${playerTotal} - BlackJack!` : `Total: ${playerTotal}`}
                         </h3>
                     </Box>
                 </Box>
