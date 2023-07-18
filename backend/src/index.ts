@@ -1,13 +1,19 @@
-import WebSocket from 'ws';
+import WebSocket, { Server as WebSocketServer } from 'ws';
 import dotenv from "dotenv";
+import fs from 'fs';
+import https from 'https';
 import { getProvider, getSigner, startGame, endGame, goCard, fillCardDeck, settleUpGame} from './moveCall';
 
 dotenv.config();
-
+const server = https.createServer({
+    cert: fs.readFileSync('/home/ptw/SuiMove-Blackjack/frontend/fullchain1.pem'), // 인증서 경로
+    key: fs.readFileSync('/home/ptw/SuiMove-Blackjack/frontend/privkey1.pem') // 개인키 경로
+});
+  
 const provider = getProvider(process.env.RPC_URL!);  
 const dealer_signer = getSigner(process.env.DEALER_PRIVATE_KEY!, provider);
 
-const wss = new WebSocket.Server({ port: 8080 });
+const wss = new WebSocketServer({ server });
 
 wss.on('connection', (ws: WebSocket) => {
     console.log('Client connected.');
@@ -46,3 +52,5 @@ wss.on('connection', (ws: WebSocket) => {
         console.log('Client disconnected.');
     });
 });
+
+server.listen(8080);
