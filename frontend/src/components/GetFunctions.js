@@ -48,7 +48,7 @@ export async function getMultiObjects(object_id_array) {
 
 export async function pushCardsDataFrom(data) {
     let card_id_array = [];
-    for (let i = 1; i < data.cards.length; i++) {
+    for (let i = 0; i < data.cards.length; i++) {
         if (data.cards[i] != null) {
             card_id_array.push(data.cards[i])
         }
