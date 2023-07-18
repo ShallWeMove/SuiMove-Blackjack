@@ -159,7 +159,6 @@ const BlackJack = ({
         try {
             const result = await wallet.signAndExecuteTransactionBlock(stx);
             console.log(result)
-            return result.confirmedLocalExecution
         } catch (err) {
             console.log(err)
         }
@@ -185,7 +184,6 @@ const BlackJack = ({
         try {
             const result = await wallet.signAndExecuteTransactionBlock(stx);
             console.log(result)
-            return result.confirmedLocalExecution
         } catch (err) {
             console.log(err)
         }
@@ -198,14 +196,9 @@ const BlackJack = ({
             playButtonSound();
 
             setLoading(true);
-            const is_executed = await readyGame();
+            await readyGame();
             await getGameTableObjectData(gameTableObjectId);
-            if (is_executed) {
-                console.log('game ready done!!!!!')
-                toast("game ready done", { autoClose: 10000 });
-            } else {
-                toast("game ready is not executed", { autoClose: 10000 });
-            }
+            console.log('game ready done!!!!!')
         }
     }
     const handleCancelGameReady = async () => {
@@ -213,15 +206,10 @@ const BlackJack = ({
             playButtonSound();
 
             setLoading(true);
-            const is_executed = await cancelReadyGame();
+            await cancelReadyGame();
             await getGameTableObjectData(gameTableObjectId);
 
-            if (is_executed) {
-                console.log('cancel game ready done!!!!!')
-                toast("cancel game ready done", { autoClose: 10000 });
-            } else {
-                toast("cancel game ready is not executed", { autoClose: 10000 });
-            }
+            console.log('cancel game ready done!!!!!')
         }
     }
 
