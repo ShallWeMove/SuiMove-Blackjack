@@ -1,3 +1,5 @@
 sui.log*
 
 .env
+
+*.pem
