@@ -347,7 +347,7 @@ const BlackJack = ({
             }}>
                 {isPlaying == 0 && <Button variant="contained" color='secondary' sx={{ width: '120px', fontWeight: '800' }} onClick={handleGameReady}>Game Ready</Button>}
 
-                {isPlaying == 1 && <Button variant="contained" color='secondary' sx={{ width: '120px', fontWeight: '800' }} onClick={handleCancelGameReady}>Cancel Ready</Button>}
+                {isPlaying == 1 && <Button variant="contained" color='warning' sx={{ width: '120px', fontWeight: '800' }} onClick={handleCancelGameReady}>Cancel Ready</Button>}
                 {isPlaying == 1 && <Button variant="contained" color='secondary' sx={{ width: '120px', fontWeight: '800' }} onClick={handleGameStart}>Game Start</Button>}
                 
                 {isPlaying == 2 && <Button variant="contained" color='secondary' sx={{ width: '120px', fontWeight: '800' }} onClick={handleHit}>Hit</Button>}
