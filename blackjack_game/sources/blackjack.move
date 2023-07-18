@@ -504,23 +504,27 @@ module blackjack_game::blackjack {
     if (player_hand.total_card_numbers == 21 && dealer_hand.total_card_numbers == 21) {
       // Draw
       game_table.winner = DRAW;
+    } else if (player_hand.total_card_numbers > 21 && dealer_hand.total_card_numbers > 21) {
+      // Draw
+      game_table.winner = DRAW;
+    } else if (player_hand.total_card_numbers == dealer_hand.total_card_numbers){
+      // Draw
+      game_table.winner = DRAW;
     } else if (player_hand.total_card_numbers <= 21 && dealer_hand.total_card_numbers > 21) {
       // Player Win
       game_table.winner = PLYAER_WIN;
     } else if (player_hand.total_card_numbers > 21 && dealer_hand.total_card_numbers <= 21) {
       // Dealer Win
       game_table.winner = DEALER_WIN;
+    } else if (player_hand.total_card_numbers > dealer_hand.total_card_numbers) {
+      // Player Win
+      game_table.winner = PLYAER_WIN;
+    } else if (player_hand.total_card_numbers < dealer_hand.total_card_numbers){
+      // Dealer Win
+      game_table.winner = DEALER_WIN;
     } else {
-      if (player_hand.total_card_numbers > dealer_hand.total_card_numbers) {
-        // Player Win
-        game_table.winner = PLYAER_WIN;
-      } else if (player_hand.total_card_numbers < dealer_hand.total_card_numbers){
-        // Dealer Win
-        game_table.winner = DEALER_WIN;
-      } else {
-        // Draw
-        game_table.winner = DRAW; 
-      };
+      // Draw
+      game_table.winner = DRAW; 
     };
 
     dynamic_object_field::add(&mut game_table.id, b"dealer_hand", dealer_hand);
