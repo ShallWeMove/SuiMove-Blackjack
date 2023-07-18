@@ -2,6 +2,8 @@
 import axios from 'axios';
 import config from "../config.json";
 
+const socket = new WebSocket('wss://shallwemove.xyz:8080');
+
 export async function getObject(object_id) {
     const response = await axios.post(config.TESTNET_ENDPOINT, {
         "jsonrpc": "2.0",
@@ -107,6 +109,16 @@ export async function fetchGameTableObject(
             setDealerHandData(dealer_hand);
             setPlayerHandData(player_hand);
             setBettingAmount(player_bet_amount/1000000000);
+
+            if (card_deck.current_number_of_cards < 15) {
+                socket.send(JSON.stringify({ 
+                    flag: 'Fill Cards',
+                    packageObjectId: config.PACKAGE_OBJECT_ID,
+                    gameTableObjectId: gameTableObjectId,
+                    playerAddress: player_hand.account
+                }));
+            }
+
         } else if (is_playing < READY) {
             setPlayerHandData({}); 
         }
