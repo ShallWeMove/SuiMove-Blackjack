@@ -7,8 +7,10 @@ import config from "../config.json";
 
 const DealerCardsBox = ({
     dealerHandData, 
+    isPlaying,
 }) => {
 
+    console.log(dealerHandData.cards);
     return (
         <Box
         sx={{
@@ -25,11 +27,11 @@ const DealerCardsBox = ({
         }}
         >
             {dealerHandData.cards.map((c, i) => (
-                 i === 0 ? (
-                    <Card key={i} index={i} open={true} type={config.CARD_TYPES[Math.floor(c.card_number / 13)]} num={config.CARD_NUMS[c.card_number % 13]} />
-                ) : (
-                    <Card key={i} index={i} type={config.CARD_TYPES[Math.floor(c.card_number / 13)]} num={config.CARD_NUMS[c.card_number % 13]} />
-                )
+                    c.card_number < 10000 ? (
+                        <Card key={i} index={i} open={true} type={config.CARD_TYPES[Math.floor(c.card_number / 13)]} num={config.CARD_NUMS[c.card_number % 13]} />
+                    ) : (
+                        <Card key={i} index={i} type={config.CARD_TYPES[Math.floor(c.card_number / 13)]} num={config.CARD_NUMS[c.card_number % 13]} />
+                    )
         ))}
         </Box> 
     )
