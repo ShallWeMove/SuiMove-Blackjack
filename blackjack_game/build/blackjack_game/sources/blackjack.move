@@ -514,9 +514,12 @@ module blackjack_game::blackjack {
       if (player_hand.total_card_numbers > dealer_hand.total_card_numbers) {
         // Player Win
         game_table.winner = PLYAER_WIN;
-      } else {
+      } else if (player_hand.total_card_numbers < dealer_hand.total_card_numbers){
         // Dealer Win
         game_table.winner = DEALER_WIN;
+      } else {
+        // Draw
+        game_table.winner = DRAW; 
       };
     };
 
