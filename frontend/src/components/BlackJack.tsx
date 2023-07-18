@@ -273,8 +273,6 @@ const BlackJack = ({
             gameTableObjectId: gameTableObjectId,
             playerAddress: wallet.address 
         }));
-
-        setLoading(false);
     }
 
     // --------------------------------------------------------------------
