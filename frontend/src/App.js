@@ -17,6 +17,7 @@ export default function App() {
         <CssBaseline />
         <Box sx={{ flexGrow: 1 }}>
           <WalletProvider chains={[{id:"sui:testnet", name: "Sui Testnet", rpcUrl: "https://sui-testnet.nodeinfra.com" }]}>
+          {/* <WalletProvider chains={[{id:"sui:testnet", name: "Sui Testnet", rpcUrl: "https://fullnode.testnet.sui.io" }]}> */}
             <Navbar />
             <Routes>
               <Route path="/" element={<Landing />} />

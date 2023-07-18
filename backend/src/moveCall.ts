@@ -70,6 +70,7 @@ export const startGame = async(signer: RawSigner, player_address: string, bettin
         target: `${package_id}::${module}::${function_name}`,
         arguments: [tx.object(game_table_id), coin, tx.pure(player_address)],
     });
+    console.log(tx)
     const result = await signer.signAndExecuteTransactionBlock({
         transactionBlock: tx,
         options: {
