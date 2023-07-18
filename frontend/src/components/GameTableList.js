@@ -25,7 +25,7 @@ const GameTableList = ({
         <Box
             sx={{
                 marginX: "auto",
-                width: "50%",
+                width: "74%",
             }}>
             <Typography
                 variant="h3"
@@ -38,7 +38,7 @@ const GameTableList = ({
             >Game Table List</Typography>
             <Grid container rowSpacing={3} columnSpacing={1}>
                 {allGameTables.map((table, i) => (
-                    <Grid key={i} item xs={4}>
+                    <Grid key={i} item xs={2}>
 
                         <Box
                             onClick={() => {
