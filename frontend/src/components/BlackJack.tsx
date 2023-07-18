@@ -16,8 +16,7 @@ import useSound from 'use-sound';
 import GameTableScore from './GameTableScore';
 
 // Create a WebSocket connection
-// const socket = new WebSocket('ws://localhost:8080');
-const socket = new WebSocket('wss://shallwemove.xyz:8080');
+const socket = new WebSocket('ws://localhost:8080');
 
 // const BlackJack: React.FC = () => {
 const BlackJack = ({
@@ -357,7 +356,7 @@ const BlackJack = ({
                 {isPlaying == 3 &&  <Button variant="contained" color='secondary' sx={{ width: '120px', fontWeight: '800' }} onClick={handleSettleUpGame}>Settle Up Game</Button>}
                
 
-                {wallet.address === config.DEALER_ADDRESS ? <Button variant="contained" color='secondary' sx={{ width: '120px', fontWeight: '800' }} onClick={handleFillCard}>Fill Card</Button> : <Box/>}
+                {config.DEALER_ADDRESSES.includes(wallet.address!) ? <Button variant="contained" color='secondary' sx={{ width: '120px', fontWeight: '800' }} onClick={handleFillCard}>Fill Card</Button> : <Box/>}
                 
             </Box>
         </Box>
