@@ -13,5 +13,9 @@
   "CARD_NUMS": ["king", "ace", "2", "3", "4", "5", "6", "7", "8", "9", "10", "jack", "queen"],
   "REAL_NUMS": [10, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10],
   "CARD_TYPES": ["heart", "spade", "diamond", "clover"],
-  "DEALER_ADDRESS": "0x3ce7f91f0312dfc57a944afdbbc0549e919ce00abe6d9913a71017453f04db41"
+  "DEALER_ADDRESSES": [
+    "0x3ce7f91f0312dfc57a944afdbbc0549e919ce00abe6d9913a71017453f04db41",
+    "0xa2fb876c75ffd1763ff768763e9cff2c289dd8eff2763d32e40a9b32e993d96a",
+    "0x4afcb4885346c65394537d38d6b3982c8c5dec04a60aa2cc98144ffddac2e21b"
+  ]
 }
