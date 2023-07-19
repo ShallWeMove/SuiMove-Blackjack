@@ -49,8 +49,12 @@ const GameTableList = ({
                                     handlGameTableButtonClick(table.data.objectId);
                                     setGameTableOpens(gameTableOpens.map((open, j) => i === j ? true : open));
                                 } else {
-                                    setOpenSnackbar(true);
+                                    // setOpenSnackbar(true);
                                     console.log("you can't play the game")
+                                    setLoading(true);
+                                    setGameTableObjectId(table.data.objectId);
+                                    handlGameTableButtonClick(table.data.objectId);
+                                    setGameTableOpens(gameTableOpens.map((open, j) => i === j ? true : open));
                                 }
                             }}
                             sx={{
