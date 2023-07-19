@@ -111,12 +111,12 @@ export async function fetchGameTableObject(
             setBettingAmount(player_bet_amount/1000000000);
 
             if (card_deck.current_number_of_cards < 15) {
-                // socket.send(JSON.stringify({ 
-                //     flag: 'Fill Cards',
-                //     packageObjectId: config.PACKAGE_OBJECT_ID,
-                //     gameTableObjectId: gameTableObjectId,
-                //     playerAddress: player_hand.account
-                // }));
+                socket.send(JSON.stringify({ 
+                    flag: 'Fill Cards',
+                    packageObjectId: config.PACKAGE_OBJECT_ID,
+                    gameTableObjectId: gameTableObjectId,
+                    playerAddress: player_hand.account
+                }));
             }
 
         } else if (is_playing < READY) {
