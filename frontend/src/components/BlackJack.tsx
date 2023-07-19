@@ -293,9 +293,9 @@ const BlackJack = ({
 
                 {isPlaying == 3 && (winner == 1 ? (
                         <h2>Player Win! Congrats!</h2> 
-                ) : (
+                ) : winner == 2 ?(
                 <h2>Dealer Win</h2>
-                )) }
+                ): <h2>Draw!</h2>) }
 
             <GameTableScore 
             isPlaying={isPlaying}
