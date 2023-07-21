@@ -96,6 +96,15 @@ export async function fetchGameTableObject(
             let card_deck = all_response.data.result[0].data.content.fields; 
             let dealer_hand = all_response.data.result[1].data.content.fields;
             let player_hand = all_response.data.result[2].data.content.fields;
+            if (card_deck.current_number_of_cards < 15) {
+                socket.send(JSON.stringify({ 
+                    flag: 'Fill Cards',
+                    packageObjectId: config.PACKAGE_OBJECT_ID,
+                    gameTableObjectId: gameTableObjectId,
+                    playerAddress: player_hand.account
+                }));
+                setTimeout(function(){}, 1000);
+            }
             let player_bet_id = all_response.data.result[3].data.content.fields.player_bet;
             let player_bet = await getObject(player_bet_id);
             let player_bet_amount = player_bet.data.result.data.content.fields.balance;
@@ -109,16 +118,6 @@ export async function fetchGameTableObject(
             setDealerHandData(dealer_hand);
             setPlayerHandData(player_hand);
             setBettingAmount(player_bet_amount/1000000000);
-
-            if (card_deck.current_number_of_cards < 15) {
-                socket.send(JSON.stringify({ 
-                    flag: 'Fill Cards',
-                    packageObjectId: config.PACKAGE_OBJECT_ID,
-                    gameTableObjectId: gameTableObjectId,
-                    playerAddress: player_hand.account
-                }));
-            }
-
         } else if (is_playing < READY) {
             setPlayerHandData({}); 
         }
