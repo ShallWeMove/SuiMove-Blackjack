@@ -338,18 +338,18 @@ const BlackJack = ({
                 bottom: '50px',
                 left: '20vw',
             }}>
-                {isPlaying == 0 && <Button variant="contained" color='secondary' sx={{ width: '120px', fontWeight: '800' }} onClick={handleGameReady}>Game Ready</Button>}
+                {isPlaying == 0 && loading == false && <Button variant="contained" color='secondary' sx={{ width: '120px', fontWeight: '800' }} onClick={handleGameReady}>Game Ready</Button>}
 
-                {isPlaying == 1 && <Button variant="contained" color='warning' sx={{ width: '120px', fontWeight: '800' }} onClick={handleCancelGameReady}>Cancel Ready</Button>}
-                {isPlaying == 1 && <Button variant="contained" color='secondary' sx={{ width: '120px', fontWeight: '800' }} onClick={handleGameStart}>Game Start</Button>}
+                {isPlaying == 1 && loading == false && <Button variant="contained" color='warning' sx={{ width: '120px', fontWeight: '800' }} onClick={handleCancelGameReady}>Cancel Ready</Button>}
+                {isPlaying == 1 && loading == false && <Button variant="contained" color='secondary' sx={{ width: '120px', fontWeight: '800' }} onClick={handleGameStart}>Game Start</Button>}
                 
-                {isPlaying == 2 && <Button variant="contained" color='secondary' sx={{ width: '120px', fontWeight: '800' }} onClick={handleHit}>Hit</Button>}
-                {isPlaying == 2 && <Button variant="contained" color='secondary' sx={{ width: '120px', fontWeight: '800' }} onClick={handleStand}>Stand</Button>}
+                {isPlaying == 2 && loading == false && <Button variant="contained" color='secondary' sx={{ width: '120px', fontWeight: '800' }} onClick={handleHit}>Hit</Button>}
+                {isPlaying == 2 && loading == false && <Button variant="contained" color='secondary' sx={{ width: '120px', fontWeight: '800' }} onClick={handleStand}>Stand</Button>}
                 
-                {isPlaying == 3 &&  <Button variant="contained" color='secondary' sx={{ width: '120px', fontWeight: '800' }} onClick={handleSettleUpGame}>Settle Up Game</Button>}
+                {isPlaying == 3 && loading == false && <Button variant="contained" color='secondary' sx={{ width: '120px', fontWeight: '800' }} onClick={handleSettleUpGame}>Settle Up Game</Button>}
                
 
-                {config.DEALER_ADDRESSES.includes(wallet.address!) ? <Button variant="contained" color='secondary' sx={{ width: '120px', fontWeight: '800' }} onClick={handleFillCard}>Fill Card</Button> : <Box/>}
+                {loading == false && config.DEALER_ADDRESSES.includes(wallet.address!) ? <Button variant="contained" color='secondary' sx={{ width: '120px', fontWeight: '800' }} onClick={handleFillCard}>Fill Card</Button> : <Box/>}
                 
             </Box>
         </Box>
