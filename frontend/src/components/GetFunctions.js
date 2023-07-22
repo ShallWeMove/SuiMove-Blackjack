@@ -111,7 +111,7 @@ export async function fetchGameTableObject(
                     gameTableObjectId: gameTableObjectId,
                     playerAddress: player_hand.account
                 }));
-                setTimeout(function(){}, 1000);
+                setTimeout(function(){}, 2500);
             }
             let player_bet_id = all_response.data.result[3].data.content.fields.player_bet;
             let player_bet = await getObject(player_bet_id);
