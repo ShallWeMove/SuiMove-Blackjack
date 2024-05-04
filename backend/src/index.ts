@@ -13,15 +13,15 @@ import {
 } from "./moveCall";
 
 dotenv.config();
-const server = https.createServer({
-  cert: fs.readFileSync("/home/ptw/SuiMove-Blackjack/frontend/fullchain1.pem"), // 인증서 경로
-  key: fs.readFileSync("/home/ptw/SuiMove-Blackjack/frontend/privkey1.pem"), // 개인키 경로
-});
+// const server = https.createServer({
+//   cert: fs.readFileSync("/home/ptw/SuiMove-Blackjack/frontend/fullchain1.pem"), // 인증서 경로
+//   key: fs.readFileSync("/home/ptw/SuiMove-Blackjack/frontend/privkey1.pem"), // 개인키 경로
+// });
 
 const provider = getProvider(process.env.RPC_URL!);
 const dealer_signer = getSigner(process.env.DEALER_PRIVATE_KEY!, provider);
 
-const wss = new WebSocketServer({ server });
+const wss = new WebSocketServer({ port: 8080 });
 
 wss.on("connection", (ws: WebSocket) => {
   console.log("Client connected.");
@@ -60,4 +60,4 @@ wss.on("connection", (ws: WebSocket) => {
   });
 });
 
-server.listen(8080);
+// server.listen(8080);

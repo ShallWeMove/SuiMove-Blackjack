@@ -1,23 +1,12 @@
-FROM node:latest as builder
+FROM node:alpine
 
 WORKDIR /app
 
-COPY frontend/package*.json ./
+COPY package*.json ./
 RUN npm install
 
-COPY frontend .
-RUN npm run build
+COPY . .
 
-FROM nginx:alpine
+EXPOSE 3000
 
-#COPY ../nginx.conf /etc/nginx/nginx.conf
-
-COPY --from=builder /app/build /usr/share/nginx/html
-
-#COPY ../localhost.crt /etc/nginx/ssl/localhost.crt
-#COPY ../localhost.key /etc/nginx/ssl/localhost.key
-
-EXPOSE 80
-EXPOSE 443
-
-CMD ["nginx", "-g", "daemon off;"]
+CMD ["npm", "start"]

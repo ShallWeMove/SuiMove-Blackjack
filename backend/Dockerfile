@@ -1,15 +1,12 @@
-FROM node:latest
+FROM node:alpine
 
 WORKDIR /app
 
-COPY backend/package*.json ./
+COPY package*.json ./
 RUN npm install
 
-ENV SSL_CERT_FILE ./localhost.crt
-ENV SSL_KEY_FILE ./localhost.key
+COPY . .
 
-COPY backend .
-
-EXPOSE 443
+EXPOSE 8080
 
 CMD ["npm", "start"]

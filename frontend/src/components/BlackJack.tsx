@@ -23,7 +23,7 @@ import useSound from "use-sound";
 import GameTableScore from "./GameTableScore";
 
 // Create a WebSocket connection
-const socket = new WebSocket("wss://shallwemove.xyz:8080");
+const socket = new WebSocket("ws://localhost/ws");
 
 // const BlackJack: React.FC = () => {
 const BlackJack = ({

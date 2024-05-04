@@ -1,7 +1,7 @@
 import axios from "axios";
 import config from "../config.json";
 
-const socket = new WebSocket("wss://shallwemove.xyz:8080");
+const socket = new WebSocket("ws://localhost/ws");
 
 export async function getObject(object_id) {
   const response = await axios.post(config.TESTNET_ENDPOINT, {
