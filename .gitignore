@@ -3,3 +3,13 @@ sui.log*
 .env
 
 *.pem
+*.crt
+*.key
+
+.idea/
+
+frontend/node_modules/
+frontend/build/
+
+backend/node_modules/
+backend/build

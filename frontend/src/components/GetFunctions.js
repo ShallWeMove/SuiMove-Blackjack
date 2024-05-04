@@ -47,13 +47,6 @@ export async function getMultiObjects(object_id_array) {
   return response;
 }
 
-// game table id 전부 가져오기
-export async function getAllGames() {
-    const response = await getMultiObjects(config.GAME_TABLES);
-    console.log("All Game Response: ", response);
-    return response;
-}
-
 
 export async function pushCardsDataFrom(data) {
   let card_id_array = [];
