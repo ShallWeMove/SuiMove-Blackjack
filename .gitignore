@@ -1,6 +1,7 @@
 sui.log*
 
 .env
+*.env
 
 *.pem
 *.crt

@@ -10,6 +10,15 @@ Enjoy <strong>Blackjack</strong> at ShallWeMove🔥!!
 [Player](#player-account-client) <br/>
 
 # Get Started
+
+## Local Development
+
+```bash
+make run
+```
+SSL Certificate files are required to run the server.
+`localhost.crt` and `localhost.key` will be automatically generated in the `nginx` directory.
+
 ## Connect Your Wallet
 ![play_1](https://github.com/ShallWeMove/SuiMove-Blackjack/assets/72509938/b432a14c-36ba-4883-9f28-092962f9a190)
 
